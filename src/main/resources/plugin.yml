@@ -1,0 +1,6 @@
+name: TesserTools
+version: '1.0-SNAPSHOT'
+main: de.bydora.tesserTools.TesserTools
+api-version: '1.21'
+authors: [ FGBxRamel, Blitu, Jupidui_ZVL ]
+description: A plugin which adds some tools for Tesserania.
