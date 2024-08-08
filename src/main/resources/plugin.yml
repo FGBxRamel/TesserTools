@@ -7,3 +7,9 @@ description: A plugin which adds some tools for Tesserania.
 contributors: [ Blitu, Jupidui_ZVL ]
 website: https://github.com/FGBxRamel/TesserTools
 prefix: Tesserania Tools
+
+commands:
+  tesbug:
+    description: Displays debug and testing output
+    usage: /tesbug
+    permission: tessertools.debug.output
