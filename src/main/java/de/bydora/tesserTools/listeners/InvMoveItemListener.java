@@ -28,14 +28,15 @@ public class InvMoveItemListener implements Listener {
         final Inventory srcinv = event.getSource();
         final Inventory destinv = event.getDestination();
         final Material blockMaterial = srcinv.getLocation().getBlock().getType();
+        if (srcinv.getSize() != 5 ||
+            blockMaterial != Material.HOPPER
+        ) {return;}
+
         final Hopper hopper = (Hopper) srcinv.getLocation().getBlock().getState();
         final PersistentDataContainer container = hopper.getPersistentDataContainer();
         final NamespacedKey key = new NamespacedKey(TesserTools.getPlugin(TesserTools.class),
                 "boost-level");
-        if (srcinv.getSize() != 5 ||
-            blockMaterial != Material.HOPPER ||
-            !container.has(key)
-        ) {return;}
+        if (!container.has(key)) {return;}
 
         final int boostLevel = container.get(key, PersistentDataType.INTEGER);
         if (boostLevel == 0) {return;}
