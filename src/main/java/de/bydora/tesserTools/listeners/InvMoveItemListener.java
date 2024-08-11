@@ -28,16 +28,17 @@ public class InvMoveItemListener implements Listener {
         final Inventory srcinv = event.getSource();
         final Inventory destinv = event.getDestination();
         final Material blockMaterial = srcinv.getLocation().getBlock().getType();
-        if (srcinv.getSize() != 5 || blockMaterial != Material.HOPPER) {return;}
-
         final Hopper hopper = (Hopper) srcinv.getLocation().getBlock().getState();
         final PersistentDataContainer container = hopper.getPersistentDataContainer();
         final NamespacedKey key = new NamespacedKey(TesserTools.getPlugin(TesserTools.class),
                 "boost-level");
-        final int boostLevel;
+        if (srcinv.getSize() != 5 ||
+            blockMaterial != Material.HOPPER ||
+            !container.has(key)
+        ) {return;}
 
-        if (container.has(key)) {boostLevel = container.get(key, PersistentDataType.INTEGER);}
-        else {boostLevel = 1;}
+        final int boostLevel = container.get(key, PersistentDataType.INTEGER);
+        if (boostLevel == 0) {return;}
 
         final ItemStack transferItems = event.getItem().clone();
         transferItems.setAmount(boostLevel - 1);
@@ -52,13 +53,5 @@ public class InvMoveItemListener implements Listener {
             },
                 0
         );
-    }
-
-    static int getTransferableItemsCount(Inventory inventory, ItemStack item) {
-        int amount = item.getAmount();
-        while (!inventory.containsAtLeast(item, 1) && amount > 1){
-            item.setAmount(--amount);
-        }
-        return amount;
     }
 }

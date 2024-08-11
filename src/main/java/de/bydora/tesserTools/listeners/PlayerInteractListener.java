@@ -30,7 +30,7 @@ public class PlayerInteractListener implements Listener {
                 "boost-level");
 
         if (!container.has(key)) {
-            container.set(key, PersistentDataType.INTEGER, 1);
+            container.set(key, PersistentDataType.INTEGER, 0);
         }
         final int boostLevel = container.get(key, PersistentDataType.INTEGER);
         if (event.getMaterial() == Material.NETHER_STAR) {
@@ -38,7 +38,18 @@ public class PlayerInteractListener implements Listener {
             event.getPlayer().sendMessage("Die Booststufe beträgt: " + Integer.toString(boostLevel));
         }
         else {
-            hopper.getPersistentDataContainer().set(key, PersistentDataType.INTEGER, boostLevel + 1);
+            final int newBoostLevel;
+            switch (boostLevel) {
+                case 0: newBoostLevel = 2; break;
+                case 2: newBoostLevel = 4; break;
+                case 4: newBoostLevel = 8; break;
+                case 8:
+                    event.getPlayer().sendMessage("Der Hopper hat bereits die maximale Stufe.");
+                    event.setCancelled(true);
+                    return;
+                default: newBoostLevel = boostLevel; break;
+            }
+            hopper.getPersistentDataContainer().set(key, PersistentDataType.INTEGER, newBoostLevel);
             hopper.update();
             event.getItem().setAmount(event.getItem().getAmount() - 1);
         }
