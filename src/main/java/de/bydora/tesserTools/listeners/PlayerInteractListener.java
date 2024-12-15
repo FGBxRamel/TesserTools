@@ -22,7 +22,7 @@ public class PlayerInteractListener implements Listener {
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK ||
             event.getClickedBlock().getType() != Material.HOPPER ||
             (event.getMaterial() != Material.FIRE_CHARGE &&
-                    event.getMaterial() != Material.NETHER_STAR)
+                    event.getMaterial() != Material.FLINT)
         ) {return;}
         final Hopper hopper = (Hopper) event.getClickedBlock().getState();
         final PersistentDataContainer container = hopper.getPersistentDataContainer();
@@ -33,7 +33,7 @@ public class PlayerInteractListener implements Listener {
             container.set(key, PersistentDataType.INTEGER, 0);
         }
         final int boostLevel = container.get(key, PersistentDataType.INTEGER);
-        if (event.getMaterial() == Material.NETHER_STAR) {
+        if (event.getMaterial() == Material.FLINT) {
 
             event.getPlayer().sendMessage("Die Booststufe beträgt: " + Integer.toString(boostLevel));
         }
