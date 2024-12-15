@@ -18,8 +18,8 @@ public class VeinMiner implements CustomEnchantment<BlockBreakEvent> {
 
     private final static String id = "tessertools:aderabbau";
     private final static String displayName = "Aderabbau";
-    private final static int maxLevel = 1;
-    private final static int startLevel = 3;
+    private final static int maxLevel = 3;
+    private final static int startLevel = 1;
     private final static Material[] enchantableItems = EquipmentGroups.PICKAXES;
 
     @Override

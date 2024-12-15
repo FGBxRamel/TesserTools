@@ -17,8 +17,8 @@ public class Unbreaking implements CustomEnchantment<PlayerItemDamageEvent> {
 
     private final static String id = "tessertools:haltbarkeit";
     private final static String displayName = "Haltbarkeit";
-    private final static int maxLevel = 4;
-    private final static int startLevel = 5;
+    private final static int maxLevel = 5;
+    private final static int startLevel = 4;
     private final static Material[] enchantableItems = EquipmentGroups.PICKAXES;
 
     @Override
