@@ -13,6 +13,7 @@ public enum EnchantmentSpaceKeys {
     //<editor-fold desc="Enchantments">
     ENCH_ABHOLZUNG(new NamespacedKey(TesserTools.getPlugin(TesserTools.class), "enchAbholzung")),
     ENCH_AREA_BREAK(new NamespacedKey(TesserTools.getPlugin(TesserTools.class), "enchAreaBreak")),
+    ENCH_VEIN_MINER(new NamespacedKey(TesserTools.getPlugin(TesserTools.class), "enchVeinMiner")),
 
     //</editor-fold>
     ;

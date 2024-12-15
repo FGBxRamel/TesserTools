@@ -4,6 +4,7 @@ import de.bydora.tesserTools.commands.CommandEnchant;
 import de.bydora.tesserTools.enchantment.enchantments.Abholzung;
 import de.bydora.tesserTools.enchantment.enchantments.AreaBreak;
 import de.bydora.tesserTools.enchantment.enchantments.CustomEnchantment;
+import de.bydora.tesserTools.enchantment.enchantments.VeinMiner;
 import de.bydora.tesserTools.enchantment.listeners.BlockPlaceListener;
 import de.bydora.tesserTools.enchantment.listeners.PlayerDropItemListener;
 import de.bydora.tesserTools.listeners.BlockDropItemListener;
@@ -60,7 +61,8 @@ public final class TesserTools extends JavaPlugin {
     private void registerEnchantments() {
         final CustomEnchantment[] enchantments = new CustomEnchantment[] {
                 new Abholzung(),
-                new AreaBreak()
+                new AreaBreak(),
+                new VeinMiner(),
         };
         for (CustomEnchantment enchantment : enchantments) {
             this.enchantmentIDs.add(enchantment.getID());
