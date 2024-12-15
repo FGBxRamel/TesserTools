@@ -17,6 +17,7 @@ public enum EnchantmentSpaceKeys {
     ENCH_VEIN_MINER(new NamespacedKey(TesserTools.getPlugin(TesserTools.class), "enchVeinMiner")),
     ENCH_UNBRKEAING(new NamespacedKey(TesserTools.getPlugin(TesserTools.class), "enchUnbreaking")),
     ENCH_HARVESTER(new NamespacedKey(TesserTools.getPlugin(TesserTools.class), "enchHarvester")),
+    ENCH_MAGNETIC(new NamespacedKey(TesserTools.getPlugin(TesserTools.class), "enchMagnetic")),
     //</editor-fold>
     ;
 
