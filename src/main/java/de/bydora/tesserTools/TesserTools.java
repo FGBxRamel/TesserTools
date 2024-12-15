@@ -1,7 +1,7 @@
 package de.bydora.tesserTools;
 
 import de.bydora.tesserTools.commands.CommandEnchant;
-import de.bydora.tesserTools.enchantment.enchantments.CustomEnchAbholzung;
+import de.bydora.tesserTools.enchantment.enchantments.Abholzung;
 import de.bydora.tesserTools.enchantment.enchantments.CustomEnchantment;
 import de.bydora.tesserTools.enchantment.listeners.BlockPlaceListener;
 import de.bydora.tesserTools.enchantment.listeners.PlayerDropItemListener;
@@ -52,7 +52,7 @@ public final class TesserTools extends JavaPlugin {
 
     private void registerEnchantments() {
         final CustomEnchantment[] enchantments = new CustomEnchantment[] {
-                new CustomEnchAbholzung()
+                new Abholzung()
         };
         for (CustomEnchantment enchantment : enchantments) {
             this.enchantmentIDs.add(enchantment.getID());

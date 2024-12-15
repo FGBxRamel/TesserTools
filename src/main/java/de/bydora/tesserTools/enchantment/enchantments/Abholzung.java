@@ -18,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 import java.util.List;
 
-public class CustomEnchAbholzung implements CustomEnchantment {
+public class Abholzung implements CustomEnchantment {
 
     private final static String id = "tessertools:abholzung";
     private final static String displayName = "Abholzung";
