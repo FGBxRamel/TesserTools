@@ -1,12 +1,21 @@
 package de.bydora.tesserTools.enchantment.enchantments;
 
 import org.bukkit.NamespacedKey;
+import org.bukkit.event.Event;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("unused")
-public interface CustomEnchantment extends Listener {
+public interface CustomEnchantment<T extends  Event> extends Listener {
+
+    /**
+     * The event that the enchantment should listen to
+     * @param event The event
+     */
+    @EventHandler
+    void enchantmentEvent(T event);
 
     /**
      * A method to get the ID of the enchantment.

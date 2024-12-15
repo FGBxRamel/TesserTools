@@ -18,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 import java.util.List;
 
-public class Abholzung implements CustomEnchantment {
+public class Abholzung implements CustomEnchantment<BlockBreakEvent> {
 
     private final static String id = "tessertools:abholzung";
     private final static String displayName = "Abholzung";
@@ -31,8 +31,9 @@ public class Abholzung implements CustomEnchantment {
             Material.SPRUCE_LOG, Material.CRIMSON_STEM, Material.WARPED_STEM
     };
 
+    @Override
     @EventHandler(ignoreCancelled = true)
-    public void onBlockBreak(BlockBreakEvent event) {
+    public void enchantmentEvent(BlockBreakEvent event) {
         Player player = event.getPlayer();
         final ItemStack item = player.getInventory().getItemInMainHand();
         final int level = getEnchantmentLevel(item);
