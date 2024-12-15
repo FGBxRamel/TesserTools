@@ -2,12 +2,14 @@ package de.bydora.tesserTools;
 
 import de.bydora.tesserTools.commands.CommandEnchant;
 import de.bydora.tesserTools.enchantment.enchantments.Abholzung;
+import de.bydora.tesserTools.enchantment.enchantments.AreaBreak;
 import de.bydora.tesserTools.enchantment.enchantments.CustomEnchantment;
 import de.bydora.tesserTools.enchantment.listeners.BlockPlaceListener;
 import de.bydora.tesserTools.enchantment.listeners.PlayerDropItemListener;
 import de.bydora.tesserTools.listeners.BlockDropItemListener;
 import de.bydora.tesserTools.listeners.InvMoveItemListener;
 import de.bydora.tesserTools.listeners.PlayerInteractListener;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -37,12 +39,17 @@ public final class TesserTools extends JavaPlugin {
     }
 
     private void registerListeners() {
-        pm.registerEvents(new InvMoveItemListener(), this);
-        pm.registerEvents(new PlayerInteractListener(), this);
-        pm.registerEvents(new BlockDropItemListener(), this);
-        pm.registerEvents(new BlockPlaceListener(), this);
-        pm.registerEvents(new PlayerDropItemListener(), this);
-        pm.registerEvents(new de.bydora.tesserTools.enchantment.listeners.PlayerInteractListener(), this);
+        Listener[] listeners = new Listener[] {
+                new InvMoveItemListener(),
+                new de.bydora.tesserTools.enchantment.listeners.PlayerInteractListener(),
+                new PlayerInteractListener(),
+                new BlockDropItemListener(),
+                new BlockPlaceListener(),
+                new PlayerDropItemListener()
+        };
+        for (Listener listener : listeners) {
+            pm.registerEvents(listener, this);
+        }
     }
 
     private void registerCommands() {
@@ -52,7 +59,8 @@ public final class TesserTools extends JavaPlugin {
 
     private void registerEnchantments() {
         final CustomEnchantment[] enchantments = new CustomEnchantment[] {
-                new Abholzung()
+                new Abholzung(),
+                new AreaBreak()
         };
         for (CustomEnchantment enchantment : enchantments) {
             this.enchantmentIDs.add(enchantment.getID());

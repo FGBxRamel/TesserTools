@@ -12,4 +12,22 @@ public record EquipmentGroups() {
             Material.NETHERITE_AXE
     };
 
+    public static final Material[] PICKAXES = new Material[] {
+            Material.DIAMOND_PICKAXE,
+            Material.GOLDEN_PICKAXE,
+            Material.IRON_PICKAXE,
+            Material.WOODEN_PICKAXE,
+            Material.STONE_PICKAXE,
+            Material.NETHERITE_PICKAXE
+    };
+
+    public static final Material[] SHOVELS = new Material[] {
+            Material.DIAMOND_SHOVEL,
+            Material.GOLDEN_SHOVEL,
+            Material.IRON_SHOVEL,
+            Material.WOODEN_SHOVEL,
+            Material.STONE_SHOVEL,
+            Material.NETHERITE_SHOVEL
+    };
+
 }

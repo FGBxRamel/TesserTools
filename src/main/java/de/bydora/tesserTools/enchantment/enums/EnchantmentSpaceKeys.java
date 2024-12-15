@@ -12,6 +12,7 @@ public enum EnchantmentSpaceKeys {
     //</editor-fold>
     //<editor-fold desc="Enchantments">
     ENCH_ABHOLZUNG(new NamespacedKey(TesserTools.getPlugin(TesserTools.class), "enchAbholzung")),
+    ENCH_AREA_BREAK(new NamespacedKey(TesserTools.getPlugin(TesserTools.class), "enchAreaBreak")),
 
     //</editor-fold>
     ;
