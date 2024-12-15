@@ -30,4 +30,13 @@ public record EquipmentGroups() {
             Material.NETHERITE_SHOVEL
     };
 
+    public static final Material[] HOES = new Material[] {
+            Material.DIAMOND_HOE,
+            Material.GOLDEN_HOE,
+            Material.IRON_HOE,
+            Material.WOODEN_HOE,
+            Material.STONE_HOE,
+            Material.NETHERITE_HOE
+    };
+
 }

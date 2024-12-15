@@ -22,7 +22,6 @@ public final class TesserTools extends JavaPlugin {
     private List<String> enchantmentIDs = new ArrayList<String>();
     private Map<String, CustomEnchantment> enchantmentMap = new HashMap<>();
 
-    @SuppressWarnings("DataFlowIssue")
     @Override
     public void onEnable() {
         this.registerCommands();
@@ -55,12 +54,13 @@ public final class TesserTools extends JavaPlugin {
         this.getCommand("enchant").setExecutor(new CommandEnchant());
     }
 
+    @SuppressWarnings("rawtypes")
     private void registerEnchantments() {
         final CustomEnchantment[] enchantments = new CustomEnchantment[] {
                 new Abholzung(),
                 new AreaBreak(),
                 new VeinMiner(),
-
+                new Harvester(),
         };
         for (CustomEnchantment enchantment : enchantments) {
             this.enchantmentIDs.add(enchantment.getID());
