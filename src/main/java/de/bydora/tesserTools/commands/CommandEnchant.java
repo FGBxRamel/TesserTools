@@ -53,7 +53,7 @@ public class CommandEnchant implements CommandExecutor, TabCompleter {
         }
 
         CustomEnchantment enchantment = ENCHANTMENT_MAP.get(enchantmentId);
-        if (!enchantment.enchantItem(item, level)) {
+        if (enchantment == null || !enchantment.enchantItem(item, level)) {
             player.sendMessage("Fehler beim verzaubern!");
             return false;
         }
@@ -80,9 +80,13 @@ public class CommandEnchant implements CommandExecutor, TabCompleter {
         // Für das zweite Argument (Level)
         if (args.length == 2) {
             // Gib Level-Vorschläge (1-5) zurück
-            String partial = args[1];
             List<String> levels = new ArrayList<>();
-            for (int i = 1; i <= 5; i++) {
+            String id = args[0];
+            CustomEnchantment enchantment = ENCHANTMENT_MAP.get(id);
+            if (enchantment == null) {return levels;}
+
+            String partial = args[1];
+            for (int i = enchantment.getStartLevel(); i <= enchantment.getMaxLevel(); i++) {
                 String level = String.valueOf(i);
                 if (level.startsWith(partial)) {
                     levels.add(level);
