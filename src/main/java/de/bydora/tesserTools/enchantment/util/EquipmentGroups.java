@@ -39,4 +39,13 @@ public record EquipmentGroups() {
             Material.NETHERITE_HOE
     };
 
+    public static final Material[] SWORDS = new Material[] {
+            Material.DIAMOND_SWORD,
+            Material.GOLDEN_SWORD,
+            Material.IRON_SWORD,
+            Material.WOODEN_SWORD,
+            Material.STONE_SWORD,
+            Material.NETHERITE_SWORD
+    };
+
 }

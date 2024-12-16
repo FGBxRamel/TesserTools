@@ -62,6 +62,7 @@ public final class TesserTools extends JavaPlugin {
                 new VeinMiner(),
                 new Harvester(),
                 new Magnetic(),
+                new FastAttack(),
         };
         for (CustomEnchantment enchantment : enchantments) {
             this.enchantmentIDs.add(enchantment.getID());
