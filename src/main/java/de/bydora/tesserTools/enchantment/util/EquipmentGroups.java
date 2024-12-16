@@ -48,4 +48,48 @@ public record EquipmentGroups() {
             Material.NETHERITE_SWORD
     };
 
+    public static final Material[] HELMETS = new Material[] {
+            Material.DIAMOND_HELMET,
+            Material.GOLDEN_HELMET,
+            Material.IRON_HELMET,
+            Material.NETHERITE_HELMET
+    };
+
+    public static final Material[] CHESTPLATES = new Material[] {
+            Material.DIAMOND_CHESTPLATE,
+            Material.GOLDEN_CHESTPLATE,
+            Material.IRON_CHESTPLATE,
+            Material.NETHERITE_CHESTPLATE
+    };
+
+    public static final Material[] LEGS = new Material[] {
+            Material.DIAMOND_LEGGINGS,
+            Material.GOLDEN_LEGGINGS,
+            Material.IRON_LEGGINGS,
+            Material.NETHERITE_LEGGINGS
+    };
+
+    public static final Material[] BOOTS = new Material[] {
+            Material.DIAMOND_BOOTS,
+            Material.GOLDEN_BOOTS,
+            Material.IRON_BOOTS,
+            Material.NETHERITE_BOOTS
+    };
+
+    public static final Material[] ARMOR =
+            MaterialArrayMerger.merge(
+                    MaterialArrayMerger.merge(HELMETS, CHESTPLATES),
+                    MaterialArrayMerger.merge(LEGS, BOOTS)
+            );
+
+    // This comes straight from hell, but it will do
+    public static final Material[] TOOLS =
+            MaterialArrayMerger.merge(
+                    MaterialArrayMerger.merge(
+                            SWORDS,
+                            MaterialArrayMerger.merge(HOES, SHOVELS)
+                    ),
+                    MaterialArrayMerger.merge(PICKAXES, AXES)
+            );
+
 }

@@ -20,6 +20,7 @@ public enum EnchantmentSpaceKeys {
     ENCH_MAGNETIC(new NamespacedKey(TesserTools.getPlugin(TesserTools.class), "enchMagnetic")),
     ENCH_FAST_ATTACK(new NamespacedKey(TesserTools.getPlugin(TesserTools.class), "enchFastAttack")),
     ENCH_LIFESTEAL(new NamespacedKey(TesserTools.getPlugin(TesserTools.class), "enchLifesteal")),
+    ENCH_PROTECTION(new NamespacedKey(TesserTools.getPlugin(TesserTools.class), "enchProtection")),
     //</editor-fold>
     ;
 
