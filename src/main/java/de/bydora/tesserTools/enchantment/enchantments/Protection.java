@@ -4,6 +4,7 @@ import de.bydora.tesserTools.enchantment.enums.EnchantmentSpaceKeys;
 import de.bydora.tesserTools.enchantment.util.EquipmentGroups;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -59,7 +60,8 @@ public class Protection implements CustomEnchantment<EntityDamageByEntityEvent> 
     @Override
     public int getEnchantmentLevel(@NotNull ItemStack itemStack) {
         PersistentDataContainer container = itemStack.getItemMeta().getPersistentDataContainer();
-        return container.getOrDefault(getSaveKey(), PersistentDataType.INTEGER, 0);
+        return container.getOrDefault(getSaveKey(), PersistentDataType.INTEGER,
+                itemStack.getEnchantmentLevel(Enchantment.PROTECTION));
     }
 
     @Override
@@ -69,6 +71,7 @@ public class Protection implements CustomEnchantment<EntityDamageByEntityEvent> 
         PersistentDataContainer container = itemMeta.getPersistentDataContainer();
         container.set(getSaveKey(), PersistentDataType.INTEGER, level);
         item.setItemMeta(itemMeta);
+        item.addUnsafeEnchantment(Enchantment.PROTECTION, level);
         return level == container.get(getSaveKey(), PersistentDataType.INTEGER);
     }
 }
