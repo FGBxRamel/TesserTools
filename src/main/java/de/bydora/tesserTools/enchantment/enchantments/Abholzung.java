@@ -84,8 +84,13 @@ public class Abholzung implements CustomEnchantment<BlockBreakEvent> {
 
     @Override
     public int getEnchantmentLevel(@NotNull ItemStack itemStack) {
-        PersistentDataContainer container = itemStack.getItemMeta().getPersistentDataContainer();
-        return container.getOrDefault(getSaveKey(), PersistentDataType.INTEGER, 0);
+        try {
+            PersistentDataContainer container = itemStack.getItemMeta().getPersistentDataContainer();
+            return container.getOrDefault(getSaveKey(), PersistentDataType.INTEGER, 0);
+        } catch (NullPointerException e) {
+            return 0;
+        }
+
     }
 
     @Override
