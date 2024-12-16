@@ -64,7 +64,6 @@ public final class TesserTools extends JavaPlugin {
                 new Magnetic(),
                 new FastAttack(),
                 new Lifesteal(),
-                new Protection(),
         };
         for (CustomEnchantment enchantment : enchantments) {
             this.enchantmentIDs.add(enchantment.getID());
