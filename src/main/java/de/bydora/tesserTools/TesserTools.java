@@ -65,6 +65,7 @@ public final class TesserTools extends JavaPlugin {
                 new FastAttack(),
                 new Lifesteal(),
                 new Protection(),
+                new SwiftSneak(),
         };
         for (CustomEnchantment enchantment : enchantments) {
             this.enchantmentIDs.add(enchantment.getID());
