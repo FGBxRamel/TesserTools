@@ -4,6 +4,7 @@ import de.bydora.tesserTools.enchantment.enums.EnchantmentSpaceKeys;
 import de.bydora.tesserTools.enchantment.util.EquipmentGroups;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -19,11 +20,11 @@ public class Unbreaking implements CustomEnchantment<PlayerItemDamageEvent> {
     private final static String displayName = "Haltbarkeit";
     private final static int maxLevel = 5;
     private final static int startLevel = 4;
-    private final static Material[] enchantableItems = EquipmentGroups.PICKAXES;
+    private final static Material[] enchantableItems = EquipmentGroups.TOOLS;
 
     @Override
     public void enchantmentEvent(PlayerItemDamageEvent event) {
-        event.getPlayer().sendMessage("JIPPI!!!!!");
+
     }
 
     @Override
@@ -59,7 +60,8 @@ public class Unbreaking implements CustomEnchantment<PlayerItemDamageEvent> {
     @Override
     public int getEnchantmentLevel(@NotNull ItemStack itemStack) {
         PersistentDataContainer container = itemStack.getItemMeta().getPersistentDataContainer();
-        return container.getOrDefault(getSaveKey(), PersistentDataType.INTEGER, 0);
+        return container.getOrDefault(getSaveKey(), PersistentDataType.INTEGER,
+                itemStack.getEnchantmentLevel(Enchantment.UNBREAKING));
     }
 
     @Override
@@ -69,6 +71,7 @@ public class Unbreaking implements CustomEnchantment<PlayerItemDamageEvent> {
         PersistentDataContainer container = itemMeta.getPersistentDataContainer();
         container.set(getSaveKey(), PersistentDataType.INTEGER, level);
         item.setItemMeta(itemMeta);
+        item.addUnsafeEnchantment(Enchantment.UNBREAKING, level);
         return level == container.get(getSaveKey(), PersistentDataType.INTEGER);
     }
 }
