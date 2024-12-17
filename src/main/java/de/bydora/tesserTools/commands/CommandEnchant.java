@@ -72,6 +72,8 @@ public class CommandEnchant implements CommandExecutor, TabCompleter {
             for (String id : ENCHANTMENTS) {
                 if (id.toLowerCase().startsWith(partial)) {
                     suggestions.add(id);
+                } else if (id.replaceFirst("tessertools:", "").startsWith(partial)) {
+                    suggestions.add(id);
                 }
             }
             return suggestions;
