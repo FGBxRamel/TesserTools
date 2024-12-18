@@ -33,18 +33,21 @@ public class Lifesteal implements CustomEnchantment<EntityDamageByEntityEvent> {
         if (event.getDamager() instanceof Player player
             && event.isCritical()
         ) {
-            AttributeInstance absorption = player.getAttribute(Attribute.MAX_ABSORPTION);
-            if (absorption.getBaseValue() < 20) {
-                absorption.setBaseValue(20);
+            if (canEnchantItem(player.getInventory().getItemInMainHand())) {
+                if (getEnchantmentLevel(player.getInventory().getItemInMainHand()) == 0) {return;}
+                AttributeInstance absorption = player.getAttribute(Attribute.MAX_ABSORPTION);
+                if (absorption.getBaseValue() < 20) {
+                    absorption.setBaseValue(20);
+                }
+                final double newAbsorption = player.getAbsorptionAmount() + 2;
+                player.setAbsorptionAmount(newAbsorption);
+                BukkitScheduler scheduler = player.getServer().getScheduler();
+                scheduler.runTaskLater(TesserTools.getPlugin(TesserTools.class), () -> {
+                    final double newAmount = player.getAbsorptionAmount() - 2;
+                    player.setAbsorptionAmount(newAmount > 0 ? newAmount : 0);
+                }, 200);
             }
-            final double newAbsorption = player.getAbsorptionAmount() + 2;
-            player.setAbsorptionAmount(newAbsorption);
-            BukkitScheduler scheduler = player.getServer().getScheduler();
-            scheduler.runTaskLater(TesserTools.getPlugin(TesserTools.class), () -> {
-                final double newAmount = player.getAbsorptionAmount() - 2;
-                player.setAbsorptionAmount(newAmount > 0 ? newAmount : 0);
-                    }, 200);
-        }
+            }
     }
 
     @Override
