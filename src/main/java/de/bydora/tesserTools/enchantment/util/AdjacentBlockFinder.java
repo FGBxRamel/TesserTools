@@ -10,8 +10,8 @@ public class AdjacentBlockFinder {
     private final Set<Material> woodTypes; // Set für schnellere Materialsuche
     private final int maxBlocks; // Maximale Anzahl an abzubauenden Blöcken
 
-    public AdjacentBlockFinder(Material[] woodTypes, int maxBlocks) {
-        this.woodTypes = new HashSet<>(Arrays.asList(woodTypes)); // Konvertiere Array in Set
+    public AdjacentBlockFinder(Material[] blockTypes, int maxBlocks) {
+        this.woodTypes = new HashSet<>(Arrays.asList(blockTypes)); // Konvertiere Array in Set
         this.maxBlocks = maxBlocks;
     }
 
