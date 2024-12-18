@@ -6,22 +6,22 @@ import org.bukkit.block.Block;
 
 import java.util.*;
 // Thank you, ChatGPT
-public class WoodBlockBreaker {
+public class AdjacentBlockFinder {
     private final Set<Material> woodTypes; // Set für schnellere Materialsuche
     private final int maxBlocks; // Maximale Anzahl an abzubauenden Blöcken
 
-    public WoodBlockBreaker(Material[] woodTypes, int maxBlocks) {
+    public AdjacentBlockFinder(Material[] woodTypes, int maxBlocks) {
         this.woodTypes = new HashSet<>(Arrays.asList(woodTypes)); // Konvertiere Array in Set
         this.maxBlocks = maxBlocks;
     }
 
-    public List<Location> findConnectedWoodBlocks(Block startBlock) {
+    public List<Location> findConnectedBlocks(Block startBlock) {
         List<Location> foundBlocks = new ArrayList<>();
         Set<Location> visited = new HashSet<>();
         Queue<Block> toCheck = new LinkedList<>();
 
         // Überprüfen, ob der Startblock ein Holzblock ist
-        if (!isWood(startBlock.getType())) {
+        if (!isMaterial(startBlock.getType())) {
             return foundBlocks;
         }
 
@@ -38,7 +38,7 @@ public class WoodBlockBreaker {
             // Suche benachbarte Blöcke
             for (Block neighbor : getAdjacentBlocks(currentBlock)) {
                 if (visited.contains(neighbor.getLocation())) continue; // Überspringe bereits besuchte
-                if (!isWood(neighbor.getType())) continue; // Überspringe keine Holzblöcke
+                if (!isMaterial(neighbor.getType())) continue; // Überspringe keine Holzblöcke
 
                 toCheck.add(neighbor);
                 visited.add(neighbor.getLocation());
@@ -49,7 +49,7 @@ public class WoodBlockBreaker {
     }
 
     // Hilfsfunktion: Überprüft, ob der Block ein Holzblock ist
-    private boolean isWood(Material material) {
+    private boolean isMaterial(Material material) {
         return woodTypes.contains(material);
     }
 

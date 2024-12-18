@@ -2,7 +2,7 @@ package de.bydora.tesserTools.enchantment.enchantments;
 
 import de.bydora.tesserTools.enchantment.enums.EnchantmentSpaceKeys;
 import de.bydora.tesserTools.enchantment.util.EquipmentGroups;
-import de.bydora.tesserTools.enchantment.util.WoodBlockBreaker;
+import de.bydora.tesserTools.enchantment.util.AdjacentBlockFinder;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -43,8 +43,8 @@ public class Abholzung implements CustomEnchantment<BlockBreakEvent> {
         ) {
             event.setCancelled(true);
             final int logAmount = 5 * level;
-            final WoodBlockBreaker breaker = new WoodBlockBreaker(woodTypes, logAmount);
-            List<Location> blocksToBreak = breaker.findConnectedWoodBlocks(event.getBlock());
+            final AdjacentBlockFinder breaker = new AdjacentBlockFinder(woodTypes, logAmount);
+            List<Location> blocksToBreak = breaker.findConnectedBlocks(event.getBlock());
 
             for (Location loc : blocksToBreak) {
                 loc.getBlock().breakNaturally(item);
