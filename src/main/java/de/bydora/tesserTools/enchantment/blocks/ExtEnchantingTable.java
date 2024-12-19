@@ -1,6 +1,8 @@
 package de.bydora.tesserTools.enchantment.blocks;
 
 import com.destroystokyo.paper.ParticleBuilder;
+import de.bydora.tesserTools.TesserTools;
+import de.bydora.tesserTools.enchantment.enchantments.CustomEnchantment;
 import de.bydora.tesserTools.enchantment.enums.EnchantmentSpaceKeys;
 import de.bydora.tesserTools.enchantment.exceptions.NotAnEnchantmentTableException;
 import io.papermc.paper.registry.RegistryAccess;
@@ -10,11 +12,13 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.block.EnchantingTable;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class ExtEnchantingTable {
@@ -23,6 +27,8 @@ public class ExtEnchantingTable {
     private final Location[] simpleLapisLocations;
     private final Location location;
     private final List<Enchantment> vanillaEnchantments;
+    private final static Collection<CustomEnchantment> customEnchantments = TesserTools.getPlugin(TesserTools.class)
+            .getEnchantmentMap().values();
     private boolean isBlocked;
     private int chargeLevel;
     private final PersistentDataContainer stateContainer;
@@ -123,5 +129,39 @@ public class ExtEnchantingTable {
     public void setBlocked(boolean blocked) {
         isBlocked = blocked;
         this.stateContainer.set(EnchantmentSpaceKeys.STATE_BLOCKED.getKey(), PersistentDataType.BOOLEAN, blocked);
+    }
+
+    /**
+     * Get the vanilla enchantments which can be put on the {@link ItemStack}.
+     * @param item The {@link ItemStack} to check
+     * @return A list of vanilla enchantments valid for the given {@link ItemStack}.
+     */
+    public List<? extends Enchantment> getVanillaEnchantments(ItemStack item) {
+        var enchantments = new ArrayList<Enchantment>();
+
+        for (var enchantment : vanillaEnchantments) {
+            if (enchantment.canEnchantItem(item)) {
+                enchantments.add(enchantment);
+            }
+        }
+        return enchantments;
+    }
+
+    /**
+     * Get the custom enchantments which can be put on the {@link ItemStack}.
+     * @param item The {@link ItemStack} to check
+     * @return A list of custom enchantments valid for the given {@link ItemStack}.
+     */
+    @SuppressWarnings("rawtypes")
+    public List<CustomEnchantment> getCustomEnchantments(ItemStack item) {
+        var enchantments = new ArrayList<CustomEnchantment>();
+        for (var enchantment : customEnchantments) {
+            if (enchantment.canEnchantItem(item)
+                && enchantment.getEnchantmentLevel(item) < enchantment.getMaxLevel()
+            ) {
+                enchantments.add(enchantment);
+            }
+        }
+        return enchantments;
     }
 }
