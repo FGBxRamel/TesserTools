@@ -2,6 +2,7 @@ package de.bydora.tesserTools.enchantment.enchantments;
 
 import de.bydora.tesserTools.enchantment.enums.EnchantmentSpaceKeys;
 import de.bydora.tesserTools.enchantment.util.EquipmentGroups;
+import de.bydora.tesserTools.enchantment.util.MaterialArrayMerger;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
@@ -20,7 +21,8 @@ public class Unbreaking implements CustomEnchantment<PlayerItemDamageEvent> {
     private final static String displayName = "Haltbarkeit";
     private final static int maxLevel = 5;
     private final static int startLevel = 4;
-    private final static Material[] enchantableItems = EquipmentGroups.TOOLS;
+    private final static Material[] enchantableItems = MaterialArrayMerger.merge(EquipmentGroups.TOOLS,
+            EquipmentGroups.ARMOR);
 
     @Override
     public void enchantmentEvent(PlayerItemDamageEvent event) {
