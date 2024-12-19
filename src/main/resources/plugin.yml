@@ -17,3 +17,7 @@ commands:
     description: Enchants the item in hand with the given special enchantment
     usage: /enchant <id> <level>
     permission: tessertools.enchantment.enchant
+  showench:
+    description: Shows all special enchantments that the item in hand has
+    usage: /showench
+    permission: tessertools.enchantment.showench

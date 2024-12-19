@@ -1,6 +1,7 @@
 package de.bydora.tesserTools;
 
 import de.bydora.tesserTools.commands.CommandEnchant;
+import de.bydora.tesserTools.commands.CommandShowEnch;
 import de.bydora.tesserTools.enchantment.enchantments.*;
 import de.bydora.tesserTools.enchantment.listeners.BlockPlaceListener;
 import de.bydora.tesserTools.enchantment.listeners.PlayerDropItemListener;
@@ -16,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("rawtypes")
 public final class TesserTools extends JavaPlugin {
 
     private final PluginManager pm = getServer().getPluginManager();
@@ -52,6 +54,7 @@ public final class TesserTools extends JavaPlugin {
     private void registerCommands() {
         // this.getCommand("tesbug").setExecutor(new CommandTesbug());
         this.getCommand("enchant").setExecutor(new CommandEnchant());
+        this.getCommand("showench").setExecutor(new CommandShowEnch());
     }
 
     @SuppressWarnings("rawtypes")
