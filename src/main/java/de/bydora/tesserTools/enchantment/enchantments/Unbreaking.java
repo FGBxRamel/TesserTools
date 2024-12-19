@@ -21,8 +21,11 @@ public class Unbreaking implements CustomEnchantment<PlayerItemDamageEvent> {
     private final static String displayName = "Haltbarkeit";
     private final static int maxLevel = 5;
     private final static int startLevel = 4;
-    private final static Material[] enchantableItems = MaterialArrayMerger.merge(EquipmentGroups.TOOLS,
-            EquipmentGroups.ARMOR);
+    private final static Material[] enchantableItems = MaterialArrayMerger.merge(
+            MaterialArrayMerger.merge(EquipmentGroups.TOOLS, EquipmentGroups.ARMOR),
+            new Material[] {Material.FISHING_ROD, Material.BOW, Material.MACE, Material.SHIELD, Material.TURTLE_HELMET,
+            Material.WOLF_ARMOR, Material.CROSSBOW, Material.FLINT_AND_STEEL, Material.FLINT_AND_STEEL, Material.BRUSH,
+            Material.CARROT_ON_A_STICK, Material.SPYGLASS, Material.WARPED_FUNGUS_ON_A_STICK});
 
     @Override
     public void enchantmentEvent(PlayerItemDamageEvent event) {
