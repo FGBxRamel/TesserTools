@@ -18,9 +18,9 @@ public class SwiftSneak implements CustomEnchantment<PlayerToggleSneakEvent> {
 
     private final static String id = "tessertools:huschen";
     private final static String displayName = "Huschen";
-    private final static int maxLevel = 3;
+    private final static int maxLevel = 5;
     private final static int startLevel = 1;
-    private final static Material[] enchantableItems = EquipmentGroups.BOOTS;
+    private final static Material[] enchantableItems = EquipmentGroups.LEGS;
 
     @Override
     public void enchantmentEvent(PlayerToggleSneakEvent event) {
