@@ -25,7 +25,7 @@ public class Unbreaking implements CustomEnchantment<PlayerItemDamageEvent> {
             MaterialArrayMerger.merge(EquipmentGroups.TOOLS, EquipmentGroups.ARMOR),
             new Material[] {Material.FISHING_ROD, Material.BOW, Material.MACE, Material.SHIELD, Material.TURTLE_HELMET,
             Material.WOLF_ARMOR, Material.CROSSBOW, Material.FLINT_AND_STEEL, Material.FLINT_AND_STEEL, Material.BRUSH,
-            Material.CARROT_ON_A_STICK, Material.SPYGLASS, Material.WARPED_FUNGUS_ON_A_STICK});
+            Material.CARROT_ON_A_STICK, Material.SPYGLASS, Material.WARPED_FUNGUS_ON_A_STICK, Material.ELYTRA});
 
     @Override
     public void enchantmentEvent(PlayerItemDamageEvent event) {
