@@ -30,7 +30,8 @@ public class AreaBreak implements CustomEnchantment<BlockBreakEvent> {
     private final static Material[] affectedBlocks = new Material[] {
             Material.STONE, Material.DEEPSLATE, Material.DIRT, Material.GRAVEL, Material.DIORITE, Material.ANDESITE,
             Material.GRANITE, Material.BASALT, Material.NETHERRACK, Material.BLACKSTONE, Material.SOUL_SAND,
-            Material.SAND, Material.END_STONE, Material.TUFF, Material.CALCITE, Material.SOUL_SOIL
+            Material.SAND, Material.END_STONE, Material.TUFF, Material.CALCITE, Material.SOUL_SOIL, Material.CLAY,
+            Material.GRASS_BLOCK, Material.MUD
     };
 
     @Override
