@@ -43,7 +43,7 @@ public class VeinMiner implements CustomEnchantment<BlockBreakEvent> {
         AdjacentBlockFinder finder = new AdjacentBlockFinder(ores, level * 5);
         List<Location> blocksToBreak = finder.findConnectedBlocks(event.getBlock());
         for (Location location : blocksToBreak) {
-            location.getBlock().breakNaturally(itemInHand);
+            location.getBlock().breakNaturally(itemInHand, true, true);
         }
     }
 
