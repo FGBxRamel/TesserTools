@@ -8,7 +8,8 @@ public enum EnchantmentSpaceKeys {
     //<editor-fold desc="Table States">
     STATE_BLOCKED(new NamespacedKey(TesserTools.getPlugin(TesserTools.class), "tableStateBlocked")),
     STATE_CONTAINER(new NamespacedKey(TesserTools.getPlugin(TesserTools.class), "tableStateContainer")),
-    STATE_CHARGE_LEVEL(new NamespacedKey(TesserTools.getPlugin(TesserTools.class), "tableStateBlocked")),
+    STATE_CHARGE_LEVEL(new NamespacedKey(TesserTools.getPlugin(TesserTools.class), "tableStateCharge")),
+    STATE_ENCHANTMENTS(new NamespacedKey(TesserTools.getPlugin(TesserTools.class), "tableStateEnchantments")),
     //</editor-fold>
 
     //<editor-fold desc="Enchantments">
@@ -22,6 +23,10 @@ public enum EnchantmentSpaceKeys {
     ENCH_LIFESTEAL(new NamespacedKey(TesserTools.getPlugin(TesserTools.class), "enchLifesteal")),
     ENCH_PROTECTION(new NamespacedKey(TesserTools.getPlugin(TesserTools.class), "enchProtection")),
     ENCH_SWIFT_SNEAK(new NamespacedKey(TesserTools.getPlugin(TesserTools.class), "enchSwiftSneak")),
+    ENCH_MISSING(new NamespacedKey(TesserTools.getPlugin(TesserTools.class), "enchMISSING")),
+    //</editor-fold>
+
+    //<editor-fold desc="Other">
     //</editor-fold>
     ;
 
