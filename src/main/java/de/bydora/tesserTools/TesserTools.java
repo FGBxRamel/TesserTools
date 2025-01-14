@@ -4,6 +4,7 @@ import de.bydora.tesserTools.commands.CommandEnchant;
 import de.bydora.tesserTools.commands.CommandShowEnch;
 import de.bydora.tesserTools.enchantment.enchantments.*;
 import de.bydora.tesserTools.enchantment.listeners.BlockPlaceListener;
+import de.bydora.tesserTools.enchantment.listeners.EntityPickupEvent;
 import de.bydora.tesserTools.enchantment.listeners.PlayerDropItemListener;
 import de.bydora.tesserTools.listeners.BlockDropItemListener;
 import de.bydora.tesserTools.listeners.InvMoveItemListener;
@@ -44,7 +45,8 @@ public final class TesserTools extends JavaPlugin {
                 new PlayerInteractListener(),
                 new BlockDropItemListener(),
                 new BlockPlaceListener(),
-                new PlayerDropItemListener()
+                new PlayerDropItemListener(),
+                new EntityPickupEvent(),
         };
         for (Listener listener : listeners) {
             pm.registerEvents(listener, this);
