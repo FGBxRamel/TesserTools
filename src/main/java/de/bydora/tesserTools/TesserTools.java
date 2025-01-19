@@ -67,7 +67,6 @@ public final class TesserTools extends JavaPlugin {
                 new VeinMiner(),
                 new Harvester(),
                 new Magnetic(),
-                new FastAttack(),
                 new Lifesteal(),
                 new Protection(),
                 new SwiftSneak(),
