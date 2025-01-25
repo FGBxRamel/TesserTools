@@ -249,7 +249,9 @@ public class ExtEnchantingTable {
         var enchantments = new ArrayList<Enchantment>();
 
         for (var enchantment : vanillaEnchantments) {
-            if (enchantment.canEnchantItem(item)) {
+            if (enchantment.canEnchantItem(item)
+                && item.getEnchantmentLevel(enchantment) < enchantment.getMaxLevel()
+            ) {
                 enchantments.add(enchantment);
             }
         }
@@ -277,7 +279,7 @@ public class ExtEnchantingTable {
      * Creates four random enchantments. The statistical distribution is 3:1 (vanilla:custom).
      * @param item The item that should be enchanted.
      */
-    public void startEnchanting(ItemStack item) {
+    public void startEnchanting(@NotNull ItemStack item) {
         var customs = getCustomEnchantments(item);
         Collections.shuffle(customs);
         List<Object> mixedList = new ArrayList<>(getVanillaEnchantments(item));
@@ -290,6 +292,26 @@ public class ExtEnchantingTable {
         this.rolledEnchantments.clear();
         for (int i = 1; i <= 4; i++) {
             this.rolledEnchantments.add(mixedList.removeFirst());
+        }
+        this.saveState();
+        showEnchantments(item);
+
+    }
+
+    /**
+     * Creates four random enchantments. The statistical distribution is 3:1 (vanilla:custom).
+     * @param item The item that should be enchanted.
+     * @param includeCustom Whether to include custom enchantments or not
+     */
+    public void startEnchanting(@NotNull ItemStack item, boolean includeCustom) {
+        if (includeCustom) {startEnchanting(item); return;}
+        var vanillas = getVanillaEnchantments(item);
+        if (vanillas.size() < 4) { return; }
+        Collections.shuffle(vanillas);
+
+        this.rolledEnchantments.clear();
+        for (int i = 1; i <= 4; i++) {
+            this.rolledEnchantments.add(vanillas.removeFirst());
         }
         this.saveState();
         showEnchantments(item);
