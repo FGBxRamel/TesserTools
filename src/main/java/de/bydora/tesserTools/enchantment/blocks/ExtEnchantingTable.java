@@ -270,8 +270,19 @@ public class ExtEnchantingTable {
     private List<CustomEnchantment> getCustomEnchantments(ItemStack item) {
         var enchantments = new ArrayList<CustomEnchantment>();
         for (var enchantment : CUSTOM_ENCHANTMENTS) {
-            if ((enchantment.canEnchantItem(item)
-                || item.getType() == Material.BOOK)
+            if (item.getType() == Material.BOOK
+                //&& enchantment.getEnchantmentLevel(item) < enchantment.getMaxLevel()
+            ) {
+                // Check for the "advanced vanilla enchantments" to not add them if the required level isn't met
+                if (enchantment instanceof Unbreaking
+                        && item.getEnchantmentLevel(Enchantment.UNBREAKING) < enchantment.getStartLevel()
+                ) {continue;}
+                else if (enchantment instanceof Protection
+                        && item.getEnchantmentLevel(Enchantment.PROTECTION) < enchantment.getStartLevel()
+                ) {continue;}
+                enchantments.add(enchantment);
+            }
+            else if (enchantment.canEnchantItem(item)
                 && enchantment.getEnchantmentLevel(item) < enchantment.getMaxLevel()
             ) {
                 // Check for the "advanced vanilla enchantments" to not add them if the required level isn't met
@@ -297,6 +308,7 @@ public class ExtEnchantingTable {
         Collections.shuffle(customs);
         List<Object> mixedList = new ArrayList<>(getVanillaEnchantments(item));
         for (int i = mixedList.size() / 3; i > 0; i--) {
+            if (customs.isEmpty()) {break;}
             mixedList.add(customs.removeFirst());
         }
         if (mixedList.size() < 4) { return; }
