@@ -45,13 +45,14 @@ public class PlayerDropItemListener implements Listener {
                         ItemStack enchantStack = enchantItem.getItemStack();
                         var enchantment = extTable.getEnchantment(quarzLocation);
                         var player = event.getPlayer();
+                        var chargeLevel = extTable.getChargeLevel();
                         switch (enchantment) {
                             case null -> {
                                 Bukkit.getScheduler().cancelTasks(TesserTools.getPlugin(TesserTools.class));
                                 return;
                             }
                             case CustomEnchantment<?> customEnch -> {
-                                if (player.getLevel() >= 50) {
+                                if (player.getLevel() >= 50 && chargeLevel > 0) {
                                     player.setLevel(player.getLevel() - 6);
                                     customEnch.enchantItem(enchantStack,
                                             customEnch.getEnchantmentLevel(enchantStack) + 1);
@@ -66,10 +67,45 @@ public class PlayerDropItemListener implements Listener {
                             }
                             default -> {}
                         }
+                        extTable.setChargeLevel(chargeLevel - 1);
                         item.remove();
-                        extTable.removeDisplays();
+                        extTable.removeTextDisplays();
                         if (new Random().nextInt(100000) == 0) {
                             player.sendMessage("Glücksspiel kann süchtig machen! Infos unter www.bzga.de");
+                        }
+
+
+                        Bukkit.getScheduler().cancelTasks(TesserTools.getPlugin(TesserTools.class));
+                    } else {
+                        metadata[0]++;
+                    }
+                }
+            }, 0L, 5L);
+        } else if (item.getItemStack().getType() == Material.END_CRYSTAL) {
+            Bukkit.getScheduler().runTaskTimer(TesserTools.getPlugin(TesserTools.class), new Runnable() {
+                @Override
+                public void run() {
+                    if (metadata[0] >= 3) {
+                        Bukkit.getScheduler().cancelTasks(TesserTools.getPlugin(TesserTools.class));
+                    } else if (item.isOnGround()
+                            && item.isValid()
+                            && item.getLocation().getBlock().getState() instanceof EnchantingTable table
+                    ) {
+                        ExtEnchantingTable extTable = new ExtEnchantingTable(item.getLocation());
+                        if (!extTable.isValid()
+                            || extTable.getChargeLevel() == 4
+                        ) {
+                            return;
+                        }
+                        int maxChargeAmount = 4 - extTable.getChargeLevel();
+                        int itemAmount = item.getItemStack().getAmount();
+                        if (itemAmount > maxChargeAmount) {
+                            item.getItemStack().setAmount(itemAmount - maxChargeAmount);
+                            extTable.setChargeLevel(extTable.getChargeLevel() + maxChargeAmount);
+                        }
+                        else {
+                            item.remove();
+                            extTable.setChargeLevel(extTable.getChargeLevel() + itemAmount);
                         }
 
 
@@ -98,8 +134,9 @@ public class PlayerDropItemListener implements Listener {
                         ) {
                             return;
                         }
+                        boolean includeCustom = (event.getPlayer().getLevel() >= 50 && extTable.getChargeLevel() > 0);
                         extTable.setBlocked(true);
-                        extTable.startEnchanting(item.getItemStack(), event.getPlayer().getLevel() >= 50);
+                        extTable.startEnchanting(item.getItemStack(), includeCustom);
 
                         Bukkit.getScheduler().cancelTasks(TesserTools.getPlugin(TesserTools.class));
                     } else {

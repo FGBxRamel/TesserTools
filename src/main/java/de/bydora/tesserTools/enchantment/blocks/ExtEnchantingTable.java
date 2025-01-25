@@ -4,6 +4,8 @@ import com.destroystokyo.paper.ParticleBuilder;
 import de.bydora.tesserTools.TesserTools;
 import de.bydora.tesserTools.enchantment.enchantments.CustomEnchantment;
 import de.bydora.tesserTools.enchantment.enchantments.Missing;
+import de.bydora.tesserTools.enchantment.enchantments.Protection;
+import de.bydora.tesserTools.enchantment.enchantments.Unbreaking;
 import de.bydora.tesserTools.enchantment.enums.EnchantmentSpaceKeys;
 import de.bydora.tesserTools.enchantment.exceptions.NotAnEnchantmentTableException;
 import io.papermc.paper.registry.RegistryAccess;
@@ -20,6 +22,7 @@ import org.bukkit.Registry;
 import org.bukkit.block.EnchantingTable;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Display;
+import org.bukkit.entity.EnderCrystal;
 import org.bukkit.entity.TextDisplay;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -271,6 +274,14 @@ public class ExtEnchantingTable {
                 || item.getType() == Material.BOOK)
                 && enchantment.getEnchantmentLevel(item) < enchantment.getMaxLevel()
             ) {
+                // Check for the "advanced vanilla enchantments" to not add them if the required level isn't met
+                if (enchantment instanceof Unbreaking
+                    && item.getEnchantmentLevel(Enchantment.UNBREAKING) < enchantment.getStartLevel()
+                ) {continue;}
+                else if (enchantment instanceof Protection
+                        && item.getEnchantmentLevel(Enchantment.PROTECTION) < enchantment.getStartLevel()
+                ) {continue;}
+
                 enchantments.add(enchantment);
             }
         }
@@ -321,7 +332,7 @@ public class ExtEnchantingTable {
     }
 
     private void showEnchantments(ItemStack itemStack) {
-        removeDisplays();
+        removeTextDisplays();
 
         int i = 0;
         for (var enchantment : this.rolledEnchantments) {
@@ -342,8 +353,8 @@ public class ExtEnchantingTable {
         }
     }
 
-    public void removeDisplays() {
-        for (var display : location.getNearbyEntitiesByType(Display.class, 6,6,6)) {
+    public void removeTextDisplays() {
+        for (var display : location.getNearbyEntitiesByType(TextDisplay.class, 6,6,6)) {
             display.remove();
         }
     }
@@ -391,6 +402,45 @@ public class ExtEnchantingTable {
             }
         }
         return enchantments;
+    }
+
+    /**
+     * Get the charge level of the enchanting table.
+     * @return The charge level
+     */
+    public int getChargeLevel() {
+        return this.chargeLevel;
+    }
+
+    /**
+     * Set the charge level of the enchanting table and update the end crystal display. <p>
+     * Will ignore anything below 0 and higher than 4.
+     * @param level The new charge level
+     * @return Whether the level was set
+     */
+    public boolean setChargeLevel(int level) {
+        if (level < 0 || level > 4) {
+            this.updateLevelCrystals();
+            return false;
+        }
+        this.chargeLevel = level;
+        this.saveState();
+        this.updateLevelCrystals();
+        return true;
+    }
+
+    private void updateLevelCrystals() {
+        int remainingCharge = this.chargeLevel;
+        for (var crystal : location.getNearbyEntitiesByType(EnderCrystal.class, 7,7,7)) {
+            crystal.remove();
+        }
+        for (var location : simpleLapisLocations) {
+            var blockLocation = location.clone().add(0,2,0);
+            if (remainingCharge-- > 0){
+                var crystal = (EnderCrystal) blockLocation.getWorld().spawn(blockLocation, EnderCrystal.class);
+                crystal.setShowingBottom(false);
+            }
+        }
     }
 
 }
