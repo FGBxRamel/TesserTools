@@ -451,6 +451,7 @@ public class ExtEnchantingTable {
             if (remainingCharge-- > 0){
                 var crystal = (EnderCrystal) blockLocation.getWorld().spawn(blockLocation, EnderCrystal.class);
                 crystal.setShowingBottom(false);
+                crystal.setInvulnerable(true);
             }
         }
     }
