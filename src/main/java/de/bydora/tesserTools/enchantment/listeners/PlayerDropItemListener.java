@@ -15,6 +15,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nullable;
+import java.util.Random;
 
 public class PlayerDropItemListener implements Listener {
 
@@ -67,6 +68,9 @@ public class PlayerDropItemListener implements Listener {
                         }
                         item.remove();
                         extTable.removeDisplays();
+                        if (new Random().nextInt(100000) == 0) {
+                            player.sendMessage("Glücksspiel kann süchtig machen! Infos unter www.bzga.de");
+                        }
 
 
                         Bukkit.getScheduler().cancelTasks(TesserTools.getPlugin(TesserTools.class));
