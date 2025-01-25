@@ -1,11 +1,13 @@
 package de.bydora.tesserTools.enchantment.listeners;
 
+import com.destroystokyo.paper.ParticleBuilder;
 import de.bydora.tesserTools.TesserTools;
 import de.bydora.tesserTools.enchantment.blocks.ExtEnchantingTable;
 import de.bydora.tesserTools.enchantment.enchantments.CustomEnchantment;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.block.EnchantingTable;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
@@ -69,6 +71,7 @@ public class PlayerDropItemListener implements Listener {
                         }
                         extTable.setChargeLevel(chargeLevel - 1);
                         item.remove();
+                        spawnEnchantParticles(extTable.getLocation().clone().add(0,1,0));
                         extTable.removeTextDisplays();
                         if (new Random().nextInt(100000) == 0) {
                             player.sendMessage("Glücksspiel kann süchtig machen! Infos unter www.bzga.de");
@@ -165,5 +168,18 @@ public class PlayerDropItemListener implements Listener {
         } else {
             return null;
         }
+    }
+
+    /**
+     * Spawns the enchanting particles on the given location
+     * @param loc The location of the particles
+     */
+    private void spawnEnchantParticles(Location loc) {
+        var particle = new ParticleBuilder(Particle.ENCHANT);
+        particle.offset(.2,.2,.2);
+        particle.location(loc);
+        particle.receivers(160);
+        particle.count(500);
+        particle.spawn();
     }
 }
