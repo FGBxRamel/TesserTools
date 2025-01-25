@@ -43,21 +43,27 @@ public class PlayerDropItemListener implements Listener {
                                 Item.class, 1,2,1).iterator().next();
                         ItemStack enchantStack = enchantItem.getItemStack();
                         var enchantment = extTable.getEnchantment(quarzLocation);
+                        var player = event.getPlayer();
                         switch (enchantment) {
                             case null -> {
                                 Bukkit.getScheduler().cancelTasks(TesserTools.getPlugin(TesserTools.class));
                                 return;
                             }
                             case CustomEnchantment<?> customEnch -> {
-                                customEnch.enchantItem(enchantStack,
-                                        customEnch.getEnchantmentLevel(enchantStack) + 1);
+                                if (player.getLevel() >= 50) {
+                                    player.setLevel(player.getLevel() - 6);
+                                    customEnch.enchantItem(enchantStack,
+                                            customEnch.getEnchantmentLevel(enchantStack) + 1);
+                                }
                             }
                             case Enchantment vanillaEnch -> {
-                                enchantStack.addUnsafeEnchantment(vanillaEnch,
-                                        enchantStack.getEnchantmentLevel(vanillaEnch) + 1);
+                                if (player.getLevel() >= 30) {
+                                    player.setLevel(player.getLevel() - 3);
+                                    enchantStack.addUnsafeEnchantment(vanillaEnch,
+                                            enchantStack.getEnchantmentLevel(vanillaEnch) + 1);
+                                }
                             }
-                            default -> {
-                            }
+                            default -> {}
                         }
                         item.remove();
                         extTable.removeDisplays();
@@ -82,11 +88,14 @@ public class PlayerDropItemListener implements Listener {
                             && item.getLocation().getBlock().getState() instanceof EnchantingTable table
                     ) {
                         ExtEnchantingTable extTable = new ExtEnchantingTable(item.getLocation());
-                        if (extTable.isBlocked() || !extTable.isValid()) {
+                        if (extTable.isBlocked()
+                            || !extTable.isValid()
+                            || event.getPlayer().getLevel() < 30
+                        ) {
                             return;
                         }
                         extTable.setBlocked(true);
-                        extTable.startEnchanting(item.getItemStack());
+                        extTable.startEnchanting(item.getItemStack(), event.getPlayer().getLevel() >= 50);
 
                         Bukkit.getScheduler().cancelTasks(TesserTools.getPlugin(TesserTools.class));
                     } else {
