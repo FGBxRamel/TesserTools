@@ -249,7 +249,8 @@ public class ExtEnchantingTable {
         var enchantments = new ArrayList<Enchantment>();
 
         for (var enchantment : vanillaEnchantments) {
-            if (enchantment.canEnchantItem(item)
+            if ((enchantment.canEnchantItem(item)
+                || item.getType() == Material.BOOK)
                 && item.getEnchantmentLevel(enchantment) < enchantment.getMaxLevel()
             ) {
                 enchantments.add(enchantment);
@@ -266,7 +267,8 @@ public class ExtEnchantingTable {
     private List<CustomEnchantment> getCustomEnchantments(ItemStack item) {
         var enchantments = new ArrayList<CustomEnchantment>();
         for (var enchantment : CUSTOM_ENCHANTMENTS) {
-            if (enchantment.canEnchantItem(item)
+            if ((enchantment.canEnchantItem(item)
+                || item.getType() == Material.BOOK)
                 && enchantment.getEnchantmentLevel(item) < enchantment.getMaxLevel()
             ) {
                 enchantments.add(enchantment);

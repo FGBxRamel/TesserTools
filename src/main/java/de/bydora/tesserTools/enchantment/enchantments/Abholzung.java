@@ -1,8 +1,8 @@
 package de.bydora.tesserTools.enchantment.enchantments;
 
 import de.bydora.tesserTools.enchantment.enums.EnchantmentSpaceKeys;
-import de.bydora.tesserTools.enchantment.util.EquipmentGroups;
 import de.bydora.tesserTools.enchantment.util.AdjacentBlockFinder;
+import de.bydora.tesserTools.enchantment.util.EquipmentGroups;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
