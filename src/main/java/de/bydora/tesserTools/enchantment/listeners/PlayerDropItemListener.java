@@ -75,7 +75,7 @@ public class PlayerDropItemListener implements Listener {
                             default -> {}
                         }
                         extTable.setChargeLevel(chargeLevel - 1);
-                        item.remove();
+                        item.getItemStack().setAmount(item.getItemStack().getAmount() - 1);
                         spawnEnchantParticles(extTable.getLocation().clone().add(0,1,0));
                         extTable.removeTextDisplays();
                         if (new Random().nextInt(100000) == 0) {
