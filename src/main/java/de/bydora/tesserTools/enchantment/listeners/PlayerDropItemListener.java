@@ -53,27 +53,36 @@ public class PlayerDropItemListener implements Listener {
                         var enchantment = extTable.getEnchantment(quarzLocation);
                         var player = event.getPlayer();
                         var chargeLevel = extTable.getChargeLevel();
+                        boolean enchanted = false;
                         switch (enchantment) {
                             case null -> {
                                 Bukkit.getScheduler().cancelTasks(TesserTools.getPlugin(TesserTools.class));
                                 return;
                             }
                             case CustomEnchantment<?> customEnch -> {
-                                if (player.getLevel() >= 50 && chargeLevel > 0) {
+                                if (player.getLevel() >= 50
+                                    && chargeLevel > 0
+                                    && customEnch.canEnchantItem(enchantStack)
+                                ) {
+                                    enchanted = true;
                                     player.setLevel(player.getLevel() - 6);
                                     customEnch.enchantItem(enchantStack,
                                             customEnch.getEnchantmentLevel(enchantStack) + 1);
                                 }
                             }
                             case Enchantment vanillaEnch -> {
-                                if (player.getLevel() >= 30) {
+                                if (player.getLevel() >= 30
+                                    && vanillaEnch.canEnchantItem(enchantStack)
+                                ) {
+                                    enchanted = true;
                                     player.setLevel(player.getLevel() - 3);
                                     enchantStack.addUnsafeEnchantment(vanillaEnch,
                                             enchantStack.getEnchantmentLevel(vanillaEnch) + 1);
                                 }
                             }
-                            default -> {}
+                            default -> {return;}
                         }
+                        if (!enchanted) {return;}
                         if (enchantItem.getItemStack().getType() == Material.BOOK) {
                             ItemStack enchantedBook = new ItemStack(Material.ENCHANTED_BOOK);
                             enchantedBook.setItemMeta(enchantItem.getItemStack().getItemMeta());
@@ -84,6 +93,7 @@ public class PlayerDropItemListener implements Listener {
                         item.getItemStack().setAmount(item.getItemStack().getAmount() - 1);
                         spawnEnchantParticles(extTable.getLocation().clone().add(0,1,0));
                         extTable.removeTextDisplays();
+
                         if (new Random().nextInt(100000) == 0) {
                             player.sendMessage("Glücksspiel kann süchtig machen! Infos unter www.bzga.de");
                         }
