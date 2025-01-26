@@ -9,6 +9,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -56,11 +57,17 @@ public class Magnetic implements CustomEnchantment<PlayerMoveEvent> {
             HashMap<Integer, ItemStack> leftover = player.getInventory().addItem(itemStack);
             // Wenn das Inventar den gesamten Stack aufnehmen konnte
             if (leftover.isEmpty()) {
+                EntityPickupItemEvent pickupEvent = new EntityPickupItemEvent(player, item, 0);
+                pickupEvent.callEvent();
                 item.remove(); // Entferne das Item aus der Welt
                 player.getWorld().playSound(playerLocation, "entity.item.pickup", 1.0f, 1.0f);
             } else {
+                var leftoverItem = leftover.values().iterator().next();
+                EntityPickupItemEvent pickupEvent = new EntityPickupItemEvent(player, item,
+                        leftoverItem.getAmount());
+                pickupEvent.callEvent();
                 // Wenn ein Teil des Stacks nicht eingesammelt werden konnte
-                item.setItemStack(leftover.values().iterator().next());
+                item.setItemStack(leftoverItem);
             }
         }
     }
