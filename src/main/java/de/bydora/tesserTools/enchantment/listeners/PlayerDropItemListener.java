@@ -44,6 +44,11 @@ public class PlayerDropItemListener implements Listener {
                         }
                         Item enchantItem = extTable.getLocation().getNearbyEntitiesByType(
                                 Item.class, 1,2,1).iterator().next();
+                        if (enchantItem == null) {
+                            event.getPlayer().sendMessage("Kein Item auf dem Tisch gefunden!");
+                            Bukkit.getScheduler().cancelTasks(TesserTools.getPlugin(TesserTools.class));
+                            return;
+                        }
                         ItemStack enchantStack = enchantItem.getItemStack();
                         var enchantment = extTable.getEnchantment(quarzLocation);
                         var player = event.getPlayer();
@@ -131,15 +136,27 @@ public class PlayerDropItemListener implements Listener {
                             && item.getLocation().getBlock().getState() instanceof EnchantingTable table
                     ) {
                         ExtEnchantingTable extTable = new ExtEnchantingTable(item.getLocation());
-                        if (extTable.isBlocked()
-                            || !extTable.isValid()
+                        if (!extTable.isValid()
                             || event.getPlayer().getLevel() < 30
                         ) {
                             return;
                         }
-                        boolean includeCustom = (event.getPlayer().getLevel() >= 50 && extTable.getChargeLevel() > 0);
-                        extTable.setBlocked(true);
-                        extTable.startEnchanting(item.getItemStack(), includeCustom);
+                        if (extTable.isBlocked()
+                            && item.getItemStack().getType() == Material.BOOK
+                        ) {
+                            var items = item.getLocation().getNearbyEntitiesByType(Item.class, 1);
+                            for (var item : items) {
+                                if (item.getItemStack().getType() == Material.BOOK) {
+                                    // Hier fusionieren, dann item löschen
+                                }
+                            }
+
+                        }
+                        else {
+                            boolean includeCustom = (event.getPlayer().getLevel() >= 50 && extTable.getChargeLevel() > 0);
+                            extTable.setBlocked(true);
+                            extTable.startEnchanting(item.getItemStack(), includeCustom);
+                        }
 
                         Bukkit.getScheduler().cancelTasks(TesserTools.getPlugin(TesserTools.class));
                     } else {
