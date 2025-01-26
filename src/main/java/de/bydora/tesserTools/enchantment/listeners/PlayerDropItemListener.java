@@ -106,10 +106,12 @@ public class PlayerDropItemListener implements Listener {
                             && item.getLocation().getBlock().getState() instanceof EnchantingTable table
                     ) {
                         ExtEnchantingTable extTable = new ExtEnchantingTable(item.getLocation());
-                        if (!extTable.isValid()
-                            || extTable.getChargeLevel() == 4
+                        if (extTable.getChargeLevel() == 4
                         ) {
+                            event.getPlayer().sendMessage("Bist du blind? (Tisch voll aufgeladen)");
                             return;
+                        } else if (!extTable.isValid()) {
+                            event.getPlayer().sendMessage("Weißt du wie in Tisch aussieht? (Invalider Tisch)");
                         }
                         int maxChargeAmount = 4 - extTable.getChargeLevel();
                         int itemAmount = item.getItemStack().getAmount();
@@ -143,10 +145,13 @@ public class PlayerDropItemListener implements Listener {
                     ) {
                         ExtEnchantingTable extTable = new ExtEnchantingTable(item.getLocation());
                         if (!extTable.isValid()
-                            || event.getPlayer().getLevel() < 30
                         ) {
+                            event.getPlayer().sendMessage("Bist du blind? (Tisch voll aufgeladen)");
                             return;
+                        } else if (event.getPlayer().getLevel() < 30) {
+                            event.getPlayer().sendMessage("Geh im Sandkasten spielen! (Zu niedriges Level)");
                         }
+
                         if (extTable.isBlocked()
                             && item.getItemStack().getType() == Material.ENCHANTED_BOOK
                         ) {
