@@ -128,7 +128,7 @@ public class PlayerDropItemListener implements Listener {
                             event.getPlayer().sendMessage("Bist du blind? (Tisch voll aufgeladen)");
                             return;
                         } else if (!extTable.isValid()) {
-                            event.getPlayer().sendMessage("Weißt du wie in Tisch aussieht? (Invalider Tisch)");
+                            event.getPlayer().sendMessage("Weißt du wie ein Tisch aussieht? (Invalider Tisch)");
                         }
                         int maxChargeAmount = 4 - extTable.getChargeLevel();
                         int itemAmount = item.getItemStack().getAmount();
