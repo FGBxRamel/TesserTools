@@ -55,14 +55,12 @@ public class PlayerDropItemListener implements Listener {
                         var chargeLevel = extTable.getChargeLevel();
                         boolean enchanted = false;
                         switch (enchantment) {
-                            case null -> {
-                                Bukkit.getScheduler().cancelTasks(TesserTools.getPlugin(TesserTools.class));
-                                return;
-                            }
                             case CustomEnchantment<?> customEnch -> {
                                 if (player.getLevel() >= 50
                                     && chargeLevel > 0
-                                    && customEnch.canEnchantItem(enchantStack)
+                                    && (customEnch.canEnchantItem(enchantStack)
+                                        || enchantStack.getType() == Material.BOOK
+                                        || enchantStack.getType() == Material.ENCHANTED_BOOK)
                                 ) {
                                     enchanted = true;
                                     player.setLevel(player.getLevel() - 6);
@@ -72,7 +70,9 @@ public class PlayerDropItemListener implements Listener {
                             }
                             case Enchantment vanillaEnch -> {
                                 if (player.getLevel() >= 30
-                                    && vanillaEnch.canEnchantItem(enchantStack)
+                                    && (vanillaEnch.canEnchantItem(enchantStack)
+                                        || enchantStack.getType() == Material.BOOK
+                                        || enchantStack.getType() == Material.ENCHANTED_BOOK)
                                 ) {
                                     enchanted = true;
                                     player.setLevel(player.getLevel() - 3);
@@ -80,18 +80,25 @@ public class PlayerDropItemListener implements Listener {
                                             enchantStack.getEnchantmentLevel(vanillaEnch) + 1);
                                 }
                             }
-                            default -> {return;}
+                            case null, default -> {
+                                Bukkit.getScheduler().cancelTasks(TesserTools.getPlugin(TesserTools.class));
+                                return;
+                            }
                         }
-                        if (!enchanted) {return;}
+                        if (!enchanted) {
+                            Bukkit.getScheduler().cancelTasks(TesserTools.getPlugin(TesserTools.class));
+                            return;
+                        }
                         if (enchantItem.getItemStack().getType() == Material.BOOK) {
                             ItemStack enchantedBook = new ItemStack(Material.ENCHANTED_BOOK);
                             enchantedBook.setItemMeta(enchantItem.getItemStack().getItemMeta());
                             enchantItem.setItemStack(enchantedBook);
                         }
 
-                        extTable.setChargeLevel(chargeLevel - 1);
                         item.getItemStack().setAmount(item.getItemStack().getAmount() - 1);
                         spawnEnchantParticles(extTable.getLocation().clone().add(0,1,0));
+                        extTable.clearEnchantments();
+                        extTable.setChargeLevel(chargeLevel - 1);
                         extTable.removeTextDisplays();
 
                         if (new Random().nextInt(100000) == 0) {
