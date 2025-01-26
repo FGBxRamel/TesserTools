@@ -253,7 +253,7 @@ public class ExtEnchantingTable {
 
         for (var enchantment : vanillaEnchantments) {
             if ((enchantment.canEnchantItem(item)
-                || item.getType() == Material.BOOK)
+                || item.getType() == Material.ENCHANTED_BOOK)
                 && item.getEnchantmentLevel(enchantment) < enchantment.getMaxLevel()
             ) {
                 enchantments.add(enchantment);
@@ -270,8 +270,8 @@ public class ExtEnchantingTable {
     private List<CustomEnchantment> getCustomEnchantments(ItemStack item) {
         var enchantments = new ArrayList<CustomEnchantment>();
         for (var enchantment : CUSTOM_ENCHANTMENTS) {
-            if (item.getType() == Material.BOOK
-                //&& enchantment.getEnchantmentLevel(item) < enchantment.getMaxLevel()
+            if (item.getType() == Material.ENCHANTED_BOOK
+                && enchantment.getEnchantmentLevel(item) < enchantment.getMaxLevel()
             ) {
                 // Check for the "advanced vanilla enchantments" to not add them if the required level isn't met
                 if (enchantment instanceof Unbreaking

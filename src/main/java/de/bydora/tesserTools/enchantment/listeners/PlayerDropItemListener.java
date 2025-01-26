@@ -74,6 +74,12 @@ public class PlayerDropItemListener implements Listener {
                             }
                             default -> {}
                         }
+                        if (enchantItem.getItemStack().getType() == Material.BOOK) {
+                            ItemStack enchantedBook = new ItemStack(Material.ENCHANTED_BOOK);
+                            enchantedBook.setItemMeta(enchantItem.getItemStack().getItemMeta());
+                            enchantItem.setItemStack(enchantedBook);
+                        }
+
                         extTable.setChargeLevel(chargeLevel - 1);
                         item.getItemStack().setAmount(item.getItemStack().getAmount() - 1);
                         spawnEnchantParticles(extTable.getLocation().clone().add(0,1,0));
@@ -142,11 +148,11 @@ public class PlayerDropItemListener implements Listener {
                             return;
                         }
                         if (extTable.isBlocked()
-                            && item.getItemStack().getType() == Material.BOOK
+                            && item.getItemStack().getType() == Material.ENCHANTED_BOOK
                         ) {
                             var items = item.getLocation().getNearbyEntitiesByType(Item.class, 1);
                             for (var item : items) {
-                                if (item.getItemStack().getType() == Material.BOOK) {
+                                if (item.getItemStack().getType() == Material.ENCHANTED_BOOK) {
                                     // Hier fusionieren, dann item löschen
                                 }
                             }
