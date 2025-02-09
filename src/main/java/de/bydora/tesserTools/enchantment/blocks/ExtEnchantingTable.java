@@ -463,7 +463,6 @@ public class ExtEnchantingTable {
      * Use after enchanting.
      */
     public void clearEnchantments() {
-        log.info("Hier2");
         this.rolledEnchantments.clear();
         for (int i = 1; i <= 4; i++) {
             this.rolledEnchantments.add(new Missing());

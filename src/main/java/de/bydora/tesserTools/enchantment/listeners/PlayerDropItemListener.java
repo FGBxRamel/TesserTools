@@ -15,11 +15,17 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 
 import javax.annotation.Nullable;
+import java.util.Map;
 import java.util.Random;
 
 public class PlayerDropItemListener implements Listener {
+
+    @SuppressWarnings("rawtypes")
+    private final static Map<String, CustomEnchantment> customEnchantments = TesserTools.getPlugin(TesserTools.class)
+            .getEnchantmentMap();
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerDropItem(PlayerDropItemEvent event) {
@@ -112,7 +118,8 @@ public class PlayerDropItemListener implements Listener {
                     }
                 }
             }, 0L, 5L);
-        } else if (item.getItemStack().getType() == Material.END_CRYSTAL) {
+        }
+        else if (item.getItemStack().getType() == Material.END_CRYSTAL) {
             Bukkit.getScheduler().runTaskTimer(TesserTools.getPlugin(TesserTools.class), new Runnable() {
                 @Override
                 public void run() {
@@ -169,16 +176,55 @@ public class PlayerDropItemListener implements Listener {
                             event.getPlayer().sendMessage("Geh im Sandkasten spielen! (Zu niedriges Level)");
                         }
 
+                        // If enchanted book was thrown on the table and the table is blocked
                         if (extTable.isBlocked()
                             && item.getItemStack().getType() == Material.ENCHANTED_BOOK
                         ) {
-                            var items = item.getLocation().getNearbyEntitiesByType(Item.class, 1);
-                            for (var item : items) {
-                                if (item.getItemStack().getType() == Material.ENCHANTED_BOOK) {
-                                    // Hier fusionieren, dann item löschen
+                            var existingItem = item.getLocation().getNearbyEntitiesByType(Item.class, 1)
+                                    .iterator().next();
+                            // Enchanted book on the table?
+                            if (existingItem == null
+                                || existingItem.getItemStack().getType() != Material.ENCHANTED_BOOK
+                            ) {
+                                Bukkit.getScheduler().cancelTasks(TesserTools.getPlugin(TesserTools.class));
+                                return;
+                            }
+                            var newBookStack = new ItemStack(Material.ENCHANTED_BOOK);
+                            var existingStack = existingItem.getItemStack();
+                            var existingMeta = (EnchantmentStorageMeta) existingStack.getItemMeta();
+                            var thrownStack = item.getItemStack();
+                            var thrownMeta = (EnchantmentStorageMeta) thrownStack.getItemMeta();
+
+
+                            // Put the vanilla enchantments on the book
+                            var vanillaEnchThrown = thrownMeta.getStoredEnchants();
+                            var vanillaEnchExisting = existingMeta.getStoredEnchants();
+                            for (var ench : vanillaEnchExisting.keySet()) {
+                                // Search for the highest level of the enchantments
+                                int existingLevel = vanillaEnchExisting.get(ench);
+                                // If both books have enchantment x and the thrown ones level is higher
+                                if (vanillaEnchThrown.containsKey(ench)
+                                    && vanillaEnchThrown.get(ench) >= existingLevel
+                                ) {
+                                    addBookEnchantment(thrownStack, ench, vanillaEnchThrown.get(ench));
+                                }
+                                // If not just use the one from the existing book
+                                else {
+                                    addBookEnchantment(thrownStack, ench, existingLevel);
                                 }
                             }
 
+                            // Put the custom enchantments on the book
+                            for (var ench : customEnchantments.values()) {
+                                int level = Math.max(ench.getEnchantmentLevel(existingStack),
+                                        ench.getEnchantmentLevel(thrownStack));
+                                if (level > 0) {
+                                    ench.enchantItem(newBookStack, level);
+                                }
+                            }
+
+                            item.setItemStack(thrownStack);
+                            existingItem.remove();
                         }
                         else {
                             boolean includeCustom = (event.getPlayer().getLevel() >= 50 && extTable.getChargeLevel() > 0);
@@ -226,5 +272,15 @@ public class PlayerDropItemListener implements Listener {
         particle.receivers(160);
         particle.count(500);
         particle.spawn();
+    }
+
+    private void addBookEnchantment(ItemStack item, Enchantment enchantment, int level){
+        EnchantmentStorageMeta meta = (EnchantmentStorageMeta) item.getItemMeta();
+        meta.addStoredEnchant(enchantment, level, true);
+        item.setItemMeta(meta);
+    }
+
+    private void addBookEnchantment(ItemStack item, CustomEnchantment enchantment, int level){
+        // Do stuff
     }
 }
