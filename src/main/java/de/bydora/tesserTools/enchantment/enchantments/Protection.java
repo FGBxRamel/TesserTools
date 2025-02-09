@@ -12,44 +12,21 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-
-public class Protection implements CustomEnchantment<EntityDamageByEntityEvent> {
+public class Protection extends CustomEnchantment<EntityDamageByEntityEvent> {
 
     private final static String id = "tessertools:schutz";
     private final static String displayName = "Schutz";
     private final static int maxLevel = 5;
-    private final static int startLevel = 4;
+    private final static int minLevel = 4;
     private final static Material[] enchantableItems = EquipmentGroups.ARMOR;
+
+    public Protection() {
+        super(id, maxLevel, displayName, minLevel, enchantableItems);
+    }
 
     @Override
     public void enchantmentEvent(EntityDamageByEntityEvent event) {
 
-    }
-
-    @Override
-    public @NotNull String getID() {
-        return id;
-    }
-
-    @Override
-    public @NotNull String getDisplayName() {
-        return displayName;
-    }
-
-    @Override
-    public int getMaxLevel() {
-        return maxLevel;
-    }
-
-    @Override
-    public int getStartLevel() {
-        return startLevel;
-    }
-
-    @Override
-    public boolean canEnchantItem(@NotNull ItemStack item) {
-        return Arrays.stream(enchantableItems).toList().contains(item.getType());
     }
 
     @Override

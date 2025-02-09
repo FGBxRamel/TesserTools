@@ -82,6 +82,8 @@ public record EquipmentGroups() {
                     MaterialArrayMerger.merge(LEGS, BOOTS)
             );
 
+    public static final Material[] NONE = new Material[0];
+
     // This comes straight from hell, but it will do
     public static final Material[] TOOLS =
             MaterialArrayMerger.merge(

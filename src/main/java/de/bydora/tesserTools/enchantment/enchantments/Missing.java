@@ -1,12 +1,17 @@
 package de.bydora.tesserTools.enchantment.enchantments;
 
 import de.bydora.tesserTools.enchantment.enums.EnchantmentSpaceKeys;
+import de.bydora.tesserTools.enchantment.util.EquipmentGroups;
 import org.bukkit.NamespacedKey;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-public class Missing implements CustomEnchantment<Event> {
+public class Missing extends CustomEnchantment<Event> {
+
+    public Missing() {
+        super("tessertools:missing", 0, "MISSING", -1, EquipmentGroups.NONE);
+    }
 
     @Override
     public void enchantmentEvent(Event event) {

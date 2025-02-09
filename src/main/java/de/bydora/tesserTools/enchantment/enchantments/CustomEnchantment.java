@@ -1,45 +1,89 @@
 package de.bydora.tesserTools.enchantment.enchantments;
 
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
+
 @SuppressWarnings("unused")
-public interface CustomEnchantment<T extends  Event> extends Listener {
+public abstract class CustomEnchantment<T extends  Event> implements Listener {
+
+    private final String id;
+    private final String displayName;
+    private final int maxLevel;
+    private final int minLevel;
+    private final Material[] enchantableItems;
+
+    public CustomEnchantment(String id, int maxLevel, String displayName, int minLevel, Material[] enchantableItems) {
+        this.id = id;
+        this.maxLevel = maxLevel;
+        this.displayName = displayName;
+        this.minLevel = minLevel;
+        this.enchantableItems = enchantableItems;
+    }
 
     /**
      * The event that the enchantment should listen to
      * @param event The event
      */
     @EventHandler
-    void enchantmentEvent(T event);
+    public abstract void enchantmentEvent(T event);
+
+    /**
+     * Get the {@link NamespacedKey} which is used when enchanting an item with this enchantment.
+     * @return The {@link NamespacedKey} which belongs to this enchantment
+     */
+    public abstract @NotNull NamespacedKey getSaveKey();
 
     /**
      * A method to get the ID of the enchantment.
      * @return The ID in format: plugin:enchantmentName
      */
-    @NotNull String getID();
+    public @NotNull String getID() {
+        return id;
+    }
 
     /**
      * A method to get the user-friendly- / display name of the enchantment.
      * @return The user-friendly name of the enchantment.
      */
-    @NotNull String getDisplayName();
+    public @NotNull String getDisplayName() {
+        return displayName;
+    }
 
     /**
      * A method to get the maximum level of this enchantment.
      * @return The maximum level of the enchantment
      */
-    int getMaxLevel();
+    public int getMaxLevel() {
+        return maxLevel;
+    }
+
+    /**
+     * Get the level that the enchantment should start at.
+     * @deprecated Bad naming. Use {@link CustomEnchantment#getMinLevel()} instead.
+     * @return The start level of the enchantment
+     */
+    @Deprecated()
+    public int getStartLevel() {
+        return minLevel;
+    }
 
     /**
      * Get the level that the enchantment should start at.
      * @return The start level of the enchantment
      */
-    int getStartLevel();
+    public int getMinLevel() {
+        return minLevel;
+    }
 
     /**
      * Checks if this Enchantment may be applied to the given {@link
@@ -51,20 +95,23 @@ public interface CustomEnchantment<T extends  Event> extends Listener {
      * @param item Item to test
      * @return True if the enchantment may be applied, otherwise False
      */
-    boolean canEnchantItem(@NotNull ItemStack item);
-
-    /**
-     * Get the {@link NamespacedKey} which is used when enchanting an item with this enchantment.
-     * @return The {@link NamespacedKey} which belongs to this enchantment
-     */
-    @NotNull NamespacedKey getSaveKey();
+    public boolean canEnchantItem(@NotNull ItemStack item) {
+        return Arrays.stream(enchantableItems).toList().contains(item.getType());
+    }
 
     /**
      * Checks wether or not the {@link ItemStack} has the enchantment.
      * @param itemStack The item stack to check
      * @return The level of the entchantment; 0 if not present.
      */
-    int getEnchantmentLevel(@NotNull ItemStack itemStack);
+    public int getEnchantmentLevel(@NotNull ItemStack itemStack) {
+        try {
+            PersistentDataContainer container = itemStack.getItemMeta().getPersistentDataContainer();
+            return container.getOrDefault(getSaveKey(), PersistentDataType.INTEGER, 0);
+        } catch (NullPointerException e) {
+            return 0;
+        }
+    }
 
     /**
      * Enchants the given item with the enchantment if possible.
@@ -72,5 +119,19 @@ public interface CustomEnchantment<T extends  Event> extends Listener {
      * @param level The level the enchantment should have
      * @return Whether the enchanting was successfully.
      */
-    boolean enchantItem(@NotNull ItemStack item, int level);
+    public boolean enchantItem(@NotNull ItemStack item, int level) {
+        if (!canEnchantItem(item)) {
+            return false;
+        }
+        ItemMeta itemMeta = item.getItemMeta();
+        PersistentDataContainer container = itemMeta.getPersistentDataContainer();
+        container.set(getSaveKey(), PersistentDataType.INTEGER, level);
+        item.setItemMeta(itemMeta);
+
+        var containerLevel = container.get(getSaveKey(), PersistentDataType.INTEGER);
+        if (containerLevel == null) {
+            return false;
+        }
+        return level == containerLevel;
+    }
 }

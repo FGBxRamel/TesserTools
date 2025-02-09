@@ -13,48 +13,25 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-
-public class Unbreaking implements CustomEnchantment<PlayerItemDamageEvent> {
+public class Unbreaking extends CustomEnchantment<PlayerItemDamageEvent> {
 
     private final static String id = "tessertools:haltbarkeit";
     private final static String displayName = "Haltbarkeit";
     private final static int maxLevel = 5;
-    private final static int startLevel = 4;
+    private final static int minLevel = 4;
     private final static Material[] enchantableItems = MaterialArrayMerger.merge(
             MaterialArrayMerger.merge(EquipmentGroups.TOOLS, EquipmentGroups.ARMOR),
             new Material[] {Material.FISHING_ROD, Material.BOW, Material.MACE, Material.SHIELD, Material.TURTLE_HELMET,
             Material.WOLF_ARMOR, Material.CROSSBOW, Material.FLINT_AND_STEEL, Material.FLINT_AND_STEEL, Material.BRUSH,
             Material.CARROT_ON_A_STICK, Material.SPYGLASS, Material.WARPED_FUNGUS_ON_A_STICK, Material.ELYTRA});
 
+    public Unbreaking() {
+        super(id, maxLevel, displayName, minLevel, enchantableItems);
+    }
+
     @Override
     public void enchantmentEvent(PlayerItemDamageEvent event) {
 
-    }
-
-    @Override
-    public @NotNull String getID() {
-        return id;
-    }
-
-    @Override
-    public @NotNull String getDisplayName() {
-        return displayName;
-    }
-
-    @Override
-    public int getMaxLevel() {
-        return maxLevel;
-    }
-
-    @Override
-    public int getStartLevel() {
-        return startLevel;
-    }
-
-    @Override
-    public boolean canEnchantItem(@NotNull ItemStack item) {
-        return Arrays.stream(enchantableItems).toList().contains(item.getType());
     }
 
     @Override

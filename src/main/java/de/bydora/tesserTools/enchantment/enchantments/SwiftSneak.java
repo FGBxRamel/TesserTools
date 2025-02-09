@@ -12,44 +12,21 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-
-public class SwiftSneak implements CustomEnchantment<PlayerToggleSneakEvent> {
+public class SwiftSneak extends CustomEnchantment<PlayerToggleSneakEvent> {
 
     private final static String id = "tessertools:huschen";
     private final static String displayName = "Huschen";
     private final static int maxLevel = 5;
-    private final static int startLevel = 1;
+    private final static int minLevel = 1;
     private final static Material[] enchantableItems = EquipmentGroups.LEGS;
+
+    public SwiftSneak() {
+        super(id, maxLevel, displayName, minLevel, enchantableItems);
+    }
 
     @Override
     public void enchantmentEvent(PlayerToggleSneakEvent event) {
 
-    }
-
-    @Override
-    public @NotNull String getID() {
-        return id;
-    }
-
-    @Override
-    public @NotNull String getDisplayName() {
-        return displayName;
-    }
-
-    @Override
-    public int getMaxLevel() {
-        return maxLevel;
-    }
-
-    @Override
-    public int getStartLevel() {
-        return startLevel;
-    }
-
-    @Override
-    public boolean canEnchantItem(@NotNull ItemStack item) {
-        return Arrays.stream(enchantableItems).toList().contains(item.getType());
     }
 
     @Override
