@@ -1,5 +1,6 @@
 package de.bydora.tesserTools.enchantment.enchantments;
 
+import de.bydora.tesserTools.TesserTools;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.event.Event;
@@ -12,9 +13,12 @@ import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
+import java.util.logging.Logger;
 
 @SuppressWarnings("unused")
 public abstract class CustomEnchantment<T extends  Event> implements Listener {
+
+    private final static Logger log = TesserTools.getPlugin(TesserTools.class).getLogger();
 
     private final String id;
     private final String displayName;
@@ -120,18 +124,18 @@ public abstract class CustomEnchantment<T extends  Event> implements Listener {
      * @return Whether the enchanting was successfully.
      */
     public boolean enchantItem(@NotNull ItemStack item, int level) {
-        if (!canEnchantItem(item)) {
+        if (!canEnchantItem(item)
+            && item.getType() != Material.BOOK
+            && item.getType() != Material.ENCHANTED_BOOK
+        ) {
             return false;
         }
+
         ItemMeta itemMeta = item.getItemMeta();
         PersistentDataContainer container = itemMeta.getPersistentDataContainer();
         container.set(getSaveKey(), PersistentDataType.INTEGER, level);
         item.setItemMeta(itemMeta);
 
-        var containerLevel = container.get(getSaveKey(), PersistentDataType.INTEGER);
-        if (containerLevel == null) {
-            return false;
-        }
-        return level == containerLevel;
+        return true;
     }
 }

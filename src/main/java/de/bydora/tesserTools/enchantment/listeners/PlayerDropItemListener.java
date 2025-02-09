@@ -107,7 +107,7 @@ public class PlayerDropItemListener implements Listener {
                         extTable.setChargeLevel(chargeLevel - 1);
                         extTable.removeTextDisplays();
 
-                        if (new Random().nextInt(100000) == 0) {
+                        if (new Random().nextInt(1000) == 0) {
                             player.sendMessage("Glücksspiel kann süchtig machen! Infos unter www.bzga.de");
                         }
 
@@ -219,7 +219,7 @@ public class PlayerDropItemListener implements Listener {
                                 int level = Math.max(ench.getEnchantmentLevel(existingStack),
                                         ench.getEnchantmentLevel(thrownStack));
                                 if (level > 0) {
-                                    ench.enchantItem(newBookStack, level);
+                                    ench.enchantItem(thrownStack, level);
                                 }
                             }
 
