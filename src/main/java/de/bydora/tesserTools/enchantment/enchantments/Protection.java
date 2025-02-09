@@ -43,7 +43,13 @@ public class Protection extends CustomEnchantment<EntityDamageByEntityEvent> {
 
     @Override
     public boolean enchantItem(@NotNull ItemStack item, int level) {
-        if (!canEnchantItem(item)) {return false;}
+        if (!canEnchantItem(item)
+            && item.getType() != Material.BOOK
+            && item.getType() != Material.ENCHANTED_BOOK
+        )
+        {
+            return false;
+        }
         ItemMeta itemMeta = item.getItemMeta();
         PersistentDataContainer container = itemMeta.getPersistentDataContainer();
         container.set(getSaveKey(), PersistentDataType.INTEGER, level);

@@ -3,7 +3,7 @@ package de.bydora.tesserTools.enchantment.listeners;
 import com.destroystokyo.paper.ParticleBuilder;
 import de.bydora.tesserTools.TesserTools;
 import de.bydora.tesserTools.enchantment.blocks.ExtEnchantingTable;
-import de.bydora.tesserTools.enchantment.enchantments.CustomEnchantment;
+import de.bydora.tesserTools.enchantment.enchantments.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -19,9 +19,14 @@ import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 
 import javax.annotation.Nullable;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Random;
+import java.util.logging.Logger;
 
 public class PlayerDropItemListener implements Listener {
+
+    private final static Logger log = TesserTools.getPlugin(TesserTools.class).getLogger();
 
     @SuppressWarnings("rawtypes")
     private final static Map<String, CustomEnchantment> customEnchantments = TesserTools.getPlugin(TesserTools.class)
@@ -42,15 +47,17 @@ public class PlayerDropItemListener implements Listener {
                             && item.isValid()
                             && item.getLocation().clone().add(0,-1,0).getBlock().getType() == Material.CHISELED_QUARTZ_BLOCK
                     ) {
-                        var quarzLocation = item.getLocation().clone().add(0, -1,0).toCenterLocation();
+                        var quarzLocation = item.getLocation().clone().add(0, -1, 0).toCenterLocation();
                         ExtEnchantingTable extTable = getExtTable(quarzLocation);
                         if (extTable == null) {
                             Bukkit.getScheduler().cancelTasks(TesserTools.getPlugin(TesserTools.class));
                             return;
                         }
-                        Item enchantItem = extTable.getLocation().getNearbyEntitiesByType(
-                                Item.class, 1,2,1).iterator().next();
-                        if (enchantItem == null) {
+                        Item enchantItem;
+                        try {
+                            enchantItem = extTable.getLocation().getNearbyEntitiesByType(
+                                    Item.class, 1, 2, 1).iterator().next();
+                        } catch (NoSuchElementException e) {
                             event.getPlayer().sendMessage("Kein Item auf dem Tisch gefunden!");
                             Bukkit.getScheduler().cancelTasks(TesserTools.getPlugin(TesserTools.class));
                             return;
@@ -63,8 +70,8 @@ public class PlayerDropItemListener implements Listener {
                         switch (enchantment) {
                             case CustomEnchantment<?> customEnch -> {
                                 if (player.getLevel() >= 50
-                                    && chargeLevel > 0
-                                    && (customEnch.canEnchantItem(enchantStack)
+                                        && chargeLevel > 0
+                                        && (customEnch.canEnchantItem(enchantStack)
                                         || enchantStack.getType() == Material.BOOK
                                         || enchantStack.getType() == Material.ENCHANTED_BOOK)
                                 ) {
@@ -76,7 +83,7 @@ public class PlayerDropItemListener implements Listener {
                             }
                             case Enchantment vanillaEnch -> {
                                 if (player.getLevel() >= 30
-                                    && (vanillaEnch.canEnchantItem(enchantStack)
+                                        && (vanillaEnch.canEnchantItem(enchantStack)
                                         || enchantStack.getType() == Material.BOOK
                                         || enchantStack.getType() == Material.ENCHANTED_BOOK)
                                 ) {
@@ -102,7 +109,7 @@ public class PlayerDropItemListener implements Listener {
                         }
 
                         item.getItemStack().setAmount(item.getItemStack().getAmount() - 1);
-                        spawnEnchantParticles(extTable.getLocation().clone().add(0,1,0));
+                        spawnEnchantParticles(extTable.getLocation().clone().add(0, 1, 0));
                         extTable.clearEnchantments();
                         extTable.setChargeLevel(chargeLevel - 1);
                         extTable.removeTextDisplays();
@@ -170,7 +177,7 @@ public class PlayerDropItemListener implements Listener {
                         ExtEnchantingTable extTable = new ExtEnchantingTable(item.getLocation());
                         if (!extTable.isValid()
                         ) {
-                            event.getPlayer().sendMessage("Bist du blind? (Tisch voll aufgeladen)");
+                            event.getPlayer().sendMessage("Weißt du wie ein Tisch aussieht? (Invalider Tisch)");
                             return;
                         } else if (event.getPlayer().getLevel() < 30) {
                             event.getPlayer().sendMessage("Geh im Sandkasten spielen! (Zu niedriges Level)");
@@ -189,7 +196,6 @@ public class PlayerDropItemListener implements Listener {
                                 Bukkit.getScheduler().cancelTasks(TesserTools.getPlugin(TesserTools.class));
                                 return;
                             }
-                            var newBookStack = new ItemStack(Material.ENCHANTED_BOOK);
                             var existingStack = existingItem.getItemStack();
                             var existingMeta = (EnchantmentStorageMeta) existingStack.getItemMeta();
                             var thrownStack = item.getItemStack();
@@ -202,11 +208,40 @@ public class PlayerDropItemListener implements Listener {
                             for (var ench : vanillaEnchExisting.keySet()) {
                                 // Search for the highest level of the enchantments
                                 int existingLevel = vanillaEnchExisting.get(ench);
+                                int thrownLevel = Objects.requireNonNullElse(vanillaEnchThrown.get(ench), 0);
                                 // If both books have enchantment x and the thrown ones level is higher
                                 if (vanillaEnchThrown.containsKey(ench)
-                                    && vanillaEnchThrown.get(ench) >= existingLevel
+                                    && thrownLevel > existingLevel
                                 ) {
-                                    addBookEnchantment(thrownStack, ench, vanillaEnchThrown.get(ench));
+                                    addBookEnchantment(thrownStack, ench, thrownLevel);
+                                } else if (
+                                        vanillaEnchThrown.containsKey(ench)
+                                        && thrownLevel == existingLevel
+                                        && ench.getMaxLevel() > thrownLevel
+                                ) {
+                                    addBookEnchantment(thrownStack, ench, thrownLevel + 1);
+                                } else if (
+                                        vanillaEnchThrown.containsKey(ench)
+                                        && thrownLevel == existingLevel
+                                        && (ench == Enchantment.PROTECTION
+                                            || ench == Enchantment.SWIFT_SNEAK
+                                            || ench == Enchantment.UNBREAKING
+                                        )
+                                ) {
+                                    CustomEnchantment customEnch;
+                                    if (ench == Enchantment.PROTECTION) {
+                                        customEnch = new Protection();
+                                    } else if (ench == Enchantment.SWIFT_SNEAK) {
+                                        customEnch = new SwiftSneak();
+                                    } else {
+                                        customEnch = new Unbreaking();
+                                    }
+
+                                    if (customEnch.getMaxLevel() > thrownLevel) {
+                                        addBookEnchantment(thrownStack, ench, thrownLevel + 1);
+                                        customEnch.enchantItem(thrownStack, thrownLevel + 1);
+                                    }
+                                    
                                 }
                                 // If not just use the one from the existing book
                                 else {
@@ -216,8 +251,13 @@ public class PlayerDropItemListener implements Listener {
 
                             // Put the custom enchantments on the book
                             for (var ench : customEnchantments.values()) {
-                                int level = Math.max(ench.getEnchantmentLevel(existingStack),
-                                        ench.getEnchantmentLevel(thrownStack));
+                                int existingLevel = ench.getEnchantmentLevel(existingStack);
+                                int thrownLevel = ench.getEnchantmentLevel(thrownStack);
+                                if (existingLevel == thrownLevel) {
+                                    continue;
+                                }
+
+                                int level = Math.max(existingLevel, thrownLevel);
                                 if (level > 0) {
                                     ench.enchantItem(thrownStack, level);
                                 }
@@ -276,11 +316,9 @@ public class PlayerDropItemListener implements Listener {
 
     private void addBookEnchantment(ItemStack item, Enchantment enchantment, int level){
         EnchantmentStorageMeta meta = (EnchantmentStorageMeta) item.getItemMeta();
+        meta.removeStoredEnchant(enchantment);
         meta.addStoredEnchant(enchantment, level, true);
         item.setItemMeta(meta);
     }
 
-    private void addBookEnchantment(ItemStack item, CustomEnchantment enchantment, int level){
-        // Do stuff
-    }
 }
