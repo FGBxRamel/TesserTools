@@ -188,6 +188,7 @@ public class PlayerDropItemListener implements Listener {
                         // If enchanted book was thrown on the table and the table is blocked
                         if (extTable.isBlocked()
                             && item.getItemStack().getType() == Material.ENCHANTED_BOOK
+                                // TODO Check if item actually exists
                         ) {
                             var existingItem = item.getLocation().getNearbyEntitiesByType(Item.class, 1)
                                     .iterator().next();
@@ -213,7 +214,7 @@ public class PlayerDropItemListener implements Listener {
                                 // Put the vanilla enchantments on the book
                                 var vanillaEnchThrown = thrownMeta.getStoredEnchants();
                                 var vanillaEnchExisting = existingMeta.getStoredEnchants();
-                                mergeVanillaEnchantments(vanillaEnchThrown, vanillaEnchExisting, thrownStack);
+                                mergeVanillaEnchantments(vanillaEnchExisting, vanillaEnchThrown, thrownStack);
 
                                 // Put the custom enchantments on the book
                                 mergeCustomEnchantments(thrownStack, existingStack);
@@ -223,9 +224,11 @@ public class PlayerDropItemListener implements Listener {
                             }
                         }
                         else {
-                            boolean includeCustom = (event.getPlayer().getLevel() >= 50 && extTable.getChargeLevel() > 0);
                             extTable.setBlocked(true);
-                            extTable.startEnchanting(item.getItemStack(), includeCustom);
+                            if (item.getItemStack().getType() != Material.ENCHANTED_BOOK) {
+                                boolean includeCustom = (event.getPlayer().getLevel() >= 50 && extTable.getChargeLevel() > 0);
+                                extTable.startEnchanting(item.getItemStack(), includeCustom);
+                            }
                         }
 
                         Bukkit.getScheduler().cancelTasks(TesserTools.getPlugin(TesserTools.class));
@@ -348,23 +351,14 @@ public class PlayerDropItemListener implements Listener {
             int level1 = ench1.get(ench);
             int level2 = Objects.requireNonNullElse(ench2.get(ench), 0);
             // If both lists have enchantment x and the second level is higher
-            if (ench2.containsKey(ench)
-                && level2 > level1
-                && ench.getMaxLevel() > level2
+            if (level2 > level1
+                && ench.getMaxLevel() >= level2
             ) {
                 enchant(item, ench, level2);
-            } else if (
-                    ench2.containsKey(ench)
-                    && level2 == level1
-                    && ench.getMaxLevel() > level2
-            ) {
-                enchant(item, ench, level2 + 1);
-            } else if (
-                    ench2.containsKey(ench)
-                    && level2 == level1
-                    && (ench == Enchantment.PROTECTION
-                        || ench == Enchantment.SWIFT_SNEAK
-                        || ench == Enchantment.UNBREAKING
+            } else if (level2 == level1
+                        && (ench == Enchantment.PROTECTION
+                            || ench == Enchantment.SWIFT_SNEAK
+                            || ench == Enchantment.UNBREAKING
                     )
                     && ench.getMaxLevel() > level2
             ) {
@@ -382,9 +376,13 @@ public class PlayerDropItemListener implements Listener {
                     enchant(item, customEnch, level2 + 1);
                 }
 
+            } else if (level2 == level1
+                    && ench.getMaxLevel() > level2
+            ) {
+                enchant(item, ench, level2 + 1);
             }
             // If not just use the one from the first map
-            else if (ench.getMaxLevel() > level1) {
+            else if (ench.getMaxLevel() >= level1) {
                 enchant(item, ench, level1);
             }
         }
