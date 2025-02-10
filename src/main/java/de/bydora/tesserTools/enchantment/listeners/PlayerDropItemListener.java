@@ -16,6 +16,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -102,7 +103,7 @@ public class PlayerDropItemListener implements Listener {
                             Bukkit.getScheduler().cancelTasks(TesserTools.getPlugin(TesserTools.class));
                             return;
                         }
-                        if (enchantItem.getItemStack().getType() == Material.BOOK) {
+                        if (enchantStack.getType() == Material.BOOK) {
                             ItemStack enchantedBook = new ItemStack(Material.ENCHANTED_BOOK);
                             enchantedBook.setItemMeta(enchantItem.getItemStack().getItemMeta());
                             enchantItem.setItemStack(enchantedBook);
@@ -181,6 +182,7 @@ public class PlayerDropItemListener implements Listener {
                             return;
                         } else if (event.getPlayer().getLevel() < 30) {
                             event.getPlayer().sendMessage("Geh im Sandkasten spielen! (Zu niedriges Level)");
+                            return;
                         }
 
                         // If enchanted book was thrown on the table and the table is blocked
@@ -190,81 +192,35 @@ public class PlayerDropItemListener implements Listener {
                             var existingItem = item.getLocation().getNearbyEntitiesByType(Item.class, 1)
                                     .iterator().next();
                             // Enchanted book on the table?
-                            if (existingItem == null
-                                || existingItem.getItemStack().getType() != Material.ENCHANTED_BOOK
-                            ) {
+                            if (existingItem == null) {
                                 Bukkit.getScheduler().cancelTasks(TesserTools.getPlugin(TesserTools.class));
                                 return;
+                            } else if (existingItem.getItemStack().getType() != Material.ENCHANTED_BOOK) {
+                                var bookMeta = (EnchantmentStorageMeta) item.getItemStack().getItemMeta();
+                                existingItem.setItemStack(
+                                        mergeVanillaEnchantments(bookMeta.getStoredEnchants(), existingItem.getItemStack().getEnchantments(),
+                                        existingItem.getItemStack(),true)
+                                        );
+                                mergeCustomEnchantments(existingItem.getItemStack(), item.getItemStack());
+                                item.remove();
+                            } else if (existingItem.getItemStack().getType() == Material.ENCHANTED_BOOK) {
+                                var existingStack = existingItem.getItemStack();
+                                var existingMeta = (EnchantmentStorageMeta) existingStack.getItemMeta();
+                                var thrownStack = item.getItemStack();
+                                var thrownMeta = (EnchantmentStorageMeta) thrownStack.getItemMeta();
+
+
+                                // Put the vanilla enchantments on the book
+                                var vanillaEnchThrown = thrownMeta.getStoredEnchants();
+                                var vanillaEnchExisting = existingMeta.getStoredEnchants();
+                                mergeVanillaEnchantments(vanillaEnchThrown, vanillaEnchExisting, thrownStack);
+
+                                // Put the custom enchantments on the book
+                                mergeCustomEnchantments(thrownStack, existingStack);
+
+                                item.setItemStack(thrownStack);
+                                existingItem.remove();
                             }
-                            var existingStack = existingItem.getItemStack();
-                            var existingMeta = (EnchantmentStorageMeta) existingStack.getItemMeta();
-                            var thrownStack = item.getItemStack();
-                            var thrownMeta = (EnchantmentStorageMeta) thrownStack.getItemMeta();
-
-
-                            // Put the vanilla enchantments on the book
-                            var vanillaEnchThrown = thrownMeta.getStoredEnchants();
-                            var vanillaEnchExisting = existingMeta.getStoredEnchants();
-                            for (var ench : vanillaEnchExisting.keySet()) {
-                                // Search for the highest level of the enchantments
-                                int existingLevel = vanillaEnchExisting.get(ench);
-                                int thrownLevel = Objects.requireNonNullElse(vanillaEnchThrown.get(ench), 0);
-                                // If both books have enchantment x and the thrown ones level is higher
-                                if (vanillaEnchThrown.containsKey(ench)
-                                    && thrownLevel > existingLevel
-                                ) {
-                                    addBookEnchantment(thrownStack, ench, thrownLevel);
-                                } else if (
-                                        vanillaEnchThrown.containsKey(ench)
-                                        && thrownLevel == existingLevel
-                                        && ench.getMaxLevel() > thrownLevel
-                                ) {
-                                    addBookEnchantment(thrownStack, ench, thrownLevel + 1);
-                                } else if (
-                                        vanillaEnchThrown.containsKey(ench)
-                                        && thrownLevel == existingLevel
-                                        && (ench == Enchantment.PROTECTION
-                                            || ench == Enchantment.SWIFT_SNEAK
-                                            || ench == Enchantment.UNBREAKING
-                                        )
-                                ) {
-                                    CustomEnchantment customEnch;
-                                    if (ench == Enchantment.PROTECTION) {
-                                        customEnch = new Protection();
-                                    } else if (ench == Enchantment.SWIFT_SNEAK) {
-                                        customEnch = new SwiftSneak();
-                                    } else {
-                                        customEnch = new Unbreaking();
-                                    }
-
-                                    if (customEnch.getMaxLevel() > thrownLevel) {
-                                        addBookEnchantment(thrownStack, ench, thrownLevel + 1);
-                                        customEnch.enchantItem(thrownStack, thrownLevel + 1);
-                                    }
-                                    
-                                }
-                                // If not just use the one from the existing book
-                                else {
-                                    addBookEnchantment(thrownStack, ench, existingLevel);
-                                }
-                            }
-
-                            // Put the custom enchantments on the book
-                            for (var ench : customEnchantments.values()) {
-                                int existingLevel = ench.getEnchantmentLevel(existingStack);
-                                int thrownLevel = ench.getEnchantmentLevel(thrownStack);
-                                if (existingLevel == thrownLevel) {
-                                    continue;
-                                }
-
-                                int level = Math.max(existingLevel, thrownLevel);
-                                if (level > 0) {
-                                    ench.enchantItem(thrownStack, level);
-                                }
-                            }
-
-                            item.setItemStack(thrownStack);
-                            existingItem.remove();
                         }
                         else {
                             boolean includeCustom = (event.getPlayer().getLevel() >= 50 && extTable.getChargeLevel() > 0);
@@ -314,11 +270,152 @@ public class PlayerDropItemListener implements Listener {
         particle.spawn();
     }
 
+    /**
+     * Enchant an item.
+     * @param item The item to enchant
+     * @param ench The enchantment
+     * @param level The level of the enchantment
+     */
+    private void enchant(@NotNull ItemStack item, @NotNull Enchantment ench, @NotNull Integer level) {
+        if (item.getType() == Material.ENCHANTED_BOOK) {
+            addBookEnchantment(item, ench, level);
+        } else {
+            item.addUnsafeEnchantment(ench, level);
+        }
+    }
+
+    /**
+     * Enchant an item.
+     * @param item The item to enchant
+     * @param ench The enchantment
+     * @param level The level of the enchantment
+     */
+    private void enchant(@NotNull ItemStack item, @NotNull CustomEnchantment ench, @NotNull Integer level) {
+        ench.enchantItem(item, level);
+    }
+
+    /**
+     * Adds an enchantment to a book.
+     * @param item The book that should be enchanted
+     * @param enchantment The enchantment to add
+     * @param level Which level the enchantment has
+     */
     private void addBookEnchantment(ItemStack item, Enchantment enchantment, int level){
         EnchantmentStorageMeta meta = (EnchantmentStorageMeta) item.getItemMeta();
         meta.removeStoredEnchant(enchantment);
         meta.addStoredEnchant(enchantment, level, true);
         item.setItemMeta(meta);
+    }
+
+    /**
+     * Takes two maps of enchantments with their level and puts them on the given ItemStack.<p />
+     * It always takes the greater level. If the levels are equal and the enchantments max level allows it
+     * the level will be incremented.
+     * @param ench1 The first list
+     * @param ench2 The second list
+     * @param item The ItemStack the enchantments should go on
+     * @return The enchanted item
+     */
+    private @NotNull ItemStack mergeVanillaEnchantments(
+            @NotNull Map<Enchantment, Integer> ench1, @NotNull Map<Enchantment, Integer> ench2, @NotNull ItemStack item
+    ) {
+        return mergeVanillaEnchantments(ench1, ench2, item, false);
+    }
+
+    /**
+     * Takes two maps of enchantments with their level and puts them on the given ItemStack.<p />
+     * It always takes the greater level. If the levels are equal and the enchantments max level allows it
+     * the level will be incremented.
+     * @param ench1 The first map
+     * @param ench2 The second map. If the item that should be enchanted is equal to where one of the maps came from,
+     *      *              the respective list needs to be passed to this argument.
+     * @param item The ItemStack the enchantments should go on
+     * @param strict Whether it should check if the enchantments can be put on the item
+     * @return The enchanted item
+     */
+    private @NotNull ItemStack mergeVanillaEnchantments(
+            @NotNull Map<Enchantment, Integer> ench1, @NotNull Map<Enchantment, Integer> ench2, @NotNull ItemStack item,
+            boolean strict
+    ) {
+        for (var ench : ench1.keySet()) {
+            boolean conflicts = false;
+            for (var itemEnch : item.getEnchantments().keySet()) {
+                if (ench.conflictsWith(itemEnch)) {conflicts = true; break;}
+            }
+            if (conflicts && strict) {continue;}
+
+            // Search for the highest level of the enchantments
+            int level1 = ench1.get(ench);
+            int level2 = Objects.requireNonNullElse(ench2.get(ench), 0);
+            // If both lists have enchantment x and the second level is higher
+            if (ench2.containsKey(ench)
+                && level2 > level1
+                && ench.getMaxLevel() > level2
+            ) {
+                enchant(item, ench, level2);
+            } else if (
+                    ench2.containsKey(ench)
+                    && level2 == level1
+                    && ench.getMaxLevel() > level2
+            ) {
+                enchant(item, ench, level2 + 1);
+            } else if (
+                    ench2.containsKey(ench)
+                    && level2 == level1
+                    && (ench == Enchantment.PROTECTION
+                        || ench == Enchantment.SWIFT_SNEAK
+                        || ench == Enchantment.UNBREAKING
+                    )
+                    && ench.getMaxLevel() > level2
+            ) {
+                CustomEnchantment customEnch;
+                if (ench == Enchantment.PROTECTION) {
+                    customEnch = new Protection();
+                } else if (ench == Enchantment.SWIFT_SNEAK) {
+                    customEnch = new SwiftSneak();
+                } else {
+                    customEnch = new Unbreaking();
+                }
+
+                if (customEnch.getMaxLevel() > level2) {
+                    enchant(item, ench, level2 + 1);
+                    enchant(item, customEnch, level2 + 1);
+                }
+
+            }
+            // If not just use the one from the first map
+            else if (ench.getMaxLevel() > level1) {
+                enchant(item, ench, level1);
+            }
+        }
+        return item;
+    }
+
+    /**
+     * Takes the custom enchantments of two items and puts them on the first. <p />
+     * It always takes the greater level. If the levels are equal and the enchantments max level allows it
+     * the level will be incremented.
+     *
+     * @param item1 The first item
+     * @param item2 The second item
+     */
+    private void mergeCustomEnchantments(@NotNull ItemStack item1, @NotNull ItemStack item2) {
+        for (var ench : customEnchantments.values()) {
+            int existingLevel = ench.getEnchantmentLevel(item2);
+            int thrownLevel = ench.getEnchantmentLevel(item1);
+            if (existingLevel == thrownLevel
+                && existingLevel > 0
+                && ench.getMaxLevel() > existingLevel
+            ) {
+                ench.enchantItem(item1, existingLevel + 1);
+                continue;
+            }
+
+            int level = Math.max(existingLevel, thrownLevel);
+            if (level > 0) {
+                ench.enchantItem(item1, level);
+            }
+        }
     }
 
 }
