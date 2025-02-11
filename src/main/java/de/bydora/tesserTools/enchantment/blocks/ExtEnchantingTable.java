@@ -467,6 +467,7 @@ public class ExtEnchantingTable {
         for (int i = 1; i <= 4; i++) {
             this.rolledEnchantments.add(new Missing());
         }
+        this.removeTextDisplays();
         this.saveState();
     }
 
