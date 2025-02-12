@@ -3,9 +3,15 @@ package de.bydora.tesserTools.enchantment.listeners;
 import com.destroystokyo.paper.ParticleBuilder;
 import de.bydora.tesserTools.TesserTools;
 import de.bydora.tesserTools.enchantment.blocks.ExtEnchantingTable;
-import de.bydora.tesserTools.enchantment.enchantments.*;
+import de.bydora.tesserTools.enchantment.enchantments.CustomEnchantment;
+import de.bydora.tesserTools.enchantment.enchantments.Protection;
+import de.bydora.tesserTools.enchantment.enchantments.SwiftSneak;
+import de.bydora.tesserTools.enchantment.enchantments.Unbreaking;
 import de.bydora.tesserTools.enchantment.exceptions.NotAnEnchantmentTableException;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.block.EnchantingTable;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
@@ -15,13 +21,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
-import org.checkerframework.checker.units.qual.N;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.logging.Logger;
 
 public class PlayerDropItemListener implements Listener {
@@ -63,6 +65,7 @@ public class PlayerDropItemListener implements Listener {
         scheduleItemCheck(item, () -> {
             if (isOnEnchantingTable(item)) {
                 processEnchantedBook(event, item);
+                cancelTasks();
             }
         });
     }
@@ -83,11 +86,12 @@ public class PlayerDropItemListener implements Listener {
             public void run() {
                 if (attempts++ >= 3 || !item.isValid()) {
                     cancelTasks();
-                } else {
+
+             } else {
                     action.run();
                 }
-            }
-        }, 0L, 5L);
+         }
+     }, 0L, 5L);
     }
 
     private boolean isOnQuartzBlock(Item item) {
@@ -120,10 +124,9 @@ public class PlayerDropItemListener implements Listener {
             enchanted = applyCustomEnchantment(player, enchantStack, customEnch, chargeLevel, true,
                     customEnch.getEnchantmentLevel(enchantStack) + 1);
         } else if (enchantment instanceof Enchantment vanillaEnch) {
-            enchanted = applyVanillaEnchantment(player, enchantStack, vanillaEnch,
-                    enchantStack.getEnchantmentLevel(vanillaEnch) + 1);
+            enchanted = Objects.nonNull(applyVanillaEnchantment(player, enchantStack, vanillaEnch,
+                    enchantStack.getEnchantmentLevel(vanillaEnch) + 1));
         }
-
         if (enchanted) finalizeEnchantmentProcess(extTable, item, enchantItem);
     }
 
@@ -138,7 +141,12 @@ public class PlayerDropItemListener implements Listener {
             player.setLevel(player.getLevel() - 6);
         }
 
-        if (hasLevel && chargeLevel > 0 && enchantment.canEnchantItem(enchantStack)) {
+        if (hasLevel && chargeLevel > 0
+            && (enchantment.canEnchantItem(enchantStack)
+                || enchantStack.getType() == Material.ENCHANTED_BOOK
+                || enchantStack.getType() == Material.BOOK
+                )
+        ) {
             enchantment.enchantItem(enchantStack, level);
             return true;
         }
@@ -156,9 +164,10 @@ public class PlayerDropItemListener implements Listener {
      * @param enchantStack The item to be enchanted
      * @param enchantment The enchantment to put on the item
      * @param changeLevel Whether to change the players level
-     * @return `true` if the enchanting worked, `false` otherwise
+     * @param level The level of the enchantment
+     * @return The enchanted ItemStack; null if it didn't enchant
      */
-    private boolean applyVanillaEnchantment(@Nullable Player player, ItemStack enchantStack, Enchantment enchantment,
+    private @Nullable ItemStack applyVanillaEnchantment(@Nullable Player player, ItemStack enchantStack, Enchantment enchantment,
                                             boolean changeLevel, Integer level) {
         // Whether the player has enough level
         boolean hasLevel = player == null || player.getLevel() >= 30;
@@ -166,18 +175,22 @@ public class PlayerDropItemListener implements Listener {
         if (player != null && changeLevel) {
             player.setLevel(player.getLevel() - 3);
         }
-
-        if (enchantment.canEnchantItem(enchantStack) && hasLevel) {
-            if (enchantStack.getType() == Material.BOOK || enchantStack.getType() == Material.ENCHANTED_BOOK){
-                var meta = (EnchantmentStorageMeta) enchantStack.getItemMeta();
-                meta.removeStoredEnchant(enchantment);
-                meta.addStoredEnchant(enchantment, level, true);
-            } else {
-                enchantStack.addUnsafeEnchantment(enchantment, level);
-            }
-            return true;
+        if (!hasLevel) {return null;}
+        if (enchantStack.getType() == Material.BOOK) {
+            enchantStack = new ItemStack(Material.ENCHANTED_BOOK);
         }
-        return false;
+
+        if (enchantStack.getType() == Material.ENCHANTED_BOOK){
+            var meta = (EnchantmentStorageMeta) enchantStack.getItemMeta();
+            meta.removeStoredEnchant(enchantment);
+            meta.addStoredEnchant(enchantment, level, true);
+            enchantStack.setItemMeta(meta);
+            return enchantStack;
+        } else if (enchantment.canEnchantItem(enchantStack)) {
+            enchantStack.addUnsafeEnchantment(enchantment, level);
+            return enchantStack;
+        }
+        return null;
     }
 
     /**
@@ -185,9 +198,9 @@ public class PlayerDropItemListener implements Listener {
      * @param player The player doing the action
      * @param enchantStack The item to be enchanted
      * @param enchantment The enchantment to put on the item
-     * @return `true` if the enchanting worked, `false` otherwise
+     * @return The enchanted ItemStack; null if it didn't enchant
      */
-    private boolean applyVanillaEnchantment(Player player, ItemStack enchantStack, Enchantment enchantment,
+    private @Nullable ItemStack applyVanillaEnchantment(Player player, ItemStack enchantStack, Enchantment enchantment,
                                             @Nullable Integer level) {
         return applyVanillaEnchantment(player, enchantStack, enchantment, true, level);
     }
@@ -196,9 +209,9 @@ public class PlayerDropItemListener implements Listener {
      * Applies an {@link Enchantment} to an {@link ItemStack}.
      * @param enchantStack The item to be enchanted
      * @param enchantment The enchantment to put on the item
-     * @return `true` if the enchanting worked, `false` otherwise
+     * @return The enchanted ItemStack; null if it didn't enchant
      */
-    private boolean applyVanillaEnchantment(ItemStack enchantStack, Enchantment enchantment, @Nullable Integer level) {
+    private @Nullable ItemStack applyVanillaEnchantment(ItemStack enchantStack, Enchantment enchantment, @Nullable Integer level) {
         return applyVanillaEnchantment(null, enchantStack, enchantment, false, level);
     }
 
@@ -250,7 +263,7 @@ public class PlayerDropItemListener implements Listener {
         if (secondItem == null) {
             return;
         }
-        mergeEnchantments(book, secondItem, false);
+        mergeEnchantments(book, secondItem, false, event.getPlayer());
         book.remove();
     }
 
@@ -261,7 +274,7 @@ public class PlayerDropItemListener implements Listener {
      * @param mergeItem Item with enchantments. All enchantments will be merged onto this
      * @param strict Whether conflicts, level and tool restrictions should be checked
      */
-    private void mergeEnchantments(Item item1, Item mergeItem, boolean strict) {
+    private void mergeEnchantments(Item item1, Item mergeItem, boolean strict, Player player) {
         var item1Stack = item1.getItemStack();
         var mergeStack = mergeItem.getItemStack();
         var itemVanillaEnch = getVanillaEnchantments(item1Stack);
@@ -287,13 +300,12 @@ public class PlayerDropItemListener implements Listener {
             if (mergeLevel > item1Level
                     && ench.getMaxLevel() >= mergeLevel
             ) {
-                applyVanillaEnchantment(mergeStack, ench, mergeLevel);
+                applyVanillaEnchantment(player, mergeStack, ench, true, mergeLevel);
             } else if (mergeLevel == item1Level // If level is equal, and it's one of the "advanced vanillas"
                     && (ench == Enchantment.PROTECTION
                     || ench == Enchantment.SWIFT_SNEAK
                     || ench == Enchantment.UNBREAKING
                     )
-                    && ench.getMaxLevel() > mergeLevel
             ) {
                 CustomEnchantment<?> customEnch;
                 if (ench == Enchantment.PROTECTION) {
@@ -305,19 +317,37 @@ public class PlayerDropItemListener implements Listener {
                 }
 
                 if (customEnch.getMaxLevel() > mergeLevel) {
-                    applyVanillaEnchantment(mergeStack, ench, mergeLevel + 1);
-                    applyCustomEnchantment(mergeStack, customEnch, 4, mergeLevel + 1);
+                    applyVanillaEnchantment(player, mergeStack, ench, true, mergeLevel + 1);
+                    applyCustomEnchantment(player, mergeStack, customEnch, 4, true, mergeLevel + 1);
                 }
 
             } else if (mergeLevel == item1Level
                     && ench.getMaxLevel() > mergeLevel
             ) {
-                // TODO Log mergeLevel + 1
-                applyVanillaEnchantment(mergeStack, ench, mergeLevel + 1);
+                applyVanillaEnchantment(player, mergeStack, ench, true, mergeLevel + 1);
             }
             // If not just use the one from the first map
             else if (ench.getMaxLevel() >= item1Level) {
-                applyVanillaEnchantment(mergeStack, ench, item1Level);
+                applyVanillaEnchantment(player, mergeStack, ench, true, item1Level);
+            }
+        }
+        mergeItem.setItemStack(mergeStack);
+
+        // Customs
+        for (var ench : customEnchantments.values()) {
+            var mergeLevel = ench.getEnchantmentLevel(mergeStack);
+            var item1Level = ench.getEnchantmentLevel(item1Stack);
+            if (mergeLevel == item1Level
+                    && mergeLevel > 0
+                    && ench.getMaxLevel() > mergeLevel
+            ) {
+                applyCustomEnchantment(player, mergeStack, ench, 4, true, mergeLevel + 1);
+                continue;
+            }
+
+            int level = Math.max(mergeLevel, item1Level);
+            if (level > 0) {
+                applyCustomEnchantment(player, mergeStack, ench, 4, true, level);
             }
         }
         mergeItem.setItemStack(mergeStack);
