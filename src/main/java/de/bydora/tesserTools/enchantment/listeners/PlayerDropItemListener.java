@@ -124,8 +124,12 @@ public class PlayerDropItemListener implements Listener {
             enchanted = applyCustomEnchantment(player, enchantStack, customEnch, chargeLevel, true,
                     customEnch.getEnchantmentLevel(enchantStack) + 1);
         } else if (enchantment instanceof Enchantment vanillaEnch) {
-            enchanted = Objects.nonNull(applyVanillaEnchantment(player, enchantStack, vanillaEnch,
-                    enchantStack.getEnchantmentLevel(vanillaEnch) + 1));
+                var newStack = applyVanillaEnchantment(player, enchantStack, vanillaEnch,
+                    enchantStack.getEnchantmentLevel(vanillaEnch) + 1);
+                if (Objects.nonNull(newStack)) {
+                    enchanted = true;
+                    enchantItem.setItemStack(newStack);
+                }
         }
         if (enchanted) finalizeEnchantmentProcess(extTable, item, enchantItem);
     }
@@ -240,9 +244,19 @@ public class PlayerDropItemListener implements Listener {
             event.getPlayer().sendMessage("Zu niedriges Level oder ungültiger Tisch!");
             return;
         }
-        extTable.setBlocked(true);
-        extTable.startEnchanting(item.getItemStack(), event.getPlayer().getLevel() >= 50
-                && extTable.getChargeLevel() > 0);
+
+        var secondItem = getNearbyItem(extTable, item);
+        if (secondItem != null
+            && secondItem.getItemStack().getType() == item.getItemStack().getType()
+            && (hasEnchantments(secondItem.getItemStack()) || hasEnchantments(item.getItemStack()))
+        ) {
+            mergeEnchantments(item, secondItem, false, event.getPlayer());
+            item.remove();
+        } else {
+            extTable.setBlocked(true);
+            extTable.startEnchanting(item.getItemStack(), event.getPlayer().getLevel() >= 50
+                    && extTable.getChargeLevel() > 0);
+        }
     }
 
     private void processEnchantedBook(PlayerDropItemEvent event, Item book) {
@@ -253,13 +267,7 @@ public class PlayerDropItemListener implements Listener {
             return;
         }
 
-        var items = getNearbyItems(extTable);
-        Item secondItem = null;
-        for (Item item : items) {
-            if (!item.equals(book)) {
-                secondItem = item;
-            }
-        }
+        var secondItem = getNearbyItem(extTable, book);
         if (secondItem == null) {
             return;
         }
@@ -335,6 +343,12 @@ public class PlayerDropItemListener implements Listener {
 
         // Customs
         for (var ench : customEnchantments.values()) {
+            if (ench instanceof Unbreaking
+                || ench instanceof SwiftSneak
+                || ench instanceof Protection
+            ) {
+                continue;
+            }
             var mergeLevel = ench.getEnchantmentLevel(mergeStack);
             var item1Level = ench.getEnchantmentLevel(item1Stack);
             if (mergeLevel == item1Level
@@ -365,12 +379,33 @@ public class PlayerDropItemListener implements Listener {
         extTable.setChargeLevel(extTable.getChargeLevel() - 1);
     }
 
-    private Item getNearbyItem(ExtEnchantingTable extTable) {
+    /**
+     * Gets the item near (on) the given enchanting table
+     * @param extTable The table on which to check
+     * @return The found item, or null
+     */
+    private @Nullable Item getNearbyItem(ExtEnchantingTable extTable) {
         return extTable.getLocation()
                 .getNearbyEntitiesByType(Item.class, 1)
                 .stream()
                 .findFirst()
                 .orElse(null);
+    }
+
+    /**
+     * Gets the item near (on) the given enchanting table
+     * @param extTable The table on which to check
+     * @param excludeItem Excludes this item from the search, never giving back this one
+     * @return The found item, or null
+     */
+    private @Nullable Item getNearbyItem(ExtEnchantingTable extTable, Item excludeItem) {
+        var items = getNearbyItems(extTable);
+        for (Item item : items) {
+            if (!item.equals(excludeItem)) {
+                return item;
+            }
+        }
+        return null;
     }
 
     private Collection<Item> getNearbyItems(ExtEnchantingTable extTable) {
@@ -423,5 +458,27 @@ public class PlayerDropItemListener implements Listener {
         } else {
             return item.getEnchantments();
         }
+    }
+
+    /**
+     * Checks whether an item has any enchantments or not
+     * @param item The item to check
+     * @return Whether it has a vanilla or custom enchantment
+     */
+    private boolean hasEnchantments(ItemStack item) {
+        if (item.getType() == Material.ENCHANTED_BOOK) {
+            var meta = (EnchantmentStorageMeta) item.getItemMeta();
+            if (!meta.getStoredEnchants().isEmpty()) {return true;}
+        } else if (!item.getEnchantments().isEmpty()) {
+            return true;
+        }
+
+        for (var ench : customEnchantments.values()) {
+            if (ench.getEnchantmentLevel(item) > 0) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
