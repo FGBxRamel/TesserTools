@@ -301,21 +301,30 @@ public class PlayerDropItemListener implements Listener {
             }
             if (conflicts) {continue;}
 
+            CustomEnchantment<?> customEnch = null;
             // Search for the highest level of the enchantments
             int item1Level = itemVanillaEnch.get(ench);
             int mergeLevel = Objects.requireNonNullElse(mergeVanillaEnch.get(ench), 0);
             // If both lists have enchantment x and the second level is higher
-            if (mergeLevel > item1Level
-                    && ench.getMaxLevel() >= mergeLevel
+            int level = mergeLevel;
+            // If both are equal
+            if (mergeLevel == item1Level
+                    && ench.getMaxLevel() > mergeLevel
             ) {
-                applyVanillaEnchantment(player, mergeStack, ench, true, mergeLevel);
-            } else if (mergeLevel == item1Level // If level is equal, and it's one of the "advanced vanillas"
-                    && (ench == Enchantment.PROTECTION
+                level = mergeLevel + 1;
+            }
+            // If not just use the one from the first map
+            else if (ench.getMaxLevel() >= item1Level
+            ) {
+                level = item1Level;
+            }
+            int customLevel = level;
+            // If it's an "advanced vanilla"
+            if (ench == Enchantment.PROTECTION
                     || ench == Enchantment.SWIFT_SNEAK
                     || ench == Enchantment.UNBREAKING
-                    )
             ) {
-                CustomEnchantment<?> customEnch;
+                // See which one it is
                 if (ench == Enchantment.PROTECTION) {
                     customEnch = new Protection();
                 } else if (ench == Enchantment.SWIFT_SNEAK) {
@@ -323,20 +332,18 @@ public class PlayerDropItemListener implements Listener {
                 } else {
                     customEnch = new Unbreaking();
                 }
-
-                if (customEnch.getMaxLevel() > mergeLevel) {
-                    applyVanillaEnchantment(player, mergeStack, ench, true, mergeLevel + 1);
-                    applyCustomEnchantment(player, mergeStack, customEnch, 4, true, mergeLevel + 1);
+                // Level detection
+                if (mergeLevel == item1Level && customEnch.getMaxLevel() > mergeLevel) {
+                    customLevel = mergeLevel + 1;
+                    }
+                 else if (customEnch.getMaxLevel() >= item1Level) {
+                    customLevel = item1Level;
                 }
-
-            } else if (mergeLevel == item1Level
-                    && ench.getMaxLevel() > mergeLevel
-            ) {
-                applyVanillaEnchantment(player, mergeStack, ench, true, mergeLevel + 1);
             }
-            // If not just use the one from the first map
-            else if (ench.getMaxLevel() >= item1Level) {
-                applyVanillaEnchantment(player, mergeStack, ench, true, item1Level);
+
+            applyVanillaEnchantment(mergeStack, ench, level);
+            if (customEnch != null) {
+                applyCustomEnchantment(mergeStack, customEnch, 4, customLevel);
             }
         }
         mergeItem.setItemStack(mergeStack);
