@@ -1,6 +1,5 @@
 package de.bydora.tesserTools;
 
-import de.bydora.tesserTools.commands.CommandEnchant;
 import de.bydora.tesserTools.commands.CommandShowEnch;
 import de.bydora.tesserTools.enchantment.enchantments.*;
 import de.bydora.tesserTools.enchantment.listeners.BlockPlaceListener;
@@ -57,7 +56,7 @@ public final class TesserTools extends JavaPlugin {
 
     private void registerCommands() {
         // this.getCommand("tesbug").setExecutor(new CommandTesbug());
-        this.getCommand("enchant").setExecutor(new CommandEnchant());
+        // this.getCommand("enchant").setExecutor(new CommandEnchant());
         this.getCommand("showench").setExecutor(new CommandShowEnch());
     }
 

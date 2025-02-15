@@ -110,7 +110,8 @@ public class PlayerDropItemListener implements Listener {
 
         Item enchantItem = getNearbyItem(extTable);
         if (enchantItem == null) {
-            event.getPlayer().sendMessage("Kein Item auf dem Tisch gefunden!");
+            ResourceBundle l18 = ResourceBundle.getBundle("translations.tools", event.getPlayer().locale());
+            event.getPlayer().sendMessage(l18.getString("noItemOnTable"));
             return;
         }
 
@@ -223,7 +224,8 @@ public class PlayerDropItemListener implements Listener {
         ExtEnchantingTable extTable = getExtTable(item.getLocation());
         if (extTable == null) {return;}
         else if (!extTable.isValid()) {
-            event.getPlayer().sendMessage("Ungültiger Verzauberungstisch!");
+            ResourceBundle l18 = ResourceBundle.getBundle("translations.tools", event.getPlayer().locale());
+            event.getPlayer().sendMessage(l18.getString("invalidTable"));
             return;
         }
         int maxChargeAmount = 4 - extTable.getChargeLevel();
@@ -239,9 +241,13 @@ public class PlayerDropItemListener implements Listener {
 
     private void processEnchantment(PlayerDropItemEvent event, Item item) {
         ExtEnchantingTable extTable = getExtTable(item.getLocation());
+        ResourceBundle l18 = ResourceBundle.getBundle("translations.tools", event.getPlayer().locale());
         if (extTable == null) {return;}
-        else if (!extTable.isValid() || event.getPlayer().getLevel() < 30) {
-            event.getPlayer().sendMessage("Zu niedriges Level oder ungültiger Tisch!");
+        else if (!extTable.isValid()) {
+            event.getPlayer().sendMessage(l18.getString("invalidTable"));
+            return;
+        } else if (event.getPlayer().getLevel() < 30) {
+            event.getPlayer().sendMessage(l18.getString("insufficientLevel"));
             return;
         }
 
@@ -263,7 +269,8 @@ public class PlayerDropItemListener implements Listener {
         ExtEnchantingTable extTable = getExtTable(book.getLocation());
         if (extTable == null) {return;}
         else if (!extTable.isValid()) {
-            event.getPlayer().sendMessage("Ungültiger Verzauberungstisch!");
+            ResourceBundle l18 = ResourceBundle.getBundle("translations.tools", event.getPlayer().locale());
+            event.getPlayer().sendMessage(l18.getString("invalidTable"));
             return;
         }
 
@@ -362,13 +369,13 @@ public class PlayerDropItemListener implements Listener {
                     && mergeLevel > 0
                     && ench.getMaxLevel() > mergeLevel
             ) {
-                applyCustomEnchantment(player, mergeStack, ench, 4, true, mergeLevel + 1);
+                applyCustomEnchantment(mergeStack, ench, 4, mergeLevel + 1);
                 continue;
             }
 
             int level = Math.max(mergeLevel, item1Level);
             if (level > 0) {
-                applyCustomEnchantment(player, mergeStack, ench, 4, true, level);
+                applyCustomEnchantment(mergeStack, ench, 4, level);
             }
         }
         mergeItem.setItemStack(mergeStack);

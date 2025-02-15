@@ -13,6 +13,8 @@ import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 @SuppressWarnings("unused")
@@ -61,6 +63,16 @@ public abstract class CustomEnchantment<T extends  Event> implements Listener {
      */
     public @NotNull String getDisplayName() {
         return displayName;
+    }
+
+    /**
+     * A method to get the user-friendly- / display name of the enchantment.
+     * @param lang The language that the enchantment should be translated to
+     * @return The user-friendly name of the enchantment
+     */
+    public @NotNull String getDisplayName(Locale lang) {
+        ResourceBundle l18 = ResourceBundle.getBundle("translations.tools", lang);
+        return l18.getString(getID().replaceFirst("tessertools:", ""));
     }
 
     /**
