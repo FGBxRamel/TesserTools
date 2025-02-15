@@ -256,8 +256,12 @@ public class PlayerDropItemListener implements Listener {
             && secondItem.getItemStack().getType() == item.getItemStack().getType()
             && (hasEnchantments(secondItem.getItemStack()) || hasEnchantments(item.getItemStack()))
         ) {
-            mergeEnchantments(item, secondItem, false, event.getPlayer());
-            item.remove();
+            var enchanted = mergeEnchantments(item, secondItem, true, event.getPlayer());
+            if (enchanted) {
+                item.remove();
+            } else {
+                event.getPlayer().sendMessage(l18.getString("failedEnchantGeneric"));
+            }
         } else {
             extTable.setBlocked(true);
             extTable.startEnchanting(item.getItemStack(), event.getPlayer().getLevel() >= 50
@@ -266,10 +270,10 @@ public class PlayerDropItemListener implements Listener {
     }
 
     private void processEnchantedBook(PlayerDropItemEvent event, Item book) {
+        ResourceBundle l18 = ResourceBundle.getBundle("translations.tools", event.getPlayer().locale());
         ExtEnchantingTable extTable = getExtTable(book.getLocation());
         if (extTable == null) {return;}
         else if (!extTable.isValid()) {
-            ResourceBundle l18 = ResourceBundle.getBundle("translations.tools", event.getPlayer().locale());
             event.getPlayer().sendMessage(l18.getString("invalidTable"));
             return;
         }
@@ -278,8 +282,12 @@ public class PlayerDropItemListener implements Listener {
         if (secondItem == null) {
             return;
         }
-        mergeEnchantments(book, secondItem, false, event.getPlayer());
-        book.remove();
+        var enchanted = mergeEnchantments(book, secondItem, true, event.getPlayer());
+        if (enchanted) {
+            book.remove();
+        } else {
+            event.getPlayer().sendMessage(l18.getString("failedEnchantGeneric"));
+        }
     }
 
     /**
@@ -289,43 +297,51 @@ public class PlayerDropItemListener implements Listener {
      * @param mergeItem Item with enchantments. All enchantments will be merged onto this
      * @param strict Whether conflicts, level and tool restrictions should be checked
      */
-    private void mergeEnchantments(Item item1, Item mergeItem, boolean strict, Player player) {
+    private boolean mergeEnchantments(Item item1, Item mergeItem, boolean strict, Player player) {
         var item1Stack = item1.getItemStack();
         var mergeStack = mergeItem.getItemStack();
         var itemVanillaEnch = getVanillaEnchantments(item1Stack);
         var mergeVanillaEnch = getVanillaEnchantments(mergeStack);
+        var newStack = new ItemStack(mergeStack);
+        int usedLevel = 0;
+        Map<Enchantment, Integer> vanillas = new HashMap<>();
 
         for (var ench : itemVanillaEnch.keySet()) {
             boolean conflicts = false;
             // Check for conflicts
-            if (strict) {
-                for (var itemEnch : mergeVanillaEnch.keySet()) {
-                    if (ench.conflictsWith(itemEnch) && ench.canEnchantItem(mergeStack)) {
-                        conflicts = true;
-                        break;
+            if (strict && mergeStack.getType() != Material.ENCHANTED_BOOK) {
+                if (!ench.canEnchantItem(mergeStack)) {
+                    conflicts = true;
+                } else {
+                    for (var itemEnch : mergeVanillaEnch.keySet()) {
+                        if (ench.conflictsWith(itemEnch)) {
+                            conflicts = true;
+                            break;
+                        }
                     }
                 }
             }
-            if (conflicts) {continue;}
+            if (conflicts) {return false;}
 
             CustomEnchantment<?> customEnch = null;
             // Search for the highest level of the enchantments
             int item1Level = itemVanillaEnch.get(ench);
             int mergeLevel = Objects.requireNonNullElse(mergeVanillaEnch.get(ench), 0);
             // If both lists have enchantment x and the second level is higher
-            int level = mergeLevel;
             // If both are equal
             if (mergeLevel == item1Level
                     && ench.getMaxLevel() > mergeLevel
             ) {
-                level = mergeLevel + 1;
+                usedLevel += 3;
+                vanillas.put(ench, mergeLevel + 1);
             }
             // If not just use the one from the first map
             else if (ench.getMaxLevel() >= item1Level
             ) {
-                level = item1Level;
+                usedLevel += 3;
+                vanillas.put(ench, item1Level);
             }
-            int customLevel = level;
+            int customLevel = mergeLevel;
             // If it's an "advanced vanilla"
             if (ench == Enchantment.PROTECTION
                     || ench == Enchantment.SWIFT_SNEAK
@@ -342,18 +358,23 @@ public class PlayerDropItemListener implements Listener {
                 // Level detection
                 if (mergeLevel == item1Level && customEnch.getMaxLevel() > mergeLevel) {
                     customLevel = mergeLevel + 1;
+                    usedLevel += mergeLevel + 1 >= 4 ? 6 : 3;
+                    vanillas.put(ench, customLevel);
                     }
                  else if (customEnch.getMaxLevel() >= item1Level) {
                     customLevel = item1Level;
+                    usedLevel += item1Level >= 4 ? 6 : 3;
+                    vanillas.put(ench, customLevel);
                 }
             }
 
-            applyVanillaEnchantment(mergeStack, ench, level);
             if (customEnch != null) {
-                applyCustomEnchantment(mergeStack, customEnch, 4, customLevel);
+                applyCustomEnchantment(newStack, customEnch, 4, customLevel);
             }
         }
-        mergeItem.setItemStack(mergeStack);
+        for (var van : vanillas.keySet()) {
+            applyVanillaEnchantment(newStack, van, vanillas.get(van));
+        }
 
         // Customs
         for (var ench : customEnchantments.values()) {
@@ -369,16 +390,24 @@ public class PlayerDropItemListener implements Listener {
                     && mergeLevel > 0
                     && ench.getMaxLevel() > mergeLevel
             ) {
-                applyCustomEnchantment(mergeStack, ench, 4, mergeLevel + 1);
+                usedLevel += 6;
+                applyCustomEnchantment(newStack, ench, 4, mergeLevel + 1);
                 continue;
             }
 
             int level = Math.max(mergeLevel, item1Level);
             if (level > 0) {
-                applyCustomEnchantment(mergeStack, ench, 4, level);
+                usedLevel += 6;
+                applyCustomEnchantment(newStack, ench, 4, level);
             }
         }
-        mergeItem.setItemStack(mergeStack);
+        if (player.getLevel() >= usedLevel) {
+            mergeItem.setItemStack(newStack);
+            player.setLevel(player.getLevel() - usedLevel);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private void finalizeEnchantmentProcess(ExtEnchantingTable extTable, Item item, Item enchantItem) {
