@@ -305,7 +305,7 @@ public class ExtEnchantingTable {
      * Creates four random enchantments. The statistical distribution is 3:1 (vanilla:custom).
      * @param item The item that should be enchanted.
      */
-    public void startEnchanting(@NotNull ItemStack item) {
+    public void startEnchanting(@NotNull ItemStack item, Locale lang) {
         var customs = getCustomEnchantments(item);
         Collections.shuffle(customs);
         List<Object> mixedList = new ArrayList<>(getVanillaEnchantments(item));
@@ -321,7 +321,7 @@ public class ExtEnchantingTable {
             this.rolledEnchantments.add(mixedList.removeFirst());
         }
         this.saveState();
-        showEnchantments(item);
+        showEnchantments(item, lang);
 
     }
 
@@ -330,8 +330,8 @@ public class ExtEnchantingTable {
      * @param item The item that should be enchanted.
      * @param includeCustom Whether to include custom enchantments or not
      */
-    public void startEnchanting(@NotNull ItemStack item, boolean includeCustom) {
-        if (includeCustom) {startEnchanting(item); return;}
+    public void startEnchanting(@NotNull ItemStack item, boolean includeCustom, Locale lang) {
+        if (includeCustom) {startEnchanting(item, lang); return;}
         var vanillas = getVanillaEnchantments(item);
         if (vanillas.size() < 4) { return; }
         Collections.shuffle(vanillas);
@@ -341,11 +341,11 @@ public class ExtEnchantingTable {
             this.rolledEnchantments.add(vanillas.removeFirst());
         }
         this.saveState();
-        showEnchantments(item);
+        showEnchantments(item, lang);
 
     }
 
-    private void showEnchantments(ItemStack itemStack) {
+    private void showEnchantments(ItemStack itemStack, Locale lang) {
         removeTextDisplays();
 
         int i = 0;
@@ -354,7 +354,7 @@ public class ExtEnchantingTable {
                 int nextLevel = getNextEnchantmentLevel(itemStack, (CustomEnchantment) enchantment);
                 String roman = nextLevel <= ROMAN_NUMERALS.size() ? ROMAN_NUMERALS.get(nextLevel) : "UNDEFINED";
                 spawnText(this.simpleQuarzLocations[i].clone().add(0,1,0),
-                        ((CustomEnchantment<?>) enchantment).getDisplayName() + " " + roman,
+                        ((CustomEnchantment<?>) enchantment).getDisplayName(lang) + " " + roman,
                         true);
             }
             else if (enchantment instanceof Enchantment) {

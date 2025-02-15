@@ -261,7 +261,7 @@ public class PlayerDropItemListener implements Listener {
         } else {
             extTable.setBlocked(true);
             extTable.startEnchanting(item.getItemStack(), event.getPlayer().getLevel() >= 50
-                    && extTable.getChargeLevel() > 0);
+                    && extTable.getChargeLevel() > 0, event.getPlayer().locale());
         }
     }
 

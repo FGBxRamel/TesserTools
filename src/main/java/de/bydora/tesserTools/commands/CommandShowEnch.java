@@ -26,7 +26,7 @@ public class CommandShowEnch implements CommandExecutor {
         var enchantments = tesserTools.getEnchantmentMap().values();
         for (CustomEnchantment enchantment : enchantments) {
             if (enchantment.getEnchantmentLevel(itemInHand) > 0) {
-                player.sendMessage(enchantment.getDisplayName() + ": " + enchantment.getEnchantmentLevel(itemInHand));
+                player.sendMessage(enchantment.getDisplayName(player.locale()) + ": " + enchantment.getEnchantmentLevel(itemInHand));
             }
         }
         return true;
