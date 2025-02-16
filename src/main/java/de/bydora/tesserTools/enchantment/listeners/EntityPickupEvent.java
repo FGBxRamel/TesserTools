@@ -24,9 +24,11 @@ public class EntityPickupEvent implements Listener {
             ) {
                 var extTable = new ExtEnchantingTable(vanillaTable.getLocation());
                 extTable.setBlocked(false);
+                extTable.clearEnchantments();
             } else if (loc.clone().add(0, -1, 0).getBlock().getState() instanceof EnchantingTable vanillaTable) {
                 var extTable = new ExtEnchantingTable(vanillaTable.getLocation());
                 extTable.setBlocked(false);
+                extTable.clearEnchantments();
             }
         }
     }
