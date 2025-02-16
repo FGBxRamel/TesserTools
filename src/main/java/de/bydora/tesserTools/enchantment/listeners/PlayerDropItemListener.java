@@ -26,8 +26,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.logging.Logger;
 
+@SuppressWarnings({"rawtypes", "UnusedReturnValue", "SameParameterValue"})
 public class PlayerDropItemListener implements Listener {
 
+    @SuppressWarnings("unused")
     private final static Logger log = TesserTools.getPlugin(TesserTools.class).getLogger();
     private final static Map<String, CustomEnchantment> customEnchantments = TesserTools.getPlugin(TesserTools.class)
             .getEnchantmentMap();
@@ -105,12 +107,15 @@ public class PlayerDropItemListener implements Listener {
     }
 
     private void processLapisEnchant(PlayerDropItemEvent event, Item item) {
+        ResourceBundle l18 = ResourceBundle.getBundle("translations.tools", event.getPlayer().locale());
         ExtEnchantingTable extTable = getQuarzTable(item.getLocation().clone().add(0, -1, 0));
         if (extTable == null) return;
+        if (!extTable.isValid()) {
+            event.getPlayer().sendMessage(l18.getString("invalidTable"));
+        }
 
         Item enchantItem = getNearbyItem(extTable);
         if (enchantItem == null) {
-            ResourceBundle l18 = ResourceBundle.getBundle("translations.tools", event.getPlayer().locale());
             event.getPlayer().sendMessage(l18.getString("noItemOnTable"));
             return;
         }
