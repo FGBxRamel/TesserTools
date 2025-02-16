@@ -258,6 +258,7 @@ public class PlayerDropItemListener implements Listener {
         ) {
             var enchanted = mergeEnchantments(item, secondItem, true, event.getPlayer());
             if (enchanted) {
+                extTable.clearEnchantments();
                 item.remove();
             } else {
                 event.getPlayer().sendMessage(l18.getString("failedEnchantGeneric"));
@@ -284,6 +285,7 @@ public class PlayerDropItemListener implements Listener {
         }
         var enchanted = mergeEnchantments(book, secondItem, true, event.getPlayer());
         if (enchanted) {
+            extTable.clearEnchantments();
             book.remove();
         } else {
             event.getPlayer().sendMessage(l18.getString("failedEnchantGeneric"));
