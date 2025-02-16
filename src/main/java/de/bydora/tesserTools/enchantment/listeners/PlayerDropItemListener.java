@@ -112,6 +112,7 @@ public class PlayerDropItemListener implements Listener {
         if (extTable == null) return;
         if (!extTable.isValid()) {
             event.getPlayer().sendMessage(l18.getString("invalidTable"));
+            return;
         }
 
         Item enchantItem = getNearbyItem(extTable);
@@ -134,6 +135,7 @@ public class PlayerDropItemListener implements Listener {
                     enchantStack.getEnchantmentLevel(vanillaEnch) + 1);
                 if (Objects.nonNull(newStack)) {
                     enchanted = true;
+                    assert newStack != null;
                     enchantItem.setItemStack(newStack);
                 }
         }
