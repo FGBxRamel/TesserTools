@@ -14,7 +14,6 @@ import io.papermc.paper.registry.TypedKey;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -357,10 +356,12 @@ public class ExtEnchantingTable {
                         ((CustomEnchantment<?>) enchantment).getDisplayName(lang) + " " + roman,
                         true);
             }
-            else if (enchantment instanceof Enchantment) {
-                int nextLevel = getNextEnchantmentLevel(itemStack, (Enchantment) enchantment);
+            else if (enchantment instanceof Enchantment castedEnch) {
+                ResourceBundle l18 = ResourceBundle.getBundle("translations.tools", lang);
+                var level = ROMAN_NUMERALS.get(getNextEnchantmentLevel(itemStack, castedEnch));
+                String enchName = l18.getString(castedEnch.getKey().asMinimalString()) + " " + level;
                 spawnText(this.simpleQuarzLocations[i].clone().add(0,1,0),
-                        PlainTextComponentSerializer.plainText().serialize(((Enchantment) enchantment).displayName(nextLevel)),
+                        enchName,
                         false);
             }
             i++;
