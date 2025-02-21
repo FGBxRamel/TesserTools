@@ -28,7 +28,7 @@ public class AreaBreak extends CustomEnchantment<BlockBreakEvent> {
             Material.STONE, Material.DEEPSLATE, Material.DIRT, Material.GRAVEL, Material.DIORITE, Material.ANDESITE,
             Material.GRANITE, Material.BASALT, Material.NETHERRACK, Material.BLACKSTONE, Material.SOUL_SAND,
             Material.SAND, Material.END_STONE, Material.TUFF, Material.CALCITE, Material.SOUL_SOIL, Material.CLAY,
-            Material.GRASS_BLOCK, Material.MUD, Material.COBBLESTONE, Material.MOSSY_COBBLESTONE, Material.SAND,
+            Material.GRASS_BLOCK, Material.MUD, Material.COBBLESTONE, Material.MOSSY_COBBLESTONE,
             Material.GRAVEL, Material.RED_SAND, Material.SANDSTONE, Material.RED_SANDSTONE, Material.GRANITE,
             Material.DIORITE, Material.COBBLED_DEEPSLATE, Material.CRIMSON_STEM, Material.WARPED_STEM,
 
