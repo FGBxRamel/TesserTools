@@ -13,9 +13,11 @@ import java.util.Set;
 public class AreaBlockBreaker {
 
     private final Set<Material> allowedMaterials; // Erlaubte Materialien
+    private final int startEnd;
 
-    public AreaBlockBreaker(Set<Material> allowedMaterials) {
+    public AreaBlockBreaker(Set<Material> allowedMaterials, boolean bigArea) {
         this.allowedMaterials = allowedMaterials;
+        this.startEnd = bigArea ? 2 : 1;
     }
 
     /**
@@ -31,9 +33,9 @@ public class AreaBlockBreaker {
         Location loc = startBlock.getLocation();
 
         if (horizontal) {
-            // Suche in einem 3x3-Bereich in der horizontalen Ebene
-            for (int dx = -1; dx <= 1; dx++) {
-                for (int dz = -1; dz <= 1; dz++) {
+            // Suche in einem 3x3-Bereich oder 5x5-Bereich in der horizontalen Ebene
+            for (int dx = -this.startEnd; dx <= this.startEnd; dx++) {
+                for (int dz = -this.startEnd; dz <= this.startEnd; dz++) {
                     if (dx == 0 && dz == 0) continue; // Den zentralen Block überspringen
                     Block neighbor = world.getBlockAt(loc.clone().add(dx, 0, dz));
                     if (isAllowed(neighbor)) {
@@ -44,8 +46,8 @@ public class AreaBlockBreaker {
         } else {
             List<Location> eastWestLocations = new ArrayList<>();
             // Suche in einem 3x3-Bereich an einer vertikalen Wand
-            for (int dy = -1; dy <= 1; dy++) {
-                for (int dz = -1; dz <= 1; dz++) {
+            for (int dy = -this.startEnd; dy <= this.startEnd; dy++) {
+                for (int dz = -this.startEnd; dz <= this.startEnd; dz++) {
                     if (dy == 0 && dz == 0) continue; // Den zentralen Block überspringen
                     Block neighbor = world.getBlockAt(loc.clone().add(0, dy, dz));
                     if (isAllowed(neighbor)) {
@@ -54,8 +56,8 @@ public class AreaBlockBreaker {
                 }
             }
             List<Location> northSouthLocations = new ArrayList<>();
-            for (int dy = -1; dy <= 1; dy++) {
-                for (int dx = -1; dx <= 1; dx++) {
+            for (int dy = -this.startEnd; dy <= this.startEnd; dy++) {
+                for (int dx = -this.startEnd; dx <= this.startEnd; dx++) {
                     if (dy == 0 && dx == 0) continue; // Den zentralen Block überspringen
                     Block neighbor = world.getBlockAt(loc.clone().add(dx, dy, 0));
                     if (isAllowed(neighbor)) {
