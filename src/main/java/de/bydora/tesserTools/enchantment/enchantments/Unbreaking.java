@@ -13,7 +13,7 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 
-public class Unbreaking extends CustomEnchantment<PlayerItemDamageEvent> {
+public class Unbreaking extends EnhVanillaEnch {
 
     private final static String id = "tessertools:haltbarkeit";
     private final static String displayName = "Haltbarkeit";
@@ -24,14 +24,10 @@ public class Unbreaking extends CustomEnchantment<PlayerItemDamageEvent> {
             new Material[] {Material.FISHING_ROD, Material.BOW, Material.MACE, Material.SHIELD, Material.TURTLE_HELMET,
             Material.WOLF_ARMOR, Material.CROSSBOW, Material.FLINT_AND_STEEL, Material.FLINT_AND_STEEL, Material.BRUSH,
             Material.CARROT_ON_A_STICK, Material.SPYGLASS, Material.WARPED_FUNGUS_ON_A_STICK, Material.ELYTRA});
+    private final static Enchantment vanillaEnchantment = Enchantment.UNBREAKING;
 
     public Unbreaking() {
-        super(id, maxLevel, displayName, minLevel, enchantableItems);
-    }
-
-    @Override
-    public void enchantmentEvent(PlayerItemDamageEvent event) {
-
+        super(id, maxLevel, displayName, minLevel, enchantableItems, vanillaEnchantment);
     }
 
     @Override
@@ -39,27 +35,4 @@ public class Unbreaking extends CustomEnchantment<PlayerItemDamageEvent> {
         return EnchantmentSpaceKeys.ENCH_UNBRKEAING.getKey();
     }
 
-    @Override
-    public int getEnchantmentLevel(@NotNull ItemStack itemStack) {
-        PersistentDataContainer container = itemStack.getItemMeta().getPersistentDataContainer();
-        return container.getOrDefault(getSaveKey(), PersistentDataType.INTEGER,
-                itemStack.getEnchantmentLevel(Enchantment.UNBREAKING));
-    }
-
-    @Override
-    public boolean enchantItem(@NotNull ItemStack item, int level) {
-        if (!canEnchantItem(item)
-                && item.getType() != Material.BOOK
-                && item.getType() != Material.ENCHANTED_BOOK
-        )
-        {
-            return false;
-        }
-        ItemMeta itemMeta = item.getItemMeta();
-        PersistentDataContainer container = itemMeta.getPersistentDataContainer();
-        container.set(getSaveKey(), PersistentDataType.INTEGER, level);
-        item.setItemMeta(itemMeta);
-        item.addUnsafeEnchantment(Enchantment.UNBREAKING, level);
-        return level == container.get(getSaveKey(), PersistentDataType.INTEGER);
-    }
 }

@@ -12,21 +12,17 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 
-public class SwiftSneak extends CustomEnchantment<PlayerToggleSneakEvent> {
+public class SwiftSneak extends EnhVanillaEnch {
 
     private final static String id = "tessertools:huschen";
     private final static String displayName = "Huschen";
     private final static int maxLevel = 5;
     private final static int minLevel = 4;
     private final static Material[] enchantableItems = EquipmentGroups.LEGS;
+    private final static Enchantment vanillaEnchantment = Enchantment.SWIFT_SNEAK;
 
     public SwiftSneak() {
-        super(id, maxLevel, displayName, minLevel, enchantableItems);
-    }
-
-    @Override
-    public void enchantmentEvent(PlayerToggleSneakEvent event) {
-
+        super(id, maxLevel, displayName, minLevel, enchantableItems, vanillaEnchantment);
     }
 
     @Override
@@ -34,27 +30,4 @@ public class SwiftSneak extends CustomEnchantment<PlayerToggleSneakEvent> {
         return EnchantmentSpaceKeys.ENCH_SWIFT_SNEAK.getKey();
     }
 
-    @Override
-    public int getEnchantmentLevel(@NotNull ItemStack itemStack) {
-        PersistentDataContainer container = itemStack.getItemMeta().getPersistentDataContainer();
-        return container.getOrDefault(getSaveKey(), PersistentDataType.INTEGER,
-                itemStack.getEnchantmentLevel(Enchantment.SWIFT_SNEAK));
-    }
-
-    @Override
-    public boolean enchantItem(@NotNull ItemStack item, int level) {
-        if (!canEnchantItem(item)
-                && item.getType() != Material.BOOK
-                && item.getType() != Material.ENCHANTED_BOOK
-        )
-        {
-            return false;
-        }
-        ItemMeta itemMeta = item.getItemMeta();
-        PersistentDataContainer container = itemMeta.getPersistentDataContainer();
-        container.set(getSaveKey(), PersistentDataType.INTEGER, level);
-        item.setItemMeta(itemMeta);
-        item.addUnsafeEnchantment(Enchantment.SWIFT_SNEAK, level);
-        return level == container.get(getSaveKey(), PersistentDataType.INTEGER);
-    }
 }
