@@ -3,10 +3,7 @@ package de.bydora.tesserTools.enchantment.listeners;
 import com.destroystokyo.paper.ParticleBuilder;
 import de.bydora.tesserTools.TesserTools;
 import de.bydora.tesserTools.enchantment.blocks.ExtEnchantingTable;
-import de.bydora.tesserTools.enchantment.enchantments.CustomEnchantment;
-import de.bydora.tesserTools.enchantment.enchantments.Protection;
-import de.bydora.tesserTools.enchantment.enchantments.SwiftSneak;
-import de.bydora.tesserTools.enchantment.enchantments.Unbreaking;
+import de.bydora.tesserTools.enchantment.enchantments.*;
 import de.bydora.tesserTools.enchantment.exceptions.NotAnEnchantmentTableException;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -33,6 +30,24 @@ public class PlayerDropItemListener implements Listener {
     private final static Logger log = TesserTools.getPlugin(TesserTools.class).getLogger();
     private final static Map<String, CustomEnchantment> customEnchantments = TesserTools.getPlugin(TesserTools.class)
             .getEnchantmentMap();
+    private final static Map<Enchantment, CustomEnchantment> enhVanillaEnchMap =  Map.of(
+            Enchantment.PROTECTION, new Protection(),
+            Enchantment.SWIFT_SNEAK, new SwiftSneak(),
+            Enchantment.UNBREAKING, new Unbreaking(),
+            Enchantment.PROJECTILE_PROTECTION, new ProjectileProtection(),
+            Enchantment.THORNS, new Thorns(),
+            Enchantment.FIRE_PROTECTION, new FireProtection(),
+            Enchantment.BLAST_PROTECTION, new BlastProtection()
+    );
+    private final static Set<Class<? extends CustomEnchantment>> excludedEnchantments = Set.of(
+            Protection.class,
+            SwiftSneak.class,
+            Unbreaking.class,
+            ProjectileProtection.class,
+            Thorns.class,
+            FireProtection.class,
+            BlastProtection.class
+    );
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerDropItem(PlayerDropItemEvent event) {
@@ -332,25 +347,15 @@ public class PlayerDropItemListener implements Listener {
             }
             if (conflicts) {return false;}
 
-            CustomEnchantment<?> customEnch = null;
+            CustomEnchantment<?> customEnch = enhVanillaEnchMap.get(ench);
             // Search for the highest level of the enchantments
             int item1Level = itemVanillaEnch.get(ench);
             int mergeLevel = Objects.requireNonNullElse(mergeVanillaEnch.get(ench), 0);
 
             int customLevel = mergeLevel;
+
             // If it's an "advanced vanilla"
-            if (ench == Enchantment.PROTECTION
-                    || ench == Enchantment.SWIFT_SNEAK
-                    || ench == Enchantment.UNBREAKING
-            ) {
-                // See which one it is
-                if (ench == Enchantment.PROTECTION) {
-                    customEnch = new Protection();
-                } else if (ench == Enchantment.SWIFT_SNEAK) {
-                    customEnch = new SwiftSneak();
-                } else {
-                    customEnch = new Unbreaking();
-                }
+            if (Objects.nonNull(customEnch)) {
                 // Level detection
                 if (mergeLevel == item1Level && customEnch.getMaxLevel() > mergeLevel) {
                     customLevel = mergeLevel + 1;
@@ -387,12 +392,8 @@ public class PlayerDropItemListener implements Listener {
 
         // Customs
         for (var ench : customEnchantments.values()) {
-            if (ench instanceof Unbreaking
-                || ench instanceof SwiftSneak
-                || ench instanceof Protection
-            ) {
-                continue;
-            }
+            if (excludedEnchantments.contains(ench.getClass())) {continue;}
+
             if (!ench.canEnchantItem(mergeStack)
                 && mergeStack.getType() != Material.ENCHANTED_BOOK
                 && ench.getEnchantmentLevel(item1Stack) > 0

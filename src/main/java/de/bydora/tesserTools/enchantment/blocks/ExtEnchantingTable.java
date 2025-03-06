@@ -2,10 +2,7 @@ package de.bydora.tesserTools.enchantment.blocks;
 
 import com.destroystokyo.paper.ParticleBuilder;
 import de.bydora.tesserTools.TesserTools;
-import de.bydora.tesserTools.enchantment.enchantments.CustomEnchantment;
-import de.bydora.tesserTools.enchantment.enchantments.Missing;
-import de.bydora.tesserTools.enchantment.enchantments.Protection;
-import de.bydora.tesserTools.enchantment.enchantments.Unbreaking;
+import de.bydora.tesserTools.enchantment.enchantments.*;
 import de.bydora.tesserTools.enchantment.enums.EnchantmentSpaceKeys;
 import de.bydora.tesserTools.enchantment.exceptions.NotAnEnchantmentTableException;
 import io.papermc.paper.registry.RegistryAccess;
@@ -51,6 +48,15 @@ public class ExtEnchantingTable {
     );
     private final static Collection<CustomEnchantment> CUSTOM_ENCHANTMENTS = TesserTools.getPlugin(TesserTools.class)
             .getEnchantmentMap().values();
+    private final static Map<@NotNull Class<? extends EnhVanillaEnch>, @NotNull Enchantment> enhVanillaEnchMap =  Map.of(
+            Protection.class, Enchantment.PROTECTION,
+            SwiftSneak.class, Enchantment.SWIFT_SNEAK,
+            Unbreaking.class, Enchantment.UNBREAKING,
+            ProjectileProtection.class, Enchantment.PROJECTILE_PROTECTION,
+            Thorns.class, Enchantment.THORNS,
+            FireProtection.class, Enchantment.FIRE_PROTECTION,
+            BlastProtection.class, Enchantment.BLAST_PROTECTION
+    );
 
     private final Location[] simpleQuarzLocations;
     private final Location[] simpleLapisLocations;
@@ -270,16 +276,14 @@ public class ExtEnchantingTable {
     private List<CustomEnchantment> getCustomEnchantments(ItemStack item) {
         var enchantments = new ArrayList<CustomEnchantment>();
         for (var enchantment : CUSTOM_ENCHANTMENTS) {
+            var vanillaEnch = enhVanillaEnchMap.get(enchantment.getClass());
             if ((item.getType() == Material.ENCHANTED_BOOK
                 || item.getType() == Material.BOOK)
                 && enchantment.getEnchantmentLevel(item) < enchantment.getMaxLevel()
             ) {
                 // Check for the "advanced vanilla enchantments" to not add them if the required level isn't met
-                if (enchantment instanceof Unbreaking
-                        && item.getEnchantmentLevel(Enchantment.UNBREAKING) < enchantment.getStartLevel()
-                ) {continue;}
-                else if (enchantment instanceof Protection
-                        && item.getEnchantmentLevel(Enchantment.PROTECTION) < enchantment.getStartLevel()
+                if (Objects.nonNull(vanillaEnch)
+                        && item.getEnchantmentLevel(vanillaEnch) < enchantment.getMinLevel()
                 ) {continue;}
                 enchantments.add(enchantment);
             }
@@ -287,13 +291,9 @@ public class ExtEnchantingTable {
                 && enchantment.getEnchantmentLevel(item) < enchantment.getMaxLevel()
             ) {
                 // Check for the "advanced vanilla enchantments" to not add them if the required level isn't met
-                if (enchantment instanceof Unbreaking
-                    && item.getEnchantmentLevel(Enchantment.UNBREAKING) < enchantment.getStartLevel()
+                if (Objects.nonNull(vanillaEnch)
+                    && item.getEnchantmentLevel(vanillaEnch) < enchantment.getMinLevel()
                 ) {continue;}
-                else if (enchantment instanceof Protection
-                        && item.getEnchantmentLevel(Enchantment.PROTECTION) < enchantment.getStartLevel()
-                ) {continue;}
-
                 enchantments.add(enchantment);
             }
         }

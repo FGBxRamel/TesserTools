@@ -72,6 +72,10 @@ public final class TesserTools extends JavaPlugin {
                 new Protection(),
                 new SwiftSneak(),
                 new Unbreaking(),
+                new ProjectileProtection(),
+                new Thorns(),
+                new FireProtection(),
+                new BlastProtection(),
         };
         for (CustomEnchantment enchantment : enchantments) {
             this.enchantmentIDs.add(enchantment.getID());

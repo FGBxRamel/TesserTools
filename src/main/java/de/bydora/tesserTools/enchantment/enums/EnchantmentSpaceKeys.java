@@ -24,6 +24,10 @@ public enum EnchantmentSpaceKeys {
     ENCH_PROTECTION(new NamespacedKey(TesserTools.getPlugin(TesserTools.class), "enchProtection")),
     ENCH_SWIFT_SNEAK(new NamespacedKey(TesserTools.getPlugin(TesserTools.class), "enchSwiftSneak")),
     ENCH_MISSING(new NamespacedKey(TesserTools.getPlugin(TesserTools.class), "enchMISSING")),
+    ENCH_PROJ_PROT(new NamespacedKey(TesserTools.getPlugin(TesserTools.class), "enchProjectileProtection")),
+    ENCH_FIRE_PROT(new NamespacedKey(TesserTools.getPlugin(TesserTools.class), "enchFireProtection")),
+    ENCH_BLAST_PROT(new NamespacedKey(TesserTools.getPlugin(TesserTools.class), "enchBlastProtection")),
+    ENCH_THORNS(new NamespacedKey(TesserTools.getPlugin(TesserTools.class), "enchThorns")),
     //</editor-fold>
 
     //<editor-fold desc="Other">

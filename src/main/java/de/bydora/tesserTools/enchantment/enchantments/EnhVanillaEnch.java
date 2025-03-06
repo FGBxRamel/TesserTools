@@ -3,12 +3,14 @@ package de.bydora.tesserTools.enchantment.enchantments;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.Event;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 public abstract class EnhVanillaEnch extends CustomEnchantment<Event> {
 
@@ -23,6 +25,12 @@ public abstract class EnhVanillaEnch extends CustomEnchantment<Event> {
     @Override
     public void enchantmentEvent(Event event) {
 
+    }
+
+    @Override
+    public @NotNull String getDisplayName(Locale lang) {
+        ResourceBundle l18 = ResourceBundle.getBundle("translations.tools", lang);
+        return l18.getString(vanillaEnchantment.getKey().asMinimalString());
     }
 
     @Override
