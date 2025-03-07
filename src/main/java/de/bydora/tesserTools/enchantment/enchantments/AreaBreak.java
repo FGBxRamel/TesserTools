@@ -49,11 +49,11 @@ public class AreaBreak extends CustomEnchantment<BlockBreakEvent> {
         if (getEnchantmentLevel(item) > 0
             && Arrays.stream(affectedBlocks).toList().contains(event.getBlock().getType())
         ) {
-            AreaBlockBreaker breaker = new AreaBlockBreaker(Set.of(affectedBlocks), this.getEnchantmentLevel(item) == 2);
-            List<Location> horizontalLocations = breaker.findDirectNeighbors(event.getPlayer(), event.getBlock(), true);
-            List<Location> verticalLocations = breaker.findDirectNeighbors(event.getPlayer(), event.getBlock(), false);
-            List<Location> locations = horizontalLocations.size() > verticalLocations.size()
-                    ? horizontalLocations : verticalLocations;
+            AreaBlockBreaker breaker = new AreaBlockBreaker(Set.of(affectedBlocks),
+                    this.getEnchantmentLevel(item) == 2);
+            var pitch = Math.abs(event.getPlayer().getEyeLocation().getPitch());
+            List<Location> locations = breaker.findDirectNeighbors(event.getPlayer(), event.getBlock(),
+                    pitch >= 45);
             for (Location location : locations) {
                 location.getBlock().breakNaturally(item);
             }
