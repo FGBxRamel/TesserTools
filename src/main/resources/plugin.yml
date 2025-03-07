@@ -1,5 +1,5 @@
 name: TesserTools
-version: '1.0-BETA'
+version: '1.0'
 main: de.bydora.tesserTools.TesserTools
 api-version: '1.21'
 author: FGBxRamel
@@ -9,7 +9,7 @@ website: https://github.com/FGBxRamel/TesserTools
 prefix: Tesserania Tools
 
 commands:
-  tesbug:
-    description: Displays debug and testing output
-    usage: /tesbug
-    permission: tessertools.debug.output
+  showench:
+    description: Shows all special enchantments that the item in hand has
+    usage: /showench
+    permission: tessertools.enchantment.showench

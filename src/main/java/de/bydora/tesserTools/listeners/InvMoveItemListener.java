@@ -22,6 +22,7 @@ public class InvMoveItemListener implements Listener {
     final NamespacedKey boostLevelKey = new NamespacedKey(TesserTools.getPlugin(TesserTools.class),
             "boost-level");
 
+    @SuppressWarnings("DataFlowIssue")
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onInvMoveItem(InventoryMoveItemEvent event) {
         final Inventory srcinv = event.getSource();
