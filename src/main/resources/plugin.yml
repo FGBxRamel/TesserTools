@@ -9,14 +9,6 @@ website: https://github.com/FGBxRamel/TesserTools
 prefix: Tesserania Tools
 
 commands:
-  tesbug:
-    description: Displays debug and testing output
-    usage: /tesbug
-    permission: tessertools.debug.output
-  enchant:
-    description: Enchants the item in hand with the given special enchantment
-    usage: /enchant <id> <level>
-    permission: tessertools.enchantment.enchant
   showench:
     description: Shows all special enchantments that the item in hand has
     usage: /showench
