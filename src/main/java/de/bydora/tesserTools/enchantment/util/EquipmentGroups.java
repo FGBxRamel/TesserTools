@@ -2,6 +2,7 @@ package de.bydora.tesserTools.enchantment.util;
 
 import org.bukkit.Material;
 
+@SuppressWarnings("unused")
 public record EquipmentGroups() {
     public static final Material[] AXES = new Material[] {
             Material.DIAMOND_AXE,

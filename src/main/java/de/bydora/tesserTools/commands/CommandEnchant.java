@@ -2,6 +2,7 @@ package de.bydora.tesserTools.commands;
 
 import de.bydora.tesserTools.TesserTools;
 import de.bydora.tesserTools.enchantment.enchantments.CustomEnchantment;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -16,10 +17,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("ALL")
 public class CommandEnchant implements CommandExecutor, TabCompleter {
 
     private static final TesserTools plugin = TesserTools.getPlugin(TesserTools.class);
     private static final List<String> ENCHANTMENTS = plugin.getEnchantmentIDs();
+    @SuppressWarnings("rawtypes")
     private static final Map<String, CustomEnchantment> ENCHANTMENT_MAP = plugin.getEnchantmentMap();
 
     @Override
@@ -47,12 +50,12 @@ public class CommandEnchant implements CommandExecutor, TabCompleter {
         }
 
         ItemStack item = player.getInventory().getItemInMainHand();
-        if (item == null) {
+        if (item.getType() == Material.AIR) {
             player.sendMessage("Du hältst kein Item in der Hand.");
             return true;
         }
 
-        CustomEnchantment enchantment = ENCHANTMENT_MAP.get(enchantmentId);
+        CustomEnchantment<?> enchantment = ENCHANTMENT_MAP.get(enchantmentId);
         if (enchantment == null || !enchantment.enchantItem(item, level)) {
             player.sendMessage("Fehler beim verzaubern!");
             return false;
@@ -84,11 +87,11 @@ public class CommandEnchant implements CommandExecutor, TabCompleter {
             // Gib Level-Vorschläge (1-5) zurück
             List<String> levels = new ArrayList<>();
             String id = args[0];
-            CustomEnchantment enchantment = ENCHANTMENT_MAP.get(id);
+            CustomEnchantment<?> enchantment = ENCHANTMENT_MAP.get(id);
             if (enchantment == null) {return levels;}
 
             String partial = args[1];
-            for (int i = enchantment.getStartLevel(); i <= enchantment.getMaxLevel(); i++) {
+            for (int i = enchantment.getMinLevel(); i <= enchantment.getMaxLevel(); i++) {
                 String level = String.valueOf(i);
                 if (level.startsWith(partial)) {
                     levels.add(level);

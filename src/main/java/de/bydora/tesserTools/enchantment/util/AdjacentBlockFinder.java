@@ -49,6 +49,7 @@ public class AdjacentBlockFinder {
     }
 
     // Hilfsfunktion: Überprüft, ob der Block ein Holzblock ist
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private boolean isMaterial(Material material) {
         return woodTypes.contains(material);
     }

@@ -49,9 +49,8 @@ public class Harvester extends CustomEnchantment<BlockBreakEvent> {
                     if (notRemoved.isEmpty()) {
                         Material crop = event.getBlock().getType();
                         BukkitScheduler scheduler = event.getPlayer().getServer().getScheduler();
-                        scheduler.runTaskLater(TesserTools.getPlugin(TesserTools.class), () -> {
-                            event.getBlock().setType(crop);
-                                }, 1);
+                        scheduler.runTaskLater(TesserTools.getPlugin(TesserTools.class),
+                                () -> event.getBlock().setType(crop), 1);
                     }
                 }
             }

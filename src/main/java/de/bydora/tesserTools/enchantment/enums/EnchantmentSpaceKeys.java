@@ -19,7 +19,6 @@ public enum EnchantmentSpaceKeys {
     ENCH_UNBRKEAING(new NamespacedKey(TesserTools.getPlugin(TesserTools.class), "enchUnbreaking")),
     ENCH_HARVESTER(new NamespacedKey(TesserTools.getPlugin(TesserTools.class), "enchHarvester")),
     ENCH_MAGNETIC(new NamespacedKey(TesserTools.getPlugin(TesserTools.class), "enchMagnetic")),
-    ENCH_FAST_ATTACK(new NamespacedKey(TesserTools.getPlugin(TesserTools.class), "enchFastAttack")),
     ENCH_LIFESTEAL(new NamespacedKey(TesserTools.getPlugin(TesserTools.class), "enchLifesteal")),
     ENCH_PROTECTION(new NamespacedKey(TesserTools.getPlugin(TesserTools.class), "enchProtection")),
     ENCH_SWIFT_SNEAK(new NamespacedKey(TesserTools.getPlugin(TesserTools.class), "enchSwiftSneak")),

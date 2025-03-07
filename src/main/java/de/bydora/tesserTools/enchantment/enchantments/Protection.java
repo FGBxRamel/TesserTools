@@ -5,11 +5,6 @@ import de.bydora.tesserTools.enchantment.util.EquipmentGroups;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 
 public class Protection extends EnhVanillaEnch {

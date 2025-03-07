@@ -34,11 +34,6 @@ public class Missing extends CustomEnchantment<Event> {
     }
 
     @Override
-    public int getStartLevel() {
-        return -1;
-    }
-
-    @Override
     public boolean canEnchantItem(@NotNull ItemStack item) {
         return false;
     }

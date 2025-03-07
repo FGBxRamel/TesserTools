@@ -27,6 +27,7 @@ public class AreaBlockBreaker {
      * @param horizontal True für horizontal (2D), False für vertikal ("an der Wand")
      * @return Eine Liste aller angrenzenden Block-Locations
      */
+    @SuppressWarnings("unused")
     public List<Location> findDirectNeighbors(Player player, Block startBlock, boolean horizontal) {
         List<Location> result = new ArrayList<>();
         World world = startBlock.getWorld();

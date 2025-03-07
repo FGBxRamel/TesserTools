@@ -1,6 +1,5 @@
 package de.bydora.tesserTools.enchantment.listeners;
 
-import de.bydora.tesserTools.TesserTools;
 import de.bydora.tesserTools.enchantment.blocks.ExtEnchantingTable;
 import org.bukkit.block.EnchantingTable;
 import org.bukkit.entity.Player;
@@ -8,15 +7,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 
-import java.util.logging.Logger;
-
 public class EntityPickupEvent implements Listener {
 
-    Logger log = TesserTools.getPlugin(TesserTools.class).getLogger();
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityPickupItem(EntityPickupItemEvent event) {
-        if (event.getEntity() instanceof Player player
+        if (event.getEntity() instanceof Player
         ) {
             // TODO Rework this, it's awful
             var loc = event.getItem().getLocation().toCenterLocation();

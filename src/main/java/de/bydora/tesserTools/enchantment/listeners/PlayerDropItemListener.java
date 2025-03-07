@@ -150,7 +150,6 @@ public class PlayerDropItemListener implements Listener {
                     enchantStack.getEnchantmentLevel(vanillaEnch) + 1);
                 if (Objects.nonNull(newStack)) {
                     enchanted = true;
-                    assert newStack != null;
                     enchantItem.setItemStack(newStack);
                 }
         }

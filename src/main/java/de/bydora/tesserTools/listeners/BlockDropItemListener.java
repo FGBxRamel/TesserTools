@@ -11,12 +11,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.util.logging.Logger;
-
 public class BlockDropItemListener implements Listener {
 
-    private final Logger log = TesserTools.getPlugin(TesserTools.class).getLogger();
 
+    @SuppressWarnings("DataFlowIssue")
     @EventHandler(ignoreCancelled = true)
     public void onBlockDropItem(BlockDropItemEvent event) {
         if (!(event.getBlockState() instanceof Hopper hopper)) {return;}

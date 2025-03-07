@@ -5,8 +5,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.PrepareAnvilEvent;
 
-import java.util.Objects;
-
 public class PrepareAnvilListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)

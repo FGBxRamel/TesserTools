@@ -15,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 import java.util.List;
 
+@SuppressWarnings("ALL")
 public class Abholzung extends CustomEnchantment<BlockBreakEvent> {
 
     private final static String id = "tessertools:abholzung";

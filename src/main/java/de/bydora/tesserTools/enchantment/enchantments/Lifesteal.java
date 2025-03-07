@@ -34,6 +34,7 @@ public class Lifesteal extends CustomEnchantment<EntityDamageByEntityEvent> {
             if (canEnchantItem(player.getInventory().getItemInMainHand())) {
                 if (getEnchantmentLevel(player.getInventory().getItemInMainHand()) == 0) {return;}
                 AttributeInstance absorption = player.getAttribute(Attribute.MAX_ABSORPTION);
+                assert absorption != null;
                 if (absorption.getBaseValue() < 20) {
                     absorption.setBaseValue(20);
                 }

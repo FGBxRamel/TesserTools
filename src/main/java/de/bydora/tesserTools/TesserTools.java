@@ -13,17 +13,14 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @SuppressWarnings("rawtypes")
 public final class TesserTools extends JavaPlugin {
 
     private final PluginManager pm = getServer().getPluginManager();
-    private List<String> enchantmentIDs = new ArrayList<String>();
-    private Map<String, CustomEnchantment> enchantmentMap = new HashMap<>();
+    private final List<String> enchantmentIDs = new ArrayList<>();
+    private final Map<String, CustomEnchantment> enchantmentMap = new HashMap<>();
 
     @Override
     public void onEnable() {
@@ -55,9 +52,7 @@ public final class TesserTools extends JavaPlugin {
     }
 
     private void registerCommands() {
-        // this.getCommand("tesbug").setExecutor(new CommandTesbug());
-        // this.getCommand("enchant").setExecutor(new CommandEnchant());
-        this.getCommand("showench").setExecutor(new CommandShowEnch());
+        Objects.requireNonNull(this.getCommand("showench")).setExecutor(new CommandShowEnch());
     }
 
     @SuppressWarnings("rawtypes")

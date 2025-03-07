@@ -11,16 +11,15 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.util.logging.Logger;
+import java.util.Objects;
 
 public class PlayerInteractListener implements Listener {
 
-    private final Logger log = TesserTools.getPlugin(TesserTools.class).getLogger();
-
+    @SuppressWarnings("DataFlowIssue")
     @EventHandler(ignoreCancelled = true)
     public void onPlayerInteract(PlayerInteractEvent event) {
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK ||
-            event.getClickedBlock().getType() != Material.HOPPER ||
+            Objects.requireNonNull(event.getClickedBlock()).getType() != Material.HOPPER ||
             (event.getMaterial() != Material.FIRE_CHARGE &&
                     event.getMaterial() != Material.FLINT)
         ) {return;}
@@ -35,7 +34,7 @@ public class PlayerInteractListener implements Listener {
         final int boostLevel = container.get(key, PersistentDataType.INTEGER);
         if (event.getMaterial() == Material.FLINT) {
 
-            event.getPlayer().sendMessage("Die Booststufe beträgt: " + Integer.toString(boostLevel));
+            event.getPlayer().sendMessage("Die Booststufe beträgt: " + boostLevel);
         }
         else {
             final int newBoostLevel;

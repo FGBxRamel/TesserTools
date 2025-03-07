@@ -27,14 +27,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.logging.Logger;
 
 import static java.util.Map.entry;
 
-@SuppressWarnings("rawtypes")
+@SuppressWarnings({"rawtypes", "UnstableApiUsage"})
 public class ExtEnchantingTable {
-
-    Logger log = TesserTools.getPlugin(TesserTools.class).getLogger();
 
     private static final Map ENCHANTMENT_MAP = TesserTools.getPlugin(TesserTools.class).getEnchantmentMap();
     public static final Registry<Enchantment> ENCHANTMENT_REGISTRY = RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT);
@@ -131,6 +128,7 @@ public class ExtEnchantingTable {
      * Determines if the table is valid for enchantments
      * @return Whether it is valid for enchantments
      */
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isValid() {
         return (this.hasValidLapis() && this.hasValidQuarz());
     }
@@ -158,6 +156,7 @@ public class ExtEnchantingTable {
         return baseParticle.clone();
     }
 
+    @SuppressWarnings("unused")
     public boolean isBlocked() {
         return isBlocked;
     }
@@ -194,6 +193,7 @@ public class ExtEnchantingTable {
     /**
      * Loads the state of the enchantment table from it's {@link PersistentDataContainer}.
      */
+    @SuppressWarnings({"UnstableApiUsage", "PatternValidation"})
     private void loadState() {
         var stateContainer = this.vanillaTable.getPersistentDataContainer().getOrDefault(
                 EnchantmentSpaceKeys.STATE_CONTAINER.getKey(), PersistentDataType.TAG_CONTAINER,
@@ -376,7 +376,7 @@ public class ExtEnchantingTable {
 
     private void spawnText(Location location, String text, boolean red) {
         // https://www.spigotmc.org/threads/tutorial-holograms-1-8.65183/
-        TextDisplay display = location.getWorld().spawn(location, TextDisplay.class, entity -> {
+        location.getWorld().spawn(location, TextDisplay.class, entity -> {
             entity.text(Component.text(text, red ? NamedTextColor.DARK_RED : NamedTextColor.WHITE));
             entity.setBillboard(Display.Billboard.VERTICAL);
             entity.setPersistent(false);
@@ -433,6 +433,7 @@ public class ExtEnchantingTable {
      * @param level The new charge level
      * @return Whether the level was set
      */
+    @SuppressWarnings("UnusedReturnValue")
     public boolean setChargeLevel(int level) {
         if (level < 0 || level > 4) {
             this.updateLevelCrystals();
@@ -452,7 +453,7 @@ public class ExtEnchantingTable {
         for (var location : simpleLapisLocations) {
             var blockLocation = location.clone().add(0,2,0);
             if (remainingCharge-- > 0){
-                var crystal = (EnderCrystal) blockLocation.getWorld().spawn(blockLocation, EnderCrystal.class);
+                var crystal = blockLocation.getWorld().spawn(blockLocation, EnderCrystal.class);
                 crystal.setShowingBottom(false);
                 crystal.setInvulnerable(true);
             }
