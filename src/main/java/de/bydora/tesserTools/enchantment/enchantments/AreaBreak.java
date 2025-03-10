@@ -7,6 +7,8 @@ import de.bydora.tesserTools.enchantment.util.MaterialArrayMerger;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
@@ -49,14 +51,7 @@ public class AreaBreak extends CustomEnchantment<BlockBreakEvent> {
         if (getEnchantmentLevel(item) > 0
             && Arrays.stream(affectedBlocks).toList().contains(event.getBlock().getType())
         ) {
-            AreaBlockBreaker breaker = new AreaBlockBreaker(Set.of(affectedBlocks),
-                    this.getEnchantmentLevel(item) == 2);
-            var pitch = Math.abs(event.getPlayer().getEyeLocation().getPitch());
-            List<Location> locations = breaker.findDirectNeighbors(event.getPlayer(), event.getBlock(),
-                    pitch >= 45);
-            for (Location location : locations) {
-                location.getBlock().breakNaturally(item);
-            }
+            breakArea(getEnchantmentLevel(item) == 2, event.getPlayer(), event.getBlock(), item);
         }
     }
 
@@ -64,6 +59,32 @@ public class AreaBreak extends CustomEnchantment<BlockBreakEvent> {
     @Override
     public @NotNull NamespacedKey getSaveKey() {
         return EnchantmentSpaceKeys.ENCH_AREA_BREAK.getKey();
+    }
+
+    /**
+     * Returns the blocks that are affected by this enchantment.
+     * Primarily used to clone the blocks to {@link DeepMine}.
+     * @return The affected blocks
+     */
+    public static @NotNull Material[] getAffectedBlocks() {
+        return affectedBlocks;
+    }
+
+    /**
+     * Breaks an area originating from the given block.<p>
+     * The given block will *not* be broken.
+     * @param bigArea Whether it's 5x5 or 3x3
+     * @param player The player executing the break
+     * @param block The block that the break will originate from
+     */
+    public static void breakArea(boolean bigArea, @NotNull Player player, @NotNull Block block,
+                                 @NotNull ItemStack item) {
+        AreaBlockBreaker breaker = new AreaBlockBreaker(Set.of(affectedBlocks), bigArea);
+        var pitch = Math.abs(player.getEyeLocation().getPitch());
+        List<Location> locations = breaker.findDirectNeighbors(player, block, pitch >= 30);
+        for (Location location : locations) {
+            location.getBlock().breakNaturally(item);
+        }
     }
 
 }

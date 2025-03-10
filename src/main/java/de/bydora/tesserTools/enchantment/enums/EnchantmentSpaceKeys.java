@@ -27,6 +27,7 @@ public enum EnchantmentSpaceKeys {
     ENCH_FIRE_PROT(new NamespacedKey(TesserTools.getPlugin(TesserTools.class), "enchFireProtection")),
     ENCH_BLAST_PROT(new NamespacedKey(TesserTools.getPlugin(TesserTools.class), "enchBlastProtection")),
     ENCH_THORNS(new NamespacedKey(TesserTools.getPlugin(TesserTools.class), "enchThorns")),
+    ENCH_DEEPMINE(new NamespacedKey(TesserTools.getPlugin(TesserTools.class), "enchDeepMine")),
     //</editor-fold>
 
     //<editor-fold desc="Other">
