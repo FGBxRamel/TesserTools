@@ -373,11 +373,12 @@ public class PlayerDropItemListener implements Listener {
                 usedLevel += 3;
                 vanillas.put(ench, mergeLevel + 1);
             }
-            // If not just use the one from the first map
+            // If not just use the higher one
             else if (ench.getMaxLevel() >= item1Level
+                    && ench.getMaxLevel() >= mergeLevel
             ) {
                 usedLevel += 3;
-                vanillas.put(ench, item1Level);
+                vanillas.put(ench, Math.max(mergeLevel, item1Level));
             }
 
 
