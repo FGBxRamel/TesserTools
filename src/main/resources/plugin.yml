@@ -17,4 +17,4 @@ commands:
     description: Helps you into the real life
     usage: /reallife
     permission: tessertools.other.reallife
-    aliases: /irl
+    aliases: irl
