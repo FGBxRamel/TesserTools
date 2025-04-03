@@ -1,5 +1,6 @@
 package de.bydora.tesserTools;
 
+import de.bydora.tesserTools.commands.CommandReallife;
 import de.bydora.tesserTools.commands.CommandShowEnch;
 import de.bydora.tesserTools.enchantment.enchantments.*;
 import de.bydora.tesserTools.enchantment.listeners.BlockPlaceListener;
@@ -53,6 +54,7 @@ public final class TesserTools extends JavaPlugin {
 
     private void registerCommands() {
         Objects.requireNonNull(this.getCommand("showench")).setExecutor(new CommandShowEnch());
+        Objects.requireNonNull(this.getCommand("reallife")).setExecutor(new CommandReallife());
     }
 
     @SuppressWarnings("rawtypes")
