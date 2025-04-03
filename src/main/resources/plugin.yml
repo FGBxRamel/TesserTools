@@ -13,3 +13,7 @@ commands:
     description: Shows all special enchantments that the item in hand has
     usage: /showench
     permission: tessertools.enchantment.showench
+  reallife:
+    description: Helps you into the real life
+    usage: /reallife
+    permission: tessertools.other.reallife
