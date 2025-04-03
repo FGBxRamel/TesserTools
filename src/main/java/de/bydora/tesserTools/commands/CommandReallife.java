@@ -18,7 +18,7 @@ public class CommandReallife implements CommandExecutor {
             sender.sendMessage("Dieser Befehl kann nur von Spielern ausgeführt werden.");
             return false;
         } else if (Objects.equals(player.getUniqueId().toString(), "91acaf99-4f22-497d-9c28-1acb65511377")) {
-            sender.sendMessage("Böse Nurray!! Los, weiter in die Sucht!");
+            sender.sendMessage("Böse Nuray!! Los, weiter in die Sucht!");
             return true;
         }
 
