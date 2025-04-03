@@ -1,5 +1,5 @@
 name: TesserTools
-version: '1.2.1'
+version: '1.2.2'
 main: de.bydora.tesserTools.TesserTools
 api-version: '1.21'
 author: FGBxRamel
@@ -17,3 +17,4 @@ commands:
     description: Helps you into the real life
     usage: /reallife
     permission: tessertools.other.reallife
+    aliases: /irl
