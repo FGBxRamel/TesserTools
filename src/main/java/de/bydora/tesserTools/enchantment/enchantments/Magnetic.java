@@ -34,10 +34,10 @@ public class Magnetic extends CustomEnchantment<PlayerMoveEvent> {
     @EventHandler(ignoreCancelled = true)
     public void enchantmentEvent(PlayerMoveEvent event) {
         final ItemStack itemInHand = event.getPlayer().getInventory().getItemInMainHand();
-        if (!canEnchantItem(itemInHand)
-            || getEnchantmentLevel(itemInHand) == 0
-        ) {return;}
-        int level = getEnchantmentLevel(itemInHand);
+        final ItemStack itemInOff = event.getPlayer().getInventory().getItemInOffHand();
+        final int level = Math.max(getEnchantmentLevel(itemInHand), getEnchantmentLevel(itemInOff));
+        if (level == 0) {return;}
+
         Player player = event.getPlayer();
         Location playerLocation = player.getLocation();
 
