@@ -1,6 +1,8 @@
 package de.bydora.tesserTools.enchantment.enchantments;
 
 import de.bydora.tesserTools.TesserTools;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.CustomModelData;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.event.Event;
@@ -135,6 +137,7 @@ public abstract class CustomEnchantment<T extends  Event> implements Listener {
      * @param level The level the enchantment should have
      * @return Whether the enchanting was successfully.
      */
+    @SuppressWarnings("UnstableApiUsage")
     public boolean enchantItem(@NotNull ItemStack item, int level) {
         if (!canEnchantItem(item)
             && item.getType() != Material.BOOK
@@ -143,11 +146,67 @@ public abstract class CustomEnchantment<T extends  Event> implements Listener {
             return false;
         }
 
+        // Set CustomModelData
+        CustomModelData currentModelData = item.getDataOrDefault(DataComponentTypes.CUSTOM_MODEL_DATA,
+                CustomModelData.customModelData().build());
+        CustomModelData.Builder builder = getBuilder(currentModelData);
+        item.setData(
+                DataComponentTypes.CUSTOM_MODEL_DATA,
+                builder.build()
+        );
+
+        // Set PersistentDataContainer
         ItemMeta itemMeta = item.getItemMeta();
         PersistentDataContainer container = itemMeta.getPersistentDataContainer();
         container.set(getSaveKey(), PersistentDataType.INTEGER, level);
         item.setItemMeta(itemMeta);
 
         return true;
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    CustomModelData.@NotNull Builder getBuilder(CustomModelData currentModelData) {
+        CustomModelData.Builder builder = CustomModelData.customModelData();
+
+        // Add the current enchantment or "multiple" flag if it's not present, add all non-related
+        boolean multipleOrEqual = false;
+        for (var string : currentModelData.strings()) {
+            // If this enchantment already exists or the "multiple" flag is present
+            if ((string.equals(sanitizeString(id)))
+                && !multipleOrEqual) {
+                builder.addString(sanitizeString(id));
+                multipleOrEqual = true;
+            }
+            // If it's an enchantment from the plugin
+            else if (string.startsWith("tessertools")
+                    && !multipleOrEqual) {
+                builder.addString("tessertools-multiple");
+                multipleOrEqual = true;
+            }
+            // All the others, not plugin related
+            else if (!string.startsWith("tessertools")) {
+                builder.addString(string);
+            }
+        }
+        if (!multipleOrEqual) {
+            builder.addString(sanitizeString(id));
+        }
+        currentModelData.floats().forEach(builder::addFloat);
+        currentModelData.flags().forEach(builder::addFlag);
+        currentModelData.colors().forEach(builder::addColor);
+        return builder;
+    }
+
+    /**
+     * Returns a custom-model-data-safe string.
+     * @param string The origin string
+     * @return A safe string
+     */
+    private static String sanitizeString(String string) {
+        return string
+                .replace("ä", "ae")
+                .replace("ö", "oe")
+                .replace("ü", "ue")
+                .replace(":", "-");
     }
 }
