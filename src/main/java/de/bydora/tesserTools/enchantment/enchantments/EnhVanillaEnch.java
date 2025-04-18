@@ -1,5 +1,7 @@
 package de.bydora.tesserTools.enchantment.enchantments;
 
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.CustomModelData;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.Event;
@@ -40,6 +42,7 @@ public abstract class EnhVanillaEnch extends CustomEnchantment<Event> {
                 itemStack.getEnchantmentLevel(this.vanillaEnchantment));
     }
 
+    @SuppressWarnings("UnstableApiUsage")
     @Override
     public boolean enchantItem(@NotNull ItemStack item, int level) {
         if (!canEnchantItem(item)
@@ -49,6 +52,16 @@ public abstract class EnhVanillaEnch extends CustomEnchantment<Event> {
         {
             return false;
         }
+
+        // Set CustomModelData
+        CustomModelData currentModelData = item.getDataOrDefault(DataComponentTypes.CUSTOM_MODEL_DATA,
+                CustomModelData.customModelData().build());
+        CustomModelData.Builder builder = this.getBuilder(currentModelData);
+        item.setData(
+                DataComponentTypes.CUSTOM_MODEL_DATA,
+                builder.build()
+        );
+
         ItemMeta itemMeta = item.getItemMeta();
         PersistentDataContainer container = itemMeta.getPersistentDataContainer();
         container.set(getSaveKey(), PersistentDataType.INTEGER, level);
