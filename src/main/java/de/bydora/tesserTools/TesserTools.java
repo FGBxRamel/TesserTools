@@ -74,6 +74,7 @@ public final class TesserTools extends JavaPlugin {
                 new FireProtection(),
                 new BlastProtection(),
                 new DeepMine(),
+                new Pathing(),
         };
         for (CustomEnchantment enchantment : enchantments) {
             this.enchantmentIDs.add(enchantment.getID());
