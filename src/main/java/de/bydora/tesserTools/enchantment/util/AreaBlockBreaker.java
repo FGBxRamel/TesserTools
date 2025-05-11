@@ -14,10 +14,18 @@ public class AreaBlockBreaker {
 
     private final Set<Material> allowedMaterials; // Erlaubte Materialien
     private final int startEnd;
+    private boolean skipMaterialCheck;
 
     public AreaBlockBreaker(Set<Material> allowedMaterials, boolean bigArea) {
         this.allowedMaterials = allowedMaterials;
         this.startEnd = bigArea ? 2 : 1;
+        this.skipMaterialCheck = false;
+    }
+
+    public AreaBlockBreaker(boolean bigArea) {
+        this.allowedMaterials = Set.of(Material.AIR);
+        this.startEnd = bigArea ? 2 : 1;
+        this.skipMaterialCheck = true;
     }
 
     /**
@@ -77,6 +85,6 @@ public class AreaBlockBreaker {
      * Überprüft, ob der Block in den erlaubten Materialien enthalten ist.
      */
     private boolean isAllowed(Block block) {
-        return allowedMaterials.contains(block.getType());
+        return skipMaterialCheck || allowedMaterials.contains(block.getType());
     }
 }
