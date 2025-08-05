@@ -28,6 +28,12 @@ public class PlayerDropItemListener implements Listener {
 
     @SuppressWarnings("unused")
     private final static Logger log = TesserTools.getPlugin(TesserTools.class).getLogger();
+
+    private final static int reqLevelVanilla = 30; // How many levels are required to show Vanilla enchantments
+    private final static int reqLevelCustom = 40; // How many levels are required to show Custom enchantments
+    private final static int usedLevelVanilla = 3; // How many levels are used when enchanting Vanilla enchantments
+    private final static int usedLevelCustom = 4; // How many levels are used when enchanting Custom enchantments
+
     private final static Map<String, CustomEnchantment> customEnchantments = TesserTools.getPlugin(TesserTools.class)
             .getEnchantmentMap();
     private final static Map<Enchantment, CustomEnchantment> enhVanillaEnchMap =  Map.of(
@@ -161,10 +167,10 @@ public class PlayerDropItemListener implements Listener {
                                            int level
     ) {
         // Whether the player has enough level
-        boolean hasLevel = player == null || player.getLevel() >= 50;
+        boolean hasLevel = player == null || player.getLevel() >= reqLevelCustom;
         // Change the players level if one exists and level should change
         if (player != null && changeLevel) {
-            player.setLevel(player.getLevel() - 6);
+            player.setLevel(player.getLevel() - usedLevelCustom);
         }
 
         if (hasLevel && chargeLevel > 0
@@ -196,10 +202,10 @@ public class PlayerDropItemListener implements Listener {
     private @Nullable ItemStack applyVanillaEnchantment(@Nullable Player player, ItemStack enchantStack, Enchantment enchantment,
                                             boolean changeLevel, Integer level) {
         // Whether the player has enough level
-        boolean hasLevel = player == null || player.getLevel() >= 30;
+        boolean hasLevel = player == null || player.getLevel() >= reqLevelVanilla;
         // Change the players level if one exists and level should change
         if (player != null && changeLevel) {
-            player.setLevel(player.getLevel() - 3);
+            player.setLevel(player.getLevel() - usedLevelVanilla);
         }
         if (!hasLevel) {return null;}
         if (enchantStack.getType() == Material.BOOK) {
@@ -267,7 +273,7 @@ public class PlayerDropItemListener implements Listener {
         else if (!extTable.isValid()) {
             event.getPlayer().sendMessage(l18.getString("invalidTable"));
             return;
-        } else if (event.getPlayer().getLevel() < 30) {
+        } else if (event.getPlayer().getLevel() < reqLevelVanilla) {
             event.getPlayer().sendMessage(l18.getString("insufficientLevel"));
             return;
         }
@@ -286,7 +292,7 @@ public class PlayerDropItemListener implements Listener {
             }
         } else {
             extTable.setBlocked(true);
-            extTable.startEnchanting(item.getItemStack(), event.getPlayer().getLevel() >= 50
+            extTable.startEnchanting(item.getItemStack(), event.getPlayer().getLevel() >= reqLevelCustom
                     && extTable.getChargeLevel() > 0, event.getPlayer().locale());
         }
     }
@@ -358,26 +364,26 @@ public class PlayerDropItemListener implements Listener {
                 // Level detection
                 if (mergeLevel == item1Level && customEnch.getMaxLevel() > mergeLevel) {
                     customLevel = mergeLevel + 1;
-                    usedLevel += customLevel > ench.getMaxLevel() ? 6 : 0;
+                    usedLevel += customLevel > ench.getMaxLevel() ? usedLevelCustom : 0;
                     vanillas.put(ench, customLevel);
                 }
                 else if (customEnch.getMaxLevel() >= item1Level) {
                     customLevel = item1Level;
-                    usedLevel += customLevel > ench.getMaxLevel() ? 6 : 0;
+                    usedLevel += customLevel > ench.getMaxLevel() ? usedLevelCustom : 0;
                     vanillas.put(ench, customLevel);
                 }
             }
             else if (mergeLevel == item1Level
                     && ench.getMaxLevel() > mergeLevel
             ) {
-                usedLevel += 3;
+                usedLevel += usedLevelVanilla;
                 vanillas.put(ench, mergeLevel + 1);
             }
             // If not just use the higher one
             else if (ench.getMaxLevel() >= item1Level
                     && ench.getMaxLevel() >= mergeLevel
             ) {
-                usedLevel += 3;
+                usedLevel += usedLevelVanilla;
                 vanillas.put(ench, Math.max(mergeLevel, item1Level));
             }
 
@@ -406,13 +412,13 @@ public class PlayerDropItemListener implements Listener {
                     && mergeLevel > 0
                     && ench.getMaxLevel() > mergeLevel
             ) {
-                usedLevel += 6;
+                usedLevel += usedLevelCustom;
                 applyCustomEnchantment(newStack, ench, 4, mergeLevel + 1);
                 continue;
             }
 
             if (item1Level > mergeLevel) {
-                usedLevel += 6;
+                usedLevel += usedLevelCustom;
                 applyCustomEnchantment(newStack, ench, 4, item1Level);
             }
         }
