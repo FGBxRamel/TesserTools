@@ -1,49 +1,38 @@
 package de.bydora.tesserTools.listeners;
 
 import de.bydora.tesserTools.TesserTools;
-import org.bukkit.NamespacedKey;
+import de.bydora.tesserTools.cache.BoostLevelCache;
 import org.bukkit.Server;
-import org.bukkit.block.Hopper;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
 
 import java.util.HashMap;
 
 
 public class InvMoveItemListener implements Listener {
 
-    private final Server server = TesserTools.getPlugin(TesserTools.class).getServer();
-    final NamespacedKey boostLevelKey = new NamespacedKey(TesserTools.getPlugin(TesserTools.class),
-            "boost-level");
+    private final Server server;
+    private final BoostLevelCache boostCache;
 
-    @SuppressWarnings("DataFlowIssue")
+    public InvMoveItemListener(TesserTools plugin) {
+        this.server = plugin.getServer();
+        this.boostCache = plugin.getBoostLevelCache();
+    }
+
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onInvMoveItem(InventoryMoveItemEvent event) {
         final Inventory srcinv = event.getSource();
         final Inventory destinv = event.getDestination();
-        int boostLevel = 0;
 
-        // Führt Prozedur aus wenn: SrcInv == boosted || (DestInv == boosted && SrcInv != Hopper)
-        if (srcinv.getLocation().getBlock().getState() instanceof final Hopper srcHopper) {
-            final PersistentDataContainer srcContainer = srcHopper.getPersistentDataContainer();
-            if (srcContainer.has(boostLevelKey)) {
-                boostLevel = srcContainer.get(boostLevelKey, PersistentDataType.INTEGER);
-            }
-        }
-        else if (destinv.getLocation().getBlock().getState() instanceof final Hopper destHopper) {
-            final PersistentDataContainer destContainer = destHopper.getPersistentDataContainer();
-            if (destContainer.has(boostLevelKey)) {
-                boostLevel = destContainer.get(boostLevelKey, PersistentDataType.INTEGER);
-            }
-        }
+        int boostLevel = Math.max(
+                boostCache.getBoostLevel(srcinv),
+                boostCache.getBoostLevel(destinv)
+        );
         if (boostLevel < 2) {return;}
-
 
         final ItemStack transferItems = event.getItem().clone();
         transferItems.setAmount(boostLevel - 1);
