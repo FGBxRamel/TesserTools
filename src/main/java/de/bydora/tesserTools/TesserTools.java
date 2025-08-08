@@ -79,6 +79,7 @@ public final class TesserTools extends JavaPlugin {
                 new DeepMine(),
                 new Pathing(),
                 new AreaFill(),
+                new SpaceFill(),
         };
         for (CustomEnchantment enchantment : enchantments) {
             this.enchantmentIDs.add(enchantment.getID());
