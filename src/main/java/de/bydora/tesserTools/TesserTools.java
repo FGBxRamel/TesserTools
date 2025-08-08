@@ -1,5 +1,6 @@
 package de.bydora.tesserTools;
 
+import de.bydora.tesserTools.cache.BoostLevelCache;
 import de.bydora.tesserTools.commands.CommandReallife;
 import de.bydora.tesserTools.commands.CommandShowEnch;
 import de.bydora.tesserTools.enchantment.enchantments.*;
@@ -22,9 +23,11 @@ public final class TesserTools extends JavaPlugin {
     private final PluginManager pm = getServer().getPluginManager();
     private final List<String> enchantmentIDs = new ArrayList<>();
     private final Map<String, CustomEnchantment> enchantmentMap = new HashMap<>();
+    private BoostLevelCache boostLevelCache;
 
     @Override
     public void onEnable() {
+        this.boostLevelCache = new BoostLevelCache();
         this.registerCommands();
         this.registerListeners();
         this.registerEnchantments();
@@ -38,7 +41,7 @@ public final class TesserTools extends JavaPlugin {
 
     private void registerListeners() {
         Listener[] listeners = new Listener[] {
-                new InvMoveItemListener(),
+                new InvMoveItemListener(this),
                 new de.bydora.tesserTools.enchantment.listeners.PlayerInteractListener(),
                 new PlayerInteractListener(),
                 new BlockDropItemListener(),
@@ -75,6 +78,8 @@ public final class TesserTools extends JavaPlugin {
                 new BlastProtection(),
                 new DeepMine(),
                 new Pathing(),
+                new AreaFill(),
+                new SpaceFill(),
         };
         for (CustomEnchantment enchantment : enchantments) {
             this.enchantmentIDs.add(enchantment.getID());
@@ -89,5 +94,9 @@ public final class TesserTools extends JavaPlugin {
 
     public Map<String, CustomEnchantment> getEnchantmentMap() {
         return enchantmentMap;
+    }
+
+    public BoostLevelCache getBoostLevelCache() {
+        return boostLevelCache;
     }
 }

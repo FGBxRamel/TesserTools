@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'de.bydora'
-version = '1.5.2'
+version = '1.8.0'
 
 repositories {
     mavenCentral()

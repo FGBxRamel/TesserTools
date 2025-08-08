@@ -10,8 +10,6 @@ import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -53,44 +51,16 @@ public class Pathing extends CustomEnchantment<PlayerInteractEvent> {
         int level = getEnchantmentLevel(event.getItem());
         if (level > 3) { level = 3; } // Limit level at 3 as we only defined blocks for 3 levels
 
-        int totalAmount = 0; // Total amount of relevant blocks the player has
-        Map<Material, Integer> availableMaterial = new HashMap<>();
-        PlayerInventory inventory = event.getPlayer().getInventory();
-        for (var material : levelBlocks.get(level - 1)) {
-            var inventoryItemStacks = inventory.all(material);
-            if (!inventoryItemStacks.isEmpty()) {
-                for (var stack : inventoryItemStacks.values()) {
-                    totalAmount += stack.getAmount();
-                    int newAmount = Objects.requireNonNullElse(availableMaterial.get(stack.getType()), 0)
-                            + stack.getAmount();
-                    availableMaterial.put(stack.getType(), newAmount);
-                }
-            }
-        }
-        if (totalAmount < 9) {
+        var availableMaterial = AreaFill.getAvailableItems(event.getPlayer().getInventory(), levelBlocks.get(level - 1),
+        9);
+        if (Objects.isNull(availableMaterial)) {
             ResourceBundle l18 = ResourceBundle.getBundle("translations.tools", event.getPlayer().locale());
             event.getPlayer().sendMessage(l18.getString("pathingNotEnoughItems"));
             return;
         }
 
-        var locations = areaFinder(event.getClickedBlock().getLocation(), level);
-        var items = availableMaterial.keySet().toArray();
-        for (var location : locations) {
-            // Get random item, check if it is the last one, if yes remove it, if not decrement it
-            Random generator = new Random();
-            Material randomItem = (Material) items[generator.nextInt(items.length)];
-            int remainingAmount = availableMaterial.get(randomItem);
-            if (remainingAmount == 1) {
-                availableMaterial.remove(randomItem);
-                items = availableMaterial.keySet().toArray();
-            } else {
-                availableMaterial.put(randomItem, remainingAmount - 1);
-            }
-
-            ItemStack removeStack = new ItemStack(randomItem, 1);
-            location.getBlock().setType(randomItem);
-            inventory.removeItemAnySlot(removeStack);
-        }
+        var blocks = areaFinder(event.getClickedBlock().getLocation(), level);
+        AreaFill.placeBlocks(blocks.stream().toList(), event.getPlayer().getInventory(), availableMaterial);
     }
 
     @Override
@@ -103,8 +73,8 @@ public class Pathing extends CustomEnchantment<PlayerInteractEvent> {
      * @param middleBlock The origin from where to search.
      * @return A set of locations of the relevant blocks
      */
-    private static @NotNull Set<Location> areaFinder(@NotNull Location middleBlock, int enchantmentLevel) {
-        Set<Location> result = new HashSet<>();
+    private static @NotNull Set<Block> areaFinder(@NotNull Location middleBlock, int enchantmentLevel) {
+        Set<Block> result = new HashSet<>();
         for (int dx = -1; dx <= 1; dx++) {
             for (int dz = -1; dz <= 1; dz++) {
                 Location neighborLocation = middleBlock.clone().add(dx, 0, dz);
@@ -112,7 +82,7 @@ public class Pathing extends CustomEnchantment<PlayerInteractEvent> {
                 if (Objects.isNull(neighbor)
                     || Arrays.stream(levelBlocks.get(enchantmentLevel - 1)).toList().contains(neighbor.getType())
                 ) {continue;}
-                result.add(neighbor.getLocation());
+                result.add(neighbor);
             }
         }
         return result;
