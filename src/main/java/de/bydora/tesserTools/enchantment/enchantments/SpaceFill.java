@@ -75,15 +75,8 @@ public class SpaceFill extends CustomEnchantment<PlayerInteractEvent>{
     }
 
     private void runAreaFill(int level, Player player, Block clickedBlock) {
-        int neededBlocks = switch (level) {
-            case 1 -> 18;
-            case 2 -> 27;
-            case 3 -> 50;
-            case 4 -> 75;
-            default -> 0;
-        };
         var airBlocks = getAirBlocks(clickedBlock, player.getFacing(), level > 2 ? 5 : 3);
-        var availableItems = getAvailableItems(player.getInventory(), fillBlocks, neededBlocks);
+        var availableItems = getAvailableItems(player.getInventory(), fillBlocks, airBlocks.size());
         if (Objects.isNull(availableItems)) {
             ResourceBundle l18 = ResourceBundle.getBundle("translations.tools", player.locale());
             player.sendMessage(l18.getString("areaEnchNotEnoughItems"));
