@@ -28,7 +28,6 @@ public final class TesserTools extends JavaPlugin {
     @Override
     public void onEnable() {
         this.boostLevelCache = new BoostLevelCache();
-        this.registerCommands();
         this.registerListeners();
         this.registerEnchantments();
         this.getLogger().info("TesserTools is enabled");
@@ -53,11 +52,6 @@ public final class TesserTools extends JavaPlugin {
         for (Listener listener : listeners) {
             pm.registerEvents(listener, this);
         }
-    }
-
-    private void registerCommands() {
-        Objects.requireNonNull(this.getCommand("showench")).setExecutor(new CommandShowEnch());
-        Objects.requireNonNull(this.getCommand("reallife")).setExecutor(new CommandReallife());
     }
 
     @SuppressWarnings("rawtypes")
