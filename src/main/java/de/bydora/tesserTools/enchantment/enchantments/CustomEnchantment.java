@@ -202,7 +202,7 @@ public abstract class CustomEnchantment<T extends  Event> extends Enchantment im
                 .replace(":", "-");
     }
 
-    // Start Vanilla Enchantment implementation
+    //<editor-fold desc="Vanilla Enchantment implementation">
     @Override public @NotNull Component displayName(int level) {
         Component name = Component.translatable(this.baseTranslationKey);
         if (level != 1 || maxLevel > 1) {
@@ -313,6 +313,6 @@ public abstract class CustomEnchantment<T extends  Event> extends Enchantment im
     public @NotNull NamespacedKey getKey() {
         return this.key;
     }
-    // End Vanilla Enchantment implementation
+    //</editor-fold>
 
 }
