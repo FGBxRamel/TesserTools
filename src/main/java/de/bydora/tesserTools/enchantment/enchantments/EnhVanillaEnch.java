@@ -3,6 +3,7 @@ package de.bydora.tesserTools.enchantment.enchantments;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.CustomModelData;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
@@ -19,8 +20,8 @@ public abstract class EnhVanillaEnch extends CustomEnchantment<Event> {
     private final Enchantment vanillaEnchantment;
 
     public EnhVanillaEnch(String id, int maxLevel, String displayName, int minLevel, Material[] enchantableItems,
-                          Enchantment vanillaEnchantment) {
-        super(id, maxLevel, displayName, minLevel, enchantableItems);
+                          Enchantment vanillaEnchantment, @NotNull NamespacedKey key) {
+        super(id, maxLevel, displayName, minLevel, enchantableItems, key);
         this.vanillaEnchantment = vanillaEnchantment;
     }
 

@@ -3,8 +3,10 @@ package de.bydora.tesserTools.enchantment.enchantments;
 import de.bydora.tesserTools.TesserTools;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.CustomModelData;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -20,7 +22,7 @@ import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 @SuppressWarnings("unused")
-public abstract class CustomEnchantment<T extends  Event> implements Listener {
+public abstract class CustomEnchantment<T extends  Event> extends Enchantment implements Listener {
 
     private final static Logger log = TesserTools.getPlugin(TesserTools.class).getLogger();
 
@@ -29,13 +31,16 @@ public abstract class CustomEnchantment<T extends  Event> implements Listener {
     private final int maxLevel;
     private final int minLevel;
     private final Material[] enchantableItems;
+    private final String baseTranslationKey;
 
-    public CustomEnchantment(String id, int maxLevel, String displayName, int minLevel, Material[] enchantableItems) {
+    public CustomEnchantment(String id, int maxLevel, String displayName, int minLevel, Material[] enchantableItems,
+    @NotNull NamespacedKey key) {
         this.id = id;
         this.maxLevel = maxLevel;
         this.displayName = displayName;
         this.minLevel = minLevel;
         this.enchantableItems = enchantableItems;
+        this.baseTranslationKey = "enchantment.tessertools." + key.getKey();
     }
 
     /**
@@ -78,43 +83,11 @@ public abstract class CustomEnchantment<T extends  Event> implements Listener {
     }
 
     /**
-     * A method to get the maximum level of this enchantment.
-     * @return The maximum level of the enchantment
-     */
-    public int getMaxLevel() {
-        return maxLevel;
-    }
-
-    /**
-     * Get the level that the enchantment should start at.
-     * @deprecated Bad naming. Use {@link CustomEnchantment#getMinLevel()} instead.
-     * @return The start level of the enchantment
-     */
-    @Deprecated()
-    public int getStartLevel() {
-        return minLevel;
-    }
-
-    /**
      * Get the level that the enchantment should start at.
      * @return The start level of the enchantment
      */
     public int getMinLevel() {
         return minLevel;
-    }
-
-    /**
-     * Checks if this Enchantment may be applied to the given {@link
-     * ItemStack}.
-     * <p>
-     * This does not check if it conflicts with any enchantments already
-     * applied to the item.
-     *
-     * @param item Item to test
-     * @return True if the enchantment may be applied, otherwise False
-     */
-    public boolean canEnchantItem(@NotNull ItemStack item) {
-        return Arrays.stream(enchantableItems).toList().contains(item.getType());
     }
 
     /**
@@ -160,6 +133,7 @@ public abstract class CustomEnchantment<T extends  Event> implements Listener {
         PersistentDataContainer container = itemMeta.getPersistentDataContainer();
         container.set(getSaveKey(), PersistentDataType.INTEGER, level);
         item.setItemMeta(itemMeta);
+        item.addUnsafeEnchantment(this, level);
 
         return true;
     }
@@ -209,4 +183,28 @@ public abstract class CustomEnchantment<T extends  Event> implements Listener {
                 .replace("ü", "ue")
                 .replace(":", "-");
     }
+
+    // Start Vanilla Enchantment implementation
+    @Override public @NotNull Component displayName(int level) {
+        Component name = Component.translatable(this.baseTranslationKey);
+        if (level != 1 || maxLevel > 1) {
+            name = name.append(Component.space())
+                    .append(Component.translatable("enchantment.level." + level));
+        }
+        return name;
+    }
+
+    @Override public @NotNull Component description() {
+        return Component.translatable(baseTranslationKey + ".description");
+    }
+
+    @Override public int getMaxLevel() { return this.maxLevel; }
+    @Override public int getStartLevel() { return getMinLevel(); }
+    @Override public boolean canEnchantItem(@NotNull ItemStack item) {
+        return Arrays.stream(enchantableItems).toList().contains(item.getType());
+    }
+    @Override public boolean isTreasure() { return false; }
+    @Override public boolean isCursed() { return false; }
+    @Override public boolean conflictsWith(@NotNull Enchantment other) { return false; }
+    // End Vanilla Enchantment implementation
 }
