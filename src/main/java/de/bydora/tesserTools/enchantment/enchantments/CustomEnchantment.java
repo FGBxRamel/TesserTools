@@ -1,27 +1,39 @@
 package de.bydora.tesserTools.enchantment.enchantments;
 
 import de.bydora.tesserTools.TesserTools;
+import de.bydora.tesserTools.enchantment.util.RegistrySets;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.CustomModelData;
+import io.papermc.paper.enchantments.EnchantmentRarity;
+import io.papermc.paper.registry.RegistryKey;
+import io.papermc.paper.registry.set.RegistryKeySet;
+import io.papermc.paper.registry.set.RegistrySet;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.enchantments.EnchantmentTarget;
+import org.bukkit.entity.EntityCategory;
+import org.bukkit.entity.EntityType;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.ItemType;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.logging.Logger;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "removal", "Contract", "UnstableApiUsage"})
 public abstract class CustomEnchantment<T extends  Event> extends Enchantment implements Listener {
 
     private final static Logger log = TesserTools.getPlugin(TesserTools.class).getLogger();
@@ -31,6 +43,8 @@ public abstract class CustomEnchantment<T extends  Event> extends Enchantment im
     private final int maxLevel;
     private final int minLevel;
     private final Material[] enchantableItems;
+    private final RegistryKeySet<@NotNull ItemType> supportedItems;
+    private final NamespacedKey key;
     private final String baseTranslationKey;
 
     public CustomEnchantment(String id, int maxLevel, String displayName, int minLevel, Material[] enchantableItems,
@@ -40,6 +54,8 @@ public abstract class CustomEnchantment<T extends  Event> extends Enchantment im
         this.displayName = displayName;
         this.minLevel = minLevel;
         this.enchantableItems = enchantableItems;
+        this.supportedItems = RegistrySets.fromMaterials(this.enchantableItems);
+        this.key = key;
         this.baseTranslationKey = "enchantment.tessertools." + key.getKey();
     }
 
@@ -54,7 +70,9 @@ public abstract class CustomEnchantment<T extends  Event> extends Enchantment im
      * Get the {@link NamespacedKey} which is used when enchanting an item with this enchantment.
      * @return The {@link NamespacedKey} which belongs to this enchantment
      */
-    public abstract @NotNull NamespacedKey getSaveKey();
+    public @NotNull NamespacedKey getSaveKey() {
+        return key;
+    }
 
     /**
      * A method to get the ID of the enchantment.
@@ -206,5 +224,95 @@ public abstract class CustomEnchantment<T extends  Event> extends Enchantment im
     @Override public boolean isTreasure() { return false; }
     @Override public boolean isCursed() { return false; }
     @Override public boolean conflictsWith(@NotNull Enchantment other) { return false; }
+    @Override
+    public @NotNull String getName() {
+        return displayName;
+    }
+
+    @Override
+    public @NotNull EnchantmentTarget getItemTarget() {
+        return EnchantmentTarget.BREAKABLE;
+    }
+
+    @Override
+    public boolean isTradeable() {
+        return false;
+    }
+
+    @Override
+    public boolean isDiscoverable() {
+        return false;
+    }
+
+    @Override
+    public int getMinModifiedCost(int level) {
+        return 0;
+    }
+
+    @Override
+    public int getMaxModifiedCost(int level) {
+        return 0;
+    }
+
+    @Override
+    public int getAnvilCost() {
+        return 0;
+    }
+
+    @Override
+    public @NotNull EnchantmentRarity getRarity() {
+        return EnchantmentRarity.VERY_RARE;
+    }
+
+    @Override
+    public float getDamageIncrease(int level, @NotNull EntityCategory entityCategory) {
+        return 0;
+    }
+
+    @Override
+    public float getDamageIncrease(int level, @NotNull EntityType entityType) {
+        return 0;
+    }
+
+    @Override
+    public @NotNull Set<EquipmentSlotGroup> getActiveSlotGroups() {
+        return Set.of();
+    }
+
+    @Override
+    public @NotNull RegistryKeySet<@NotNull ItemType> getSupportedItems() {
+        return this.supportedItems;
+    }
+
+    @Override
+    public @Nullable RegistryKeySet<@NotNull ItemType> getPrimaryItems() {
+        return null;
+    }
+
+    @Override
+    public int getWeight() {
+        return 0;
+    }
+
+    @Override
+    public @NotNull RegistryKeySet<@NotNull Enchantment> getExclusiveWith() {
+        return RegistrySet.keySet(RegistryKey.ENCHANTMENT);
+    }
+
+    @Override
+    public @NotNull String translationKey() {
+        return this.baseTranslationKey;
+    }
+
+    @Override
+    public @NotNull String getTranslationKey() {
+        return this.baseTranslationKey;
+    }
+
+    @Override
+    public @NotNull NamespacedKey getKey() {
+        return this.key;
+    }
     // End Vanilla Enchantment implementation
+
 }
