@@ -17,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 
-@SuppressWarnings({"UnstableApiUsage", "rawtypes"})
+@SuppressWarnings({"UnstableApiUsage", "unused"})
 public final class TesserToolsBootstrap implements PluginBootstrap {
 
     @Override
