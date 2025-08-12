@@ -1,8 +1,6 @@
 package de.bydora.tesserTools;
 
 import de.bydora.tesserTools.cache.BoostLevelCache;
-import de.bydora.tesserTools.commands.CommandReallife;
-import de.bydora.tesserTools.commands.CommandShowEnch;
 import de.bydora.tesserTools.enchantment.enchantments.*;
 import de.bydora.tesserTools.enchantment.listeners.BlockPlaceListener;
 import de.bydora.tesserTools.enchantment.listeners.EntityPickupEvent;
@@ -15,7 +13,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @SuppressWarnings("rawtypes")
 public final class TesserTools extends JavaPlugin {
@@ -24,6 +25,25 @@ public final class TesserTools extends JavaPlugin {
     private final List<String> enchantmentIDs = new ArrayList<>();
     private final Map<String, CustomEnchantment> enchantmentMap = new HashMap<>();
     private BoostLevelCache boostLevelCache;
+    private final CustomEnchantment<?>[] enchantments = new CustomEnchantment[] {
+            new Abholzung(),
+            new AreaBreak(),
+            new VeinMiner(),
+            new Harvester(),
+            new Magnetic(),
+            new Lifesteal(),
+            new Protection(),
+            new SwiftSneak(),
+            new Unbreaking(),
+            new ProjectileProtection(),
+            new Thorns(),
+            new FireProtection(),
+            new BlastProtection(),
+            new DeepMine(),
+            new Pathing(),
+            new AreaFill(),
+            new SpaceFill(),
+    };
 
     @Override
     public void onEnable() {
@@ -56,25 +76,6 @@ public final class TesserTools extends JavaPlugin {
 
     @SuppressWarnings("rawtypes")
     private void registerEnchantments() {
-        final CustomEnchantment[] enchantments = new CustomEnchantment[] {
-                new Abholzung(),
-                new AreaBreak(),
-                new VeinMiner(),
-                new Harvester(),
-                new Magnetic(),
-                new Lifesteal(),
-                new Protection(),
-                new SwiftSneak(),
-                new Unbreaking(),
-                new ProjectileProtection(),
-                new Thorns(),
-                new FireProtection(),
-                new BlastProtection(),
-                new DeepMine(),
-                new Pathing(),
-                new AreaFill(),
-                new SpaceFill(),
-        };
         for (CustomEnchantment enchantment : enchantments) {
             this.enchantmentIDs.add(enchantment.getID());
             this.enchantmentMap.put(enchantment.getID(), enchantment);

@@ -1,12 +1,12 @@
 package de.bydora.tesserTools.enchantment.enchantments;
 
 import de.bydora.tesserTools.enchantment.enums.EnchantmentSpaceKeys;
-import de.bydora.tesserTools.enchantment.util.AreaBlockBreaker;
-import de.bydora.tesserTools.enchantment.util.EquipmentGroups;
-import de.bydora.tesserTools.enchantment.util.MaterialArrayMerger;
+import de.bydora.tesserTools.enchantment.util.*;
+import io.papermc.paper.registry.RegistryKey;
+import io.papermc.paper.registry.set.RegistrySet;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -24,7 +24,6 @@ public class AreaBreak extends CustomEnchantment<BlockBreakEvent> {
     private final static String displayName = "Flächenabbau";
     private final static int maxLevel = 2;
     private final static int minLevel = 1;
-    private final static NamespacedKey key = EnchantmentSpaceKeys.ENCH_AREA_BREAK.getKey();
     private final static Material[] enchantableItems =
             MaterialArrayMerger.merge(EquipmentGroups.PICKAXES, EquipmentGroups.SHOVELS);
     private final static Material[] affectedBlocks = new Material[] {
@@ -42,7 +41,23 @@ public class AreaBreak extends CustomEnchantment<BlockBreakEvent> {
     };
 
     public AreaBreak() {
-        super(id, maxLevel, displayName, minLevel, enchantableItems, key);
+        super(id, maxLevel, displayName, minLevel, enchantableItems, EnchantmentSpaceKeys.ENCH_AREA_BREAK.getKey());
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    public static EnchantDef def() {
+        var supported = RegistrySets.fromMaterials(enchantableItems);
+        var description = Component.translatable(getBaseTranslationKey(id) + ".description");
+        return new EnchantDef(
+                sanitizeString(id),
+                description,
+                supported,
+                1,
+                maxLevel,
+                10,
+                Set.of(),
+                RegistrySet.keySet(RegistryKey.ENCHANTMENT)
+        );
     }
 
     @Override

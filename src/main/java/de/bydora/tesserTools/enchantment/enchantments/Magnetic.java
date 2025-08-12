@@ -1,11 +1,15 @@
 package de.bydora.tesserTools.enchantment.enchantments;
 
 import de.bydora.tesserTools.enchantment.enums.EnchantmentSpaceKeys;
+import de.bydora.tesserTools.enchantment.util.EnchantDef;
 import de.bydora.tesserTools.enchantment.util.EquipmentGroups;
 import de.bydora.tesserTools.enchantment.util.MaterialArrayMerger;
+import de.bydora.tesserTools.enchantment.util.RegistrySets;
+import io.papermc.paper.registry.RegistryKey;
+import io.papermc.paper.registry.set.RegistrySet;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -15,6 +19,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Set;
 
 public class Magnetic extends CustomEnchantment<PlayerMoveEvent> {
 
@@ -22,12 +27,27 @@ public class Magnetic extends CustomEnchantment<PlayerMoveEvent> {
     private final static String displayName = "Magnetisch";
     private final static int maxLevel = 2;
     private final static int minLevel = 1;
-    private final static NamespacedKey key = EnchantmentSpaceKeys.ENCH_MAGNETIC.getKey();
     private final static Material[] enchantableItems = MaterialArrayMerger.merge(new Material[] {Material.SHEARS},
             EquipmentGroups.TOOLS);
 
     public Magnetic() {
-        super(id, maxLevel, displayName, minLevel, enchantableItems, key);
+        super(id, maxLevel, displayName, minLevel, enchantableItems, EnchantmentSpaceKeys.ENCH_MAGNETIC.getKey());
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    public static EnchantDef def() {
+        var supported = RegistrySets.fromMaterials(enchantableItems);
+        var description = Component.translatable(getBaseTranslationKey(id) + ".description");
+        return new EnchantDef(
+                sanitizeString(id),
+                description,
+                supported,
+                1,
+                maxLevel,
+                10,
+                Set.of(),
+                RegistrySet.keySet(RegistryKey.ENCHANTMENT)
+        );
     }
 
     @SuppressWarnings("UnstableApiUsage")

@@ -2,16 +2,21 @@ package de.bydora.tesserTools.enchantment.enchantments;
 
 import de.bydora.tesserTools.enchantment.enums.EnchantmentSpaceKeys;
 import de.bydora.tesserTools.enchantment.util.AdjacentBlockFinder;
+import de.bydora.tesserTools.enchantment.util.EnchantDef;
 import de.bydora.tesserTools.enchantment.util.EquipmentGroups;
+import de.bydora.tesserTools.enchantment.util.RegistrySets;
+import io.papermc.paper.registry.RegistryKey;
+import io.papermc.paper.registry.set.RegistrySet;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 public class VeinMiner extends CustomEnchantment<BlockBreakEvent> {
 
@@ -19,7 +24,6 @@ public class VeinMiner extends CustomEnchantment<BlockBreakEvent> {
     private final static String displayName = "Aderabbau";
     private final static int maxLevel = 3;
     private final static int minLevel = 1;
-    private final static NamespacedKey key = EnchantmentSpaceKeys.ENCH_VEIN_MINER.getKey();
     private final static Material[] enchantableItems = EquipmentGroups.PICKAXES;
     private final static Material[] ores = new Material[] {
             Material.COAL_ORE, Material.COPPER_ORE, Material.DEEPSLATE_COAL_ORE, Material.DEEPSLATE_COPPER_ORE,
@@ -30,7 +34,23 @@ public class VeinMiner extends CustomEnchantment<BlockBreakEvent> {
     };
 
     public VeinMiner() {
-        super(id, maxLevel, displayName, minLevel, enchantableItems, key);
+        super(id, maxLevel, displayName, minLevel, enchantableItems, EnchantmentSpaceKeys.ENCH_VEIN_MINER.getKey());
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    public static EnchantDef def() {
+        var supported = RegistrySets.fromMaterials(enchantableItems);
+        var description = Component.translatable(getBaseTranslationKey(id) + ".description");
+        return new EnchantDef(
+                sanitizeString(id),
+                description,
+                supported,
+                1,
+                maxLevel,
+                10,
+                Set.of(),
+                RegistrySet.keySet(RegistryKey.ENCHANTMENT)
+        );
     }
 
     @Override

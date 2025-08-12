@@ -1,10 +1,14 @@
 package de.bydora.tesserTools.enchantment.enchantments;
 
 import de.bydora.tesserTools.enchantment.enums.EnchantmentSpaceKeys;
+import de.bydora.tesserTools.enchantment.util.EnchantDef;
 import de.bydora.tesserTools.enchantment.util.EquipmentGroups;
+import de.bydora.tesserTools.enchantment.util.RegistrySets;
+import io.papermc.paper.registry.RegistryKey;
+import io.papermc.paper.registry.set.RegistrySet;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
@@ -20,7 +24,6 @@ public class Pathing extends CustomEnchantment<PlayerInteractEvent> {
     private final static String displayName = "Straßenbauer";
     private final static int maxLevel = 3;
     private final static int minLevel = 1;
-    private final static NamespacedKey key = EnchantmentSpaceKeys.ENCH_PATHING.getKey();
     private final static Material[] enchantableItems = EquipmentGroups.HOES;
     private final static List<Material[]> levelBlocks = new ArrayList<>(List.of(
             new Material[] { Material.DIRT, Material.COARSE_DIRT, Material.ROOTED_DIRT, Material.GRASS_BLOCK,
@@ -35,7 +38,23 @@ public class Pathing extends CustomEnchantment<PlayerInteractEvent> {
     ));
 
     public Pathing() {
-        super(id, maxLevel, displayName, minLevel, enchantableItems, key);
+        super(id, maxLevel, displayName, minLevel, enchantableItems, EnchantmentSpaceKeys.ENCH_PATHING.getKey());
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    public static EnchantDef def() {
+        var supported = RegistrySets.fromMaterials(enchantableItems);
+        var description = Component.translatable(getBaseTranslationKey(id) + ".description");
+        return new EnchantDef(
+                sanitizeString(id),
+                description,
+                supported,
+                1,
+                maxLevel,
+                10,
+                Set.of(),
+                RegistrySet.keySet(RegistryKey.ENCHANTMENT)
+        );
     }
 
     @Override

@@ -1,6 +1,5 @@
 package de.bydora.tesserTools.enchantment.enchantments;
 
-import de.bydora.tesserTools.TesserTools;
 import de.bydora.tesserTools.enchantment.util.RegistrySets;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.CustomModelData;
@@ -24,6 +23,7 @@ import org.bukkit.inventory.ItemType;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,12 +31,9 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
-import java.util.logging.Logger;
 
 @SuppressWarnings({"unused", "removal", "Contract", "UnstableApiUsage"})
 public abstract class CustomEnchantment<T extends  Event> extends Enchantment implements Listener {
-
-    private final static Logger log = TesserTools.getPlugin(TesserTools.class).getLogger();
 
     private final String id;
     private final String displayName;
@@ -56,7 +53,7 @@ public abstract class CustomEnchantment<T extends  Event> extends Enchantment im
         this.enchantableItems = enchantableItems;
         this.supportedItems = RegistrySets.fromMaterials(this.enchantableItems);
         this.key = key;
-        this.baseTranslationKey = "enchantment.tessertools." + key.getKey();
+        this.baseTranslationKey = getBaseTranslationKey(id);
     }
 
     /**
@@ -81,6 +78,13 @@ public abstract class CustomEnchantment<T extends  Event> extends Enchantment im
     public @NotNull String getID() {
         return id;
     }
+
+    /**
+     * Returns a US-ASCII safe string of the ID
+     * @return The ID as ASCII safe
+     */
+    @Subst("tessertools:missing")
+    public @NotNull String getSafeID() {return sanitizeString(id);}
 
     /**
      * A method to get the user-friendly- / display name of the enchantment.
@@ -194,12 +198,17 @@ public abstract class CustomEnchantment<T extends  Event> extends Enchantment im
      * @param string The origin string
      * @return A safe string
      */
-    private static String sanitizeString(String string) {
+    public static String sanitizeString(String string) {
         return string
                 .replace("ä", "ae")
                 .replace("ö", "oe")
                 .replace("ü", "ue")
                 .replace(":", "-");
+    }
+
+    public static String getBaseTranslationKey(String id) {
+        return "enchantment.tessertools." +
+                sanitizeString(id.replaceFirst("tessertools:", ""));
     }
 
     //<editor-fold desc="Vanilla Enchantment implementation">
@@ -210,6 +219,10 @@ public abstract class CustomEnchantment<T extends  Event> extends Enchantment im
                     .append(Component.translatable("enchantment.level." + level));
         }
         return name;
+    }
+
+    public @NotNull Component displayName() {
+        return Component.translatable(this.baseTranslationKey);
     }
 
     @Override public @NotNull Component description() {
