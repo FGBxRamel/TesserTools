@@ -4,9 +4,12 @@ import de.bydora.tesserTools.enchantment.util.RegistrySets;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.CustomModelData;
 import io.papermc.paper.enchantments.EnchantmentRarity;
+import io.papermc.paper.registry.RegistryAccess;
 import io.papermc.paper.registry.RegistryKey;
+import io.papermc.paper.registry.TypedKey;
 import io.papermc.paper.registry.set.RegistryKeySet;
 import io.papermc.paper.registry.set.RegistrySet;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -155,7 +158,7 @@ public abstract class CustomEnchantment<T extends  Event> extends Enchantment im
         PersistentDataContainer container = itemMeta.getPersistentDataContainer();
         container.set(getSaveKey(), PersistentDataType.INTEGER, level);
         item.setItemMeta(itemMeta);
-        item.addUnsafeEnchantment(this, level);
+        item.addUnsafeEnchantment(getRegisteredEnchantment(), level);
 
         return true;
     }
@@ -163,14 +166,18 @@ public abstract class CustomEnchantment<T extends  Event> extends Enchantment im
     @SuppressWarnings("UnstableApiUsage")
     CustomModelData.@NotNull Builder getBuilder(CustomModelData currentModelData) {
         CustomModelData.Builder builder = CustomModelData.customModelData();
+        final var cleanId = id.replace("ä", "ae")
+                .replace("ö", "oe")
+                .replace("ü", "ue")
+                .replace(":", "-");
 
         // Add the current enchantment or "multiple" flag if it's not present, add all non-related
         boolean multipleOrEqual = false;
         for (var string : currentModelData.strings()) {
             // If this enchantment already exists or the "multiple" flag is present
-            if ((string.equals(sanitizeString(id)))
+            if ((string.equals(cleanId))
                 && !multipleOrEqual) {
-                builder.addString(sanitizeString(id));
+                builder.addString(cleanId);
                 multipleOrEqual = true;
             }
             // If it's an enchantment from the plugin
@@ -185,7 +192,7 @@ public abstract class CustomEnchantment<T extends  Event> extends Enchantment im
             }
         }
         if (!multipleOrEqual) {
-            builder.addString(sanitizeString(id));
+            builder.addString(cleanId);
         }
         currentModelData.floats().forEach(builder::addFloat);
         currentModelData.flags().forEach(builder::addFlag);
@@ -194,7 +201,7 @@ public abstract class CustomEnchantment<T extends  Event> extends Enchantment im
     }
 
     /**
-     * Returns a custom-model-data-safe string.
+     * Returns a mostly ASCII-safe string.
      * @param string The origin string
      * @return A safe string
      */
@@ -202,13 +209,17 @@ public abstract class CustomEnchantment<T extends  Event> extends Enchantment im
         return string
                 .replace("ä", "ae")
                 .replace("ö", "oe")
-                .replace("ü", "ue")
-                .replace(":", "-");
+                .replace("ü", "ue");
     }
 
     public static String getBaseTranslationKey(String id) {
         return "enchantment.tessertools." +
                 sanitizeString(id.replaceFirst("tessertools:", ""));
+    }
+
+    private Enchantment getRegisteredEnchantment() {
+        var reg = RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT);
+        return reg.get(TypedKey.create(RegistryKey.ENCHANTMENT, Key.key(getSafeID())));
     }
 
     //<editor-fold desc="Vanilla Enchantment implementation">
