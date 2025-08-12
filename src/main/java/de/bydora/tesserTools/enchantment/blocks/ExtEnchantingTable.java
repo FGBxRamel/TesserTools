@@ -412,10 +412,10 @@ public class ExtEnchantingTable {
     private List<String> getEnchantmentStrings() {
         var enchantments = new ArrayList<String>();
         for (var enchantment : this.rolledEnchantments) {
-            if (enchantment instanceof Enchantment) {
-                enchantments.add(((Enchantment) enchantment).getKey().toString());
-            } else if (enchantment instanceof CustomEnchantment) {
+            if (enchantment instanceof CustomEnchantment) {
                 enchantments.add(((CustomEnchantment<?>) enchantment).getID());
+            } else if (enchantment instanceof Enchantment) {
+                enchantments.add(((Enchantment) enchantment).getKey().toString());
             }
         }
         return enchantments;
