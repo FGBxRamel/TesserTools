@@ -20,7 +20,7 @@ import java.util.*;
 
 public class Pathing extends CustomEnchantment<PlayerInteractEvent> {
 
-    private final static String id = "tessertools:strassenbauer";
+    private final static String id = "tessertools:pathing";
     private final static String displayName = "Straßenbauer";
     private final static int maxLevel = 3;
     private final static int minLevel = 1;

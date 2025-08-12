@@ -20,7 +20,7 @@ import java.util.*;
 
 public class AreaFill extends CustomEnchantment<PlayerInteractEvent> {
 
-    private final static String id = "tessertools:flaechenfuellung";
+    private final static String id = "tessertools:area_fill";
     private final static String displayName = "Flächenfüllung";
     private final static int maxLevel = 2;
     private final static int minLevel = 1;

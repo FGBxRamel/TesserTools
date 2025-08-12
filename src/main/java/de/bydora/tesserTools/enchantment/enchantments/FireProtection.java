@@ -14,7 +14,7 @@ import java.util.Set;
 
 public class FireProtection extends EnhVanillaEnch {
 
-    private final static String id = "tessertools:feuerschutz";
+    private final static String id = "tessertools:fire_protection";
     private final static String displayName = "Feuerschutz";
     private final static int maxLevel = 5;
     private final static int minLevel = 4;

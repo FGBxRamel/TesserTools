@@ -14,7 +14,7 @@ import java.util.Set;
 
 public class Protection extends EnhVanillaEnch {
 
-    private final static String id = "tessertools:schutz";
+    private final static String id = "tessertools:protection";
     private final static String displayName = "Schutz";
     private final static int maxLevel = 5;
     private final static int minLevel = 4;

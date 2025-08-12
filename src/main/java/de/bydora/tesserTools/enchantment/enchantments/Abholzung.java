@@ -21,7 +21,7 @@ import java.util.Set;
 
 public class Abholzung extends CustomEnchantment<BlockBreakEvent> {
 
-    private final static String id = "tessertools:abholzung";
+    private final static String id = "tessertools:tree_cutter";
     private final static String displayName = "Abholzung";
     private final static int maxLevel = 3;
     private final static int minLevel = 1;

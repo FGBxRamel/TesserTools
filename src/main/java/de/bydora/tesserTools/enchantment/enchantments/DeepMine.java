@@ -20,7 +20,7 @@ import java.util.Set;
 
 public class DeepMine extends CustomEnchantment<BlockBreakEvent> {
 
-    private final static String id = "tessertools:tiefenabbau";
+    private final static String id = "tessertools:deep_mining";
     private final static String displayName = "Tiefenabbau";
     private final static int maxLevel = 2;
     private final static int minLevel = 1;

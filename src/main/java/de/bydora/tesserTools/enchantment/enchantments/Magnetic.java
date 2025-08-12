@@ -23,7 +23,7 @@ import java.util.Set;
 
 public class Magnetic extends CustomEnchantment<PlayerMoveEvent> {
 
-    private final static String id = "tessertools:magnetisch";
+    private final static String id = "tessertools:magnetic";
     private final static String displayName = "Magnetisch";
     private final static int maxLevel = 2;
     private final static int minLevel = 1;

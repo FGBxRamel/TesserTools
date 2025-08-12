@@ -14,7 +14,7 @@ import java.util.Set;
 
 public class Thorns extends EnhVanillaEnch {
 
-    private final static String id = "tessertools:dornen";
+    private final static String id = "tessertools:thorns";
     private final static String displayName = "Dornen";
     private final static int maxLevel = 5;
     private final static int minLevel = 3;

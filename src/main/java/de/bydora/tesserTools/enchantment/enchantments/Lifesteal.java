@@ -20,7 +20,7 @@ import java.util.Set;
 
 public class Lifesteal extends CustomEnchantment<EntityDamageByEntityEvent> {
 
-    private final static String id = "tessertools:lebensklauer";
+    private final static String id = "tessertools:life_steal";
     private final static String displayName = "Lebensklauer";
     private final static int maxLevel = 1;
     private final static int minLevel = 1;

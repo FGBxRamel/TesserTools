@@ -20,7 +20,7 @@ import java.util.Set;
 
 public class AreaBreak extends CustomEnchantment<BlockBreakEvent> {
 
-    private final static String id = "tessertools:flächenabbau";
+    private final static String id = "tessertools:area_break";
     private final static String displayName = "Flächenabbau";
     private final static int maxLevel = 2;
     private final static int minLevel = 1;

@@ -14,7 +14,7 @@ import java.util.Set;
 
 public class BlastProtection extends EnhVanillaEnch {
 
-    private final static String id = "tessertools:explosionsschutz";
+    private final static String id = "tessertools:blast_protection";
     private final static String displayName = "Explosionsschutz";
     private final static int maxLevel = 5;
     private final static int minLevel = 4;

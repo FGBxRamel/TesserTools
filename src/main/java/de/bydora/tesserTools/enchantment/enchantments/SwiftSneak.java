@@ -14,7 +14,7 @@ import java.util.Set;
 
 public class SwiftSneak extends EnhVanillaEnch {
 
-    private final static String id = "tessertools:huschen";
+    private final static String id = "tessertools:swift_sneak";
     private final static String displayName = "Huschen";
     private final static int maxLevel = 5;
     private final static int minLevel = 4;

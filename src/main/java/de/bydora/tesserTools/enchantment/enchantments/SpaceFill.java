@@ -22,7 +22,7 @@ import static de.bydora.tesserTools.enchantment.enchantments.AreaFill.*;
 
 public class SpaceFill extends CustomEnchantment<PlayerInteractEvent>{
 
-    private final static String id = "tessertools:tiefenauffuellung";
+    private final static String id = "tessertools:deep_filling";
     private final static String displayName = "Tiefenauffüllung";
     private final static int maxLevel = 4;
     private final static int minLevel = 1;

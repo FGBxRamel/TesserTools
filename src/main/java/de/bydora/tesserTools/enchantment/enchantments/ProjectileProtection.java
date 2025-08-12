@@ -14,7 +14,7 @@ import java.util.Set;
 
 public class ProjectileProtection extends EnhVanillaEnch {
 
-    private final static String id = "tessertools:schusssicher";
+    private final static String id = "tessertools:projectile_protection";
     private final static String displayName = "Schusssicher";
     private final static int maxLevel = 5;
     private final static int minLevel = 4;

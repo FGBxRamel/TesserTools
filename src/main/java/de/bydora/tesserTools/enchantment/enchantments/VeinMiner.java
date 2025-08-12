@@ -20,7 +20,7 @@ import java.util.Set;
 
 public class VeinMiner extends CustomEnchantment<BlockBreakEvent> {
 
-    private final static String id = "tessertools:aderabbau";
+    private final static String id = "tessertools:vein_miner";
     private final static String displayName = "Aderabbau";
     private final static int maxLevel = 3;
     private final static int minLevel = 1;

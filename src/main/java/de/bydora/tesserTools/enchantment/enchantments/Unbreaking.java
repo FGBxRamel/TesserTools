@@ -15,7 +15,7 @@ import java.util.Set;
 
 public class Unbreaking extends EnhVanillaEnch {
 
-    private final static String id = "tessertools:haltbarkeit";
+    private final static String id = "tessertools:unbreaking";
     private final static String displayName = "Haltbarkeit";
     private final static int maxLevel = 5;
     private final static int minLevel = 4;

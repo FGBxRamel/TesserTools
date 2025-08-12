@@ -22,7 +22,7 @@ import static java.util.Map.entry;
 
 public class Harvester extends CustomEnchantment<BlockBreakEvent> {
 
-    private final static String id = "tessertools:ernter";
+    private final static String id = "tessertools:harvester";
     private final static String displayName = "Ernter";
     private final static int maxLevel = 1;
     private final static int minLevel = 1;
