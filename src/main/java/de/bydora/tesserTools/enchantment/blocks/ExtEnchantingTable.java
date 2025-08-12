@@ -30,11 +30,11 @@ import java.util.*;
 
 import static java.util.Map.entry;
 
-@SuppressWarnings({"rawtypes", "UnstableApiUsage"})
+@SuppressWarnings({"rawtypes"})
 public class ExtEnchantingTable {
 
     private static final Map ENCHANTMENT_MAP = TesserTools.getPlugin(TesserTools.class).getEnchantmentMap();
-    public static final Registry<Enchantment> ENCHANTMENT_REGISTRY = RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT);
+    public static final Registry<@NotNull Enchantment> ENCHANTMENT_REGISTRY = RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT);
     private static final Map<Integer, String> ROMAN_NUMERALS = Map.ofEntries(
             entry(1, "I"),
             entry(2, "II"),
@@ -95,7 +95,9 @@ public class ExtEnchantingTable {
 
         this.vanillaEnchantments = new ArrayList<>();
         for (Enchantment enchantment : ENCHANTMENT_REGISTRY) {
-            vanillaEnchantments.add(enchantment);
+            if (!enchantment.getKey().asMinimalString().contains("tessertools")) {
+                vanillaEnchantments.add(enchantment);
+            }
         }
     }
 
@@ -193,7 +195,7 @@ public class ExtEnchantingTable {
     /**
      * Loads the state of the enchantment table from it's {@link PersistentDataContainer}.
      */
-    @SuppressWarnings({"UnstableApiUsage", "PatternValidation"})
+    @SuppressWarnings({"PatternValidation"})
     private void loadState() {
         var stateContainer = this.vanillaTable.getPersistentDataContainer().getOrDefault(
                 EnchantmentSpaceKeys.STATE_CONTAINER.getKey(), PersistentDataType.TAG_CONTAINER,
