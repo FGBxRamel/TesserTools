@@ -433,11 +433,6 @@ public class PlayerDropItemListener implements Listener {
     }
 
     private void finalizeEnchantmentProcess(ExtEnchantingTable extTable, Item item, Item enchantItem) {
-        if (enchantItem.getItemStack().getType() == Material.BOOK) {
-//            var enchantedBook = new ItemStack(Material.ENCHANTED_BOOK);
-//            enchantedBook.setItemMeta(enchantItem.getItemStack().getItemMeta());
-//            enchantItem.setItemStack(enchantedBook);
-        }
         item.getItemStack().setAmount(item.getItemStack().getAmount() - 1);
         spawnEnchantParticles(extTable.getLocation().add(0, 1, 0));
         extTable.clearEnchantments();

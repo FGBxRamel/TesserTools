@@ -83,6 +83,7 @@ public final class TesserTools extends JavaPlugin {
         }
     }
 
+    @SuppressWarnings("unused")
     public List<String> getEnchantmentIDs() {
         return enchantmentIDs;
     }
