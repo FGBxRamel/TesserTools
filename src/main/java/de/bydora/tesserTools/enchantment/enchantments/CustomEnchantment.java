@@ -117,14 +117,22 @@ public abstract class CustomEnchantment<T extends  Event> extends Enchantment im
     }
 
     /**
-     * Checks wether or not the {@link ItemStack} has the enchantment.
+     * Checks whether the {@link ItemStack} has the enchantment.
      * @param itemStack The item stack to check
-     * @return The level of the entchantment; 0 if not present.
+     * @return The level of the enchantment; 0 if not present.
      */
     public int getEnchantmentLevel(@NotNull ItemStack itemStack) {
         try {
+            var regEnch = getRegisteredEnchantment();
             PersistentDataContainer container = itemStack.getItemMeta().getPersistentDataContainer();
-            return container.getOrDefault(getSaveKey(), PersistentDataType.INTEGER, 0);
+            var level = container.getOrDefault(getSaveKey(), PersistentDataType.INTEGER, 0);
+            // If it doesn't exist in the PDC, but as vanilla enchantment it will return the level of it and sync
+            // the PDC
+            if (level == 0 && itemStack.containsEnchantment(regEnch)) {
+                level = itemStack.getEnchantments().get(regEnch);
+                enchantItem(itemStack, level);
+            }
+            return level;
         } catch (NullPointerException e) {
             return 0;
         }
