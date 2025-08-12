@@ -12,7 +12,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -23,13 +22,15 @@ public class Magnetic extends CustomEnchantment<PlayerMoveEvent> {
     private final static String displayName = "Magnetisch";
     private final static int maxLevel = 2;
     private final static int minLevel = 1;
+    private final static NamespacedKey key = EnchantmentSpaceKeys.ENCH_MAGNETIC.getKey();
     private final static Material[] enchantableItems = MaterialArrayMerger.merge(new Material[] {Material.SHEARS},
             EquipmentGroups.TOOLS);
 
     public Magnetic() {
-        super(id, maxLevel, displayName, minLevel, enchantableItems);
+        super(id, maxLevel, displayName, minLevel, enchantableItems, key);
     }
 
+    @SuppressWarnings("UnstableApiUsage")
     @Override
     @EventHandler(ignoreCancelled = true)
     public void enchantmentEvent(PlayerMoveEvent event) {
@@ -71,10 +72,4 @@ public class Magnetic extends CustomEnchantment<PlayerMoveEvent> {
             }
         }
     }
-
-    @Override
-    public @NotNull NamespacedKey getSaveKey() {
-        return EnchantmentSpaceKeys.ENCH_MAGNETIC.getKey();
-    }
-
 }

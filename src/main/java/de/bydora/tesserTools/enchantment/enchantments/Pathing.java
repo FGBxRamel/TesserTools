@@ -20,6 +20,7 @@ public class Pathing extends CustomEnchantment<PlayerInteractEvent> {
     private final static String displayName = "Straßenbauer";
     private final static int maxLevel = 3;
     private final static int minLevel = 1;
+    private final static NamespacedKey key = EnchantmentSpaceKeys.ENCH_PATHING.getKey();
     private final static Material[] enchantableItems = EquipmentGroups.HOES;
     private final static List<Material[]> levelBlocks = new ArrayList<>(List.of(
             new Material[] { Material.DIRT, Material.COARSE_DIRT, Material.ROOTED_DIRT, Material.GRASS_BLOCK,
@@ -34,7 +35,7 @@ public class Pathing extends CustomEnchantment<PlayerInteractEvent> {
     ));
 
     public Pathing() {
-        super(id, maxLevel, displayName, minLevel, enchantableItems);
+        super(id, maxLevel, displayName, minLevel, enchantableItems, key);
     }
 
     @Override
@@ -61,11 +62,6 @@ public class Pathing extends CustomEnchantment<PlayerInteractEvent> {
 
         var blocks = areaFinder(event.getClickedBlock().getLocation(), level);
         AreaFill.placeBlocks(blocks.stream().toList(), event.getPlayer().getInventory(), availableMaterial);
-    }
-
-    @Override
-    public @NotNull NamespacedKey getSaveKey() {
-        return EnchantmentSpaceKeys.ENCH_PATHING.getKey();
     }
 
     /**

@@ -9,7 +9,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitScheduler;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -22,6 +21,7 @@ public class Harvester extends CustomEnchantment<BlockBreakEvent> {
     private final static String displayName = "Ernter";
     private final static int maxLevel = 1;
     private final static int minLevel = 1;
+    private final static NamespacedKey key = EnchantmentSpaceKeys.ENCH_HARVESTER.getKey();
     private final static Material[] enchantableItems = EquipmentGroups.HOES;
     private final static Map<Material, Material> cropSeedMapping = Map.ofEntries(
             entry(Material.WHEAT, Material.WHEAT_SEEDS),
@@ -31,7 +31,7 @@ public class Harvester extends CustomEnchantment<BlockBreakEvent> {
     );
 
     public Harvester() {
-        super(id, maxLevel, displayName, minLevel, enchantableItems);
+        super(id, maxLevel, displayName, minLevel, enchantableItems, key);
     }
 
     @Override
@@ -56,10 +56,4 @@ public class Harvester extends CustomEnchantment<BlockBreakEvent> {
             }
         }
     }
-
-    @Override
-    public @NotNull NamespacedKey getSaveKey() {
-        return EnchantmentSpaceKeys.ENCH_HARVESTER.getKey();
-    }
-
 }

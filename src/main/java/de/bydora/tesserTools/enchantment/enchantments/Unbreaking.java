@@ -6,7 +6,6 @@ import de.bydora.tesserTools.enchantment.util.MaterialArrayMerger;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
-import org.jetbrains.annotations.NotNull;
 
 public class Unbreaking extends EnhVanillaEnch {
 
@@ -14,6 +13,7 @@ public class Unbreaking extends EnhVanillaEnch {
     private final static String displayName = "Haltbarkeit";
     private final static int maxLevel = 5;
     private final static int minLevel = 4;
+    private final static NamespacedKey key = EnchantmentSpaceKeys.ENCH_UNBRKEAING.getKey();
     private final static Material[] enchantableItems = MaterialArrayMerger.merge(
             MaterialArrayMerger.merge(EquipmentGroups.TOOLS, EquipmentGroups.ARMOR),
             new Material[] {Material.FISHING_ROD, Material.BOW, Material.MACE, Material.SHIELD, Material.TURTLE_HELMET,
@@ -22,12 +22,6 @@ public class Unbreaking extends EnhVanillaEnch {
     private final static Enchantment vanillaEnchantment = Enchantment.UNBREAKING;
 
     public Unbreaking() {
-        super(id, maxLevel, displayName, minLevel, enchantableItems, vanillaEnchantment);
+        super(id, maxLevel, displayName, minLevel, enchantableItems, vanillaEnchantment, key);
     }
-
-    @Override
-    public @NotNull NamespacedKey getSaveKey() {
-        return EnchantmentSpaceKeys.ENCH_UNBRKEAING.getKey();
-    }
-
 }

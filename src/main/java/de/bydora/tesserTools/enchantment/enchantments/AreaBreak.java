@@ -24,6 +24,7 @@ public class AreaBreak extends CustomEnchantment<BlockBreakEvent> {
     private final static String displayName = "Flächenabbau";
     private final static int maxLevel = 2;
     private final static int minLevel = 1;
+    private final static NamespacedKey key = EnchantmentSpaceKeys.ENCH_AREA_BREAK.getKey();
     private final static Material[] enchantableItems =
             MaterialArrayMerger.merge(EquipmentGroups.PICKAXES, EquipmentGroups.SHOVELS);
     private final static Material[] affectedBlocks = new Material[] {
@@ -41,7 +42,7 @@ public class AreaBreak extends CustomEnchantment<BlockBreakEvent> {
     };
 
     public AreaBreak() {
-        super(id, maxLevel, displayName, minLevel, enchantableItems);
+        super(id, maxLevel, displayName, minLevel, enchantableItems, key);
     }
 
     @Override
@@ -53,12 +54,6 @@ public class AreaBreak extends CustomEnchantment<BlockBreakEvent> {
         ) {
             breakArea(getEnchantmentLevel(item) == 2, event.getPlayer(), event.getBlock(), item);
         }
-    }
-
-
-    @Override
-    public @NotNull NamespacedKey getSaveKey() {
-        return EnchantmentSpaceKeys.ENCH_AREA_BREAK.getKey();
     }
 
     /**

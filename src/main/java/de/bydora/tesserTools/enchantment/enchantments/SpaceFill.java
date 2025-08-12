@@ -25,6 +25,7 @@ public class SpaceFill extends CustomEnchantment<PlayerInteractEvent>{
     private final static String displayName = "Tiefenauffüllung";
     private final static int maxLevel = 4;
     private final static int minLevel = 1;
+    private final static NamespacedKey key =EnchantmentSpaceKeys.ENCH_SPACE_FILL.getKey();
     private final static Material[] enchantableItems = new Material[]{Material.BUNDLE};
     private final static Material[] fillBlocks = new Material[] {
             Material.STONE, Material.COBBLESTONE, Material.MOSSY_COBBLESTONE,
@@ -37,7 +38,7 @@ public class SpaceFill extends CustomEnchantment<PlayerInteractEvent>{
     };
 
     public SpaceFill() {
-        super(id, maxLevel, displayName, minLevel, enchantableItems);
+        super(id, maxLevel, displayName, minLevel, enchantableItems, key);
     }
 
     @Override
@@ -64,13 +65,8 @@ public class SpaceFill extends CustomEnchantment<PlayerInteractEvent>{
     }
 
     @Override
-    public @NotNull NamespacedKey getSaveKey() {
-        return EnchantmentSpaceKeys.ENCH_SPACE_FILL.getKey();
-    }
-
-    @Override
     public boolean canEnchantItem(@NotNull ItemStack item) {
-        final boolean hasAreaFill = new AreaFill().getEnchantmentLevel(item) != 0;
+        final boolean hasAreaFill = item.containsEnchantment(new AreaFill());
         return Arrays.stream(enchantableItems).toList().contains(item.getType()) && !hasAreaFill;
     }
 

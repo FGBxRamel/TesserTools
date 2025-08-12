@@ -9,7 +9,6 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;
@@ -20,6 +19,7 @@ public class VeinMiner extends CustomEnchantment<BlockBreakEvent> {
     private final static String displayName = "Aderabbau";
     private final static int maxLevel = 3;
     private final static int minLevel = 1;
+    private final static NamespacedKey key = EnchantmentSpaceKeys.ENCH_VEIN_MINER.getKey();
     private final static Material[] enchantableItems = EquipmentGroups.PICKAXES;
     private final static Material[] ores = new Material[] {
             Material.COAL_ORE, Material.COPPER_ORE, Material.DEEPSLATE_COAL_ORE, Material.DEEPSLATE_COPPER_ORE,
@@ -30,7 +30,7 @@ public class VeinMiner extends CustomEnchantment<BlockBreakEvent> {
     };
 
     public VeinMiner() {
-        super(id, maxLevel, displayName, minLevel, enchantableItems);
+        super(id, maxLevel, displayName, minLevel, enchantableItems, key);
     }
 
     @Override
@@ -46,10 +46,5 @@ public class VeinMiner extends CustomEnchantment<BlockBreakEvent> {
         for (Location location : blocksToBreak) {
             location.getBlock().breakNaturally(itemInHand, true, true);
         }
-    }
-
-    @Override
-    public @NotNull NamespacedKey getSaveKey() {
-        return EnchantmentSpaceKeys.ENCH_VEIN_MINER.getKey();
     }
 }

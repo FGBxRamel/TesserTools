@@ -11,7 +11,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.scheduler.BukkitScheduler;
-import org.jetbrains.annotations.NotNull;
 
 public class Lifesteal extends CustomEnchantment<EntityDamageByEntityEvent> {
 
@@ -19,10 +18,11 @@ public class Lifesteal extends CustomEnchantment<EntityDamageByEntityEvent> {
     private final static String displayName = "Lebensklauer";
     private final static int maxLevel = 1;
     private final static int minLevel = 1;
+    private final static NamespacedKey key =EnchantmentSpaceKeys.ENCH_LIFESTEAL.getKey();
     private final static Material[] enchantableItems = EquipmentGroups.SWORDS;
 
     public Lifesteal() {
-        super(id, maxLevel, displayName, minLevel, enchantableItems);
+        super(id, maxLevel, displayName, minLevel, enchantableItems, key);
     }
 
     @Override
@@ -48,10 +48,4 @@ public class Lifesteal extends CustomEnchantment<EntityDamageByEntityEvent> {
             }
             }
     }
-
-    @Override
-    public @NotNull NamespacedKey getSaveKey() {
-        return EnchantmentSpaceKeys.ENCH_LIFESTEAL.getKey();
-    }
-
 }

@@ -10,18 +10,17 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;
 
-@SuppressWarnings("ALL")
 public class Abholzung extends CustomEnchantment<BlockBreakEvent> {
 
     private final static String id = "tessertools:abholzung";
     private final static String displayName = "Abholzung";
     private final static int maxLevel = 3;
     private final static int minLevel = 1;
+    private final static NamespacedKey key = EnchantmentSpaceKeys.ENCH_ABHOLZUNG.getKey();
     private final static Material[] enchantableItems = EquipmentGroups.AXES;
     private final static Material[] woodTypes = new Material[] {
             Material.ACACIA_LOG, Material.BIRCH_LOG, Material.CHERRY_LOG, Material.DARK_OAK_LOG,
@@ -30,7 +29,7 @@ public class Abholzung extends CustomEnchantment<BlockBreakEvent> {
     };
 
     public Abholzung() {
-        super(id, maxLevel, displayName, minLevel, enchantableItems);
+        super(id, maxLevel, displayName, minLevel, enchantableItems, key);
     }
 
     @Override
@@ -53,10 +52,4 @@ public class Abholzung extends CustomEnchantment<BlockBreakEvent> {
             }
         }
     }
-
-    @Override
-    public @NotNull NamespacedKey getSaveKey() {
-        return EnchantmentSpaceKeys.ENCH_ABHOLZUNG.getKey();
-    }
-
 }

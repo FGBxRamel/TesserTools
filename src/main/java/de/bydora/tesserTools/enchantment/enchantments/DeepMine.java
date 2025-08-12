@@ -19,12 +19,13 @@ public class DeepMine extends CustomEnchantment<BlockBreakEvent> {
     private final static String displayName = "Tiefenabbau";
     private final static int maxLevel = 2;
     private final static int minLevel = 1;
+    private final static NamespacedKey key = EnchantmentSpaceKeys.ENCH_DEEPMINE.getKey();
     private final static Material[] enchantableItems = MaterialArrayMerger.merge(
             EquipmentGroups.SHOVELS, EquipmentGroups.PICKAXES);
     private final static Material[] affectedBlocks = AreaBreak.getAffectedBlocks();
 
     public DeepMine() {
-        super(id, maxLevel, displayName, minLevel, enchantableItems);
+        super(id, maxLevel, displayName, minLevel, enchantableItems, key);
     }
 
     @Override
@@ -48,11 +49,6 @@ public class DeepMine extends CustomEnchantment<BlockBreakEvent> {
                 }
             }
         }
-    }
-
-    @Override
-    public @NotNull NamespacedKey getSaveKey() {
-        return EnchantmentSpaceKeys.ENCH_DEEPMINE.getKey();
     }
 
     /**
