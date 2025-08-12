@@ -1,19 +1,31 @@
 package de.bydora.tesserTools.commands;
 
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.enchantments.Enchantment;
+import com.mojang.brigadier.Command;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
+import io.papermc.paper.command.brigadier.Commands;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 @SuppressWarnings("unused")
-public class CommandTesbug implements CommandExecutor {
+public class CommandTesbug {
 
-    @Override
-    public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        Player player = (Player) commandSender;
-        player.sendMessage(Enchantment.BANE_OF_ARTHROPODS.key().asMinimalString());
-        return true;
+    public static LiteralArgumentBuilder<CommandSourceStack> createCommand() {
+        return Commands.literal("tesbug")
+//                .requires(sender -> sender.getSender().hasPermission(
+//                        "tessertools.debug.tesbug"))
+                .executes(CommandTesbug::tesbugLogic);
+    }
+
+    private static int tesbugLogic(CommandContext<CommandSourceStack> ctx) {
+        Entity executor = Objects.requireNonNull(ctx.getSource().getExecutor());
+        if (!(executor instanceof Player player)) {
+            return Command.SINGLE_SUCCESS;
+        }
+        player.sendPlainMessage("Hello!");
+        return Command.SINGLE_SUCCESS;
     }
 }
