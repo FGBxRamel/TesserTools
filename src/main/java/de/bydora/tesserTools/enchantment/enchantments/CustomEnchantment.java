@@ -23,6 +23,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ItemType;
+import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -136,12 +137,12 @@ public abstract class CustomEnchantment<T extends  Event> extends Enchantment im
      * @return Whether the enchanting was successfully.
      */
     @SuppressWarnings("UnstableApiUsage")
-    public boolean enchantItem(@NotNull ItemStack item, int level) {
+    public ItemStack enchantItem(@NotNull ItemStack item, int level) {
         if (!canEnchantItem(item)
             && item.getType() != Material.BOOK
             && item.getType() != Material.ENCHANTED_BOOK
         ) {
-            return false;
+            return null;
         }
 
         // Set CustomModelData
@@ -153,14 +154,28 @@ public abstract class CustomEnchantment<T extends  Event> extends Enchantment im
                 builder.build()
         );
 
-        // Set PersistentDataContainer
+        var regEnchantment = getRegisteredEnchantment();
+
+        // Put the enchantment on the item
+        if (item.getType() == Material.BOOK) {
+            item = new ItemStack(Material.ENCHANTED_BOOK);
+        }
+        if (item.getType() == Material.ENCHANTED_BOOK){
+            var meta = (EnchantmentStorageMeta) item.getItemMeta();
+            meta.removeStoredEnchant(regEnchantment);
+            meta.addStoredEnchant(regEnchantment, level, true);
+            item.setItemMeta(meta);
+        } else {
+            item.addUnsafeEnchantment(regEnchantment, level);
+        }
+
+        // Set PDC
         ItemMeta itemMeta = item.getItemMeta();
         PersistentDataContainer container = itemMeta.getPersistentDataContainer();
         container.set(getSaveKey(), PersistentDataType.INTEGER, level);
         item.setItemMeta(itemMeta);
-        item.addUnsafeEnchantment(getRegisteredEnchantment(), level);
 
-        return true;
+        return item;
     }
 
     @SuppressWarnings("UnstableApiUsage")

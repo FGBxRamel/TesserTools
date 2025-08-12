@@ -44,7 +44,7 @@ public class Missing extends CustomEnchantment<Event> {
     }
 
     @Override
-    public boolean enchantItem(@NotNull ItemStack item, int level) {
-        return false;
+    public ItemStack enchantItem(@NotNull ItemStack item, int level) {
+        return null;
     }
 }
