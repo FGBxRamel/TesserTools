@@ -1,7 +1,7 @@
 package de.bydora.tesserTools;
 
+import de.bydora.tesserTools.commands.CommandMigration;
 import de.bydora.tesserTools.commands.CommandReallife;
-import de.bydora.tesserTools.commands.CommandTesbug;
 import de.bydora.tesserTools.enchantment.enchantments.*;
 import de.bydora.tesserTools.enchantment.util.EnchantDef;
 import io.papermc.paper.plugin.bootstrap.BootstrapContext;
@@ -27,8 +27,9 @@ public final class TesserToolsBootstrap implements PluginBootstrap {
                 commands -> {
             commands.registrar().register(CommandReallife.createCommand().build(),
                     "Helps you into the real life", Collections.singleton("reallife"));
-            commands.registrar().register(CommandTesbug.createCommand().build(),
-                    "Tessertools debugging command");
+//            commands.registrar().register(CommandTesbug.createCommand().build(),
+//                    "Tessertools debugging command");
+            commands.registrar().register(CommandMigration.createCommand().build());
         });
 
         // Registering Enchantments
