@@ -168,12 +168,14 @@ public abstract class CustomEnchantment<T extends  Event> extends Enchantment im
         if (item.getType() == Material.BOOK) {
             item = new ItemStack(Material.ENCHANTED_BOOK);
         }
-        if (item.getType() == Material.ENCHANTED_BOOK){
+        // If it's an enhanced vanilla it would double the name, so we don't put the registered custom on it
+        if (item.getType() == Material.ENCHANTED_BOOK && !(this instanceof EnhVanillaEnch)){
             var meta = (EnchantmentStorageMeta) item.getItemMeta();
             meta.removeStoredEnchant(regEnchantment);
             meta.addStoredEnchant(regEnchantment, level, true);
             item.setItemMeta(meta);
-        } else {
+        // See above for the condition
+        } else if (!(this instanceof EnhVanillaEnch)){
             item.addUnsafeEnchantment(regEnchantment, level);
         }
 
