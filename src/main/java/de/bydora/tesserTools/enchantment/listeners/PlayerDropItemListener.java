@@ -148,21 +148,22 @@ public class PlayerDropItemListener implements Listener {
         var chargeLevel = extTable.getChargeLevel();
 
         boolean enchanted = false;
+        ItemStack newStack = null;
         if (enchantment instanceof CustomEnchantment<?> customEnch) {
-            enchanted = applyCustomEnchantment(player, enchantStack, customEnch, chargeLevel, true,
+            newStack = applyCustomEnchantment(player, enchantStack, customEnch, chargeLevel, true,
                     customEnch.getEnchantmentLevel(enchantStack) + 1);
         } else if (enchantment instanceof Enchantment vanillaEnch) {
-                var newStack = applyVanillaEnchantment(player, enchantStack, vanillaEnch,
+                newStack = applyVanillaEnchantment(player, enchantStack, vanillaEnch,
                     enchantStack.getEnchantmentLevel(vanillaEnch) + 1);
-                if (Objects.nonNull(newStack)) {
-                    enchanted = true;
-                    enchantItem.setItemStack(newStack);
-                }
+        }
+        if (Objects.nonNull(newStack)) {
+            enchanted = true;
+            enchantItem.setItemStack(newStack);
         }
         if (enchanted) finalizeEnchantmentProcess(extTable, item, enchantItem);
     }
 
-    private boolean applyCustomEnchantment(@Nullable Player player, ItemStack enchantStack,
+    private ItemStack applyCustomEnchantment(@Nullable Player player, ItemStack enchantStack,
                                            CustomEnchantment<?> enchantment, int chargeLevel, boolean changeLevel,
                                            int level
     ) {
@@ -179,13 +180,13 @@ public class PlayerDropItemListener implements Listener {
                 || enchantStack.getType() == Material.BOOK
                 )
         ) {
-            enchantment.enchantItem(enchantStack, level);
-            return true;
+            enchantStack = enchantment.enchantItem(enchantStack, level);
+            return enchantStack;
         }
-        return false;
+        return null;
     }
 
-    private boolean applyCustomEnchantment(ItemStack enchantStack, CustomEnchantment<?> enchantment, int chargeLevel,
+    private ItemStack applyCustomEnchantment(ItemStack enchantStack, CustomEnchantment<?> enchantment, int chargeLevel,
                                            int level) {
         return applyCustomEnchantment(null, enchantStack, enchantment, chargeLevel, false, level);
     }
@@ -432,11 +433,6 @@ public class PlayerDropItemListener implements Listener {
     }
 
     private void finalizeEnchantmentProcess(ExtEnchantingTable extTable, Item item, Item enchantItem) {
-        if (enchantItem.getItemStack().getType() == Material.BOOK) {
-            var enchantedBook = new ItemStack(Material.ENCHANTED_BOOK);
-            enchantedBook.setItemMeta(enchantItem.getItemStack().getItemMeta());
-            enchantItem.setItemStack(enchantedBook);
-        }
         item.getItemStack().setAmount(item.getItemStack().getAmount() - 1);
         spawnEnchantParticles(extTable.getLocation().add(0, 1, 0));
         extTable.clearEnchantments();

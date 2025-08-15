@@ -1,5 +1,5 @@
 name: TesserTools
-version: '1.8.1'
+version: '2.0.0'
 main: de.bydora.tesserTools.TesserTools
 api-version: '1.21'
 author: FGBxRamel
@@ -8,13 +8,8 @@ contributors: [ Blitu, Jupidui_ZVL ]
 website: https://github.com/FGBxRamel/TesserTools
 prefix: Tesserania Tools
 
-commands:
-  showench:
-    description: Shows all special enchantments that the item in hand has
-    usage: /showench
-    permission: tessertools.enchantment.showench
-  reallife:
-    description: Helps you into the real life
-    usage: /reallife
-    permission: tessertools.other.reallife
-    aliases: irl
+#reallife:
+#  description: Helps you into the real life
+#  usage: /reallife
+#  permission: tessertools.other.reallife
+#  aliases: irl

@@ -2,23 +2,27 @@ package de.bydora.tesserTools.enchantment.enchantments;
 
 import de.bydora.tesserTools.TesserTools;
 import de.bydora.tesserTools.enchantment.enums.EnchantmentSpaceKeys;
+import de.bydora.tesserTools.enchantment.util.EnchantDef;
 import de.bydora.tesserTools.enchantment.util.EquipmentGroups;
+import de.bydora.tesserTools.enchantment.util.RegistrySets;
+import io.papermc.paper.registry.RegistryKey;
+import io.papermc.paper.registry.set.RegistrySet;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitScheduler;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Set;
 
 import static java.util.Map.entry;
 
 public class Harvester extends CustomEnchantment<BlockBreakEvent> {
 
-    private final static String id = "tessertools:ernter";
+    private final static String id = "tessertools:harvester";
     private final static String displayName = "Ernter";
     private final static int maxLevel = 1;
     private final static int minLevel = 1;
@@ -31,7 +35,23 @@ public class Harvester extends CustomEnchantment<BlockBreakEvent> {
     );
 
     public Harvester() {
-        super(id, maxLevel, displayName, minLevel, enchantableItems);
+        super(id, maxLevel, displayName, minLevel, enchantableItems, EnchantmentSpaceKeys.ENCH_HARVESTER.getKey());
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    public static EnchantDef def() {
+        var supported = RegistrySets.fromMaterials(enchantableItems);
+        var description = Component.translatable(getBaseTranslationKey(id) + ".description");
+        return new EnchantDef(
+                sanitizeString(id),
+                description,
+                supported,
+                1,
+                maxLevel,
+                10,
+                Set.of(),
+                RegistrySet.keySet(RegistryKey.ENCHANTMENT)
+        );
     }
 
     @Override
@@ -56,10 +76,4 @@ public class Harvester extends CustomEnchantment<BlockBreakEvent> {
             }
         }
     }
-
-    @Override
-    public @NotNull NamespacedKey getSaveKey() {
-        return EnchantmentSpaceKeys.ENCH_HARVESTER.getKey();
-    }
-
 }

@@ -1,8 +1,12 @@
 package de.bydora.tesserTools.enchantment.enchantments;
 
 import de.bydora.tesserTools.enchantment.enums.EnchantmentSpaceKeys;
+import de.bydora.tesserTools.enchantment.util.EnchantDef;
+import de.bydora.tesserTools.enchantment.util.RegistrySets;
+import io.papermc.paper.registry.RegistryKey;
+import io.papermc.paper.registry.set.RegistrySet;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.event.EventHandler;
@@ -16,7 +20,7 @@ import java.util.*;
 
 public class AreaFill extends CustomEnchantment<PlayerInteractEvent> {
 
-    private final static String id = "tessertools:flaechenfuellung";
+    private final static String id = "tessertools:area_fill";
     private final static String displayName = "Flächenfüllung";
     private final static int maxLevel = 2;
     private final static int minLevel = 1;
@@ -32,7 +36,23 @@ public class AreaFill extends CustomEnchantment<PlayerInteractEvent> {
     };
 
     public AreaFill() {
-        super(id, maxLevel, displayName, minLevel, enchantableItems);
+        super(id, maxLevel, displayName, minLevel, enchantableItems, EnchantmentSpaceKeys.ENCH_AREA_FILL.getKey());
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    public static EnchantDef def() {
+        var supported = RegistrySets.fromMaterials(enchantableItems);
+        var description = Component.translatable(getBaseTranslationKey(id) + ".description");
+        return new EnchantDef(
+                sanitizeString(id),
+                description,
+                supported,
+                1,
+                maxLevel,
+                10,
+                Set.of(),
+                RegistrySet.keySet(RegistryKey.ENCHANTMENT)
+        );
     }
 
     @Override
@@ -59,13 +79,8 @@ public class AreaFill extends CustomEnchantment<PlayerInteractEvent> {
     }
 
     @Override
-    public @NotNull NamespacedKey getSaveKey() {
-        return EnchantmentSpaceKeys.ENCH_AREA_FILL.getKey();
-    }
-
-    @Override
     public boolean canEnchantItem(@NotNull ItemStack item) {
-        final boolean hasSpaceFill = new SpaceFill().getEnchantmentLevel(item) != 0;
+        final boolean hasSpaceFill = new AreaFill().getEnchantmentLevel(item) > 0;
         return Arrays.stream(enchantableItems).toList().contains(item.getType()) && !hasSpaceFill;
     }
 

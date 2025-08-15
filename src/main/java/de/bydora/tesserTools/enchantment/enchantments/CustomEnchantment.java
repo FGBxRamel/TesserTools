@@ -1,41 +1,63 @@
 package de.bydora.tesserTools.enchantment.enchantments;
 
-import de.bydora.tesserTools.TesserTools;
+import de.bydora.tesserTools.enchantment.util.RegistrySets;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.CustomModelData;
+import io.papermc.paper.enchantments.EnchantmentRarity;
+import io.papermc.paper.registry.RegistryAccess;
+import io.papermc.paper.registry.RegistryKey;
+import io.papermc.paper.registry.TypedKey;
+import io.papermc.paper.registry.set.RegistryKeySet;
+import io.papermc.paper.registry.set.RegistrySet;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.enchantments.EnchantmentTarget;
+import org.bukkit.entity.EntityCategory;
+import org.bukkit.entity.EntityType;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.ItemType;
+import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.ResourceBundle;
-import java.util.logging.Logger;
+import java.util.Set;
 
-@SuppressWarnings("unused")
-public abstract class CustomEnchantment<T extends  Event> implements Listener {
-
-    private final static Logger log = TesserTools.getPlugin(TesserTools.class).getLogger();
+@SuppressWarnings({"unused", "removal", "Contract", "UnstableApiUsage"})
+public abstract class CustomEnchantment<T extends  Event> extends Enchantment implements Listener {
 
     private final String id;
     private final String displayName;
     private final int maxLevel;
     private final int minLevel;
     private final Material[] enchantableItems;
+    private final RegistryKeySet<@NotNull ItemType> supportedItems;
+    private final NamespacedKey key;
+    private final String baseTranslationKey;
 
-    public CustomEnchantment(String id, int maxLevel, String displayName, int minLevel, Material[] enchantableItems) {
+    public CustomEnchantment(String id, int maxLevel, String displayName, int minLevel, Material[] enchantableItems,
+    @NotNull NamespacedKey key) {
         this.id = id;
         this.maxLevel = maxLevel;
         this.displayName = displayName;
         this.minLevel = minLevel;
         this.enchantableItems = enchantableItems;
+        this.supportedItems = RegistrySets.fromMaterials(this.enchantableItems);
+        this.key = key;
+        this.baseTranslationKey = getBaseTranslationKey(id);
     }
 
     /**
@@ -49,7 +71,9 @@ public abstract class CustomEnchantment<T extends  Event> implements Listener {
      * Get the {@link NamespacedKey} which is used when enchanting an item with this enchantment.
      * @return The {@link NamespacedKey} which belongs to this enchantment
      */
-    public abstract @NotNull NamespacedKey getSaveKey();
+    public @NotNull NamespacedKey getSaveKey() {
+        return key;
+    }
 
     /**
      * A method to get the ID of the enchantment.
@@ -58,6 +82,13 @@ public abstract class CustomEnchantment<T extends  Event> implements Listener {
     public @NotNull String getID() {
         return id;
     }
+
+    /**
+     * Returns a US-ASCII safe string of the ID
+     * @return The ID as ASCII safe
+     */
+    @Subst("tessertools:missing")
+    public @NotNull String getSafeID() {return sanitizeString(id);}
 
     /**
      * A method to get the user-friendly- / display name of the enchantment.
@@ -78,24 +109,6 @@ public abstract class CustomEnchantment<T extends  Event> implements Listener {
     }
 
     /**
-     * A method to get the maximum level of this enchantment.
-     * @return The maximum level of the enchantment
-     */
-    public int getMaxLevel() {
-        return maxLevel;
-    }
-
-    /**
-     * Get the level that the enchantment should start at.
-     * @deprecated Bad naming. Use {@link CustomEnchantment#getMinLevel()} instead.
-     * @return The start level of the enchantment
-     */
-    @Deprecated()
-    public int getStartLevel() {
-        return minLevel;
-    }
-
-    /**
      * Get the level that the enchantment should start at.
      * @return The start level of the enchantment
      */
@@ -104,28 +117,22 @@ public abstract class CustomEnchantment<T extends  Event> implements Listener {
     }
 
     /**
-     * Checks if this Enchantment may be applied to the given {@link
-     * ItemStack}.
-     * <p>
-     * This does not check if it conflicts with any enchantments already
-     * applied to the item.
-     *
-     * @param item Item to test
-     * @return True if the enchantment may be applied, otherwise False
-     */
-    public boolean canEnchantItem(@NotNull ItemStack item) {
-        return Arrays.stream(enchantableItems).toList().contains(item.getType());
-    }
-
-    /**
-     * Checks wether or not the {@link ItemStack} has the enchantment.
+     * Checks whether the {@link ItemStack} has the enchantment.
      * @param itemStack The item stack to check
-     * @return The level of the entchantment; 0 if not present.
+     * @return The level of the enchantment; 0 if not present.
      */
     public int getEnchantmentLevel(@NotNull ItemStack itemStack) {
         try {
+            var regEnch = getRegisteredEnchantment();
             PersistentDataContainer container = itemStack.getItemMeta().getPersistentDataContainer();
-            return container.getOrDefault(getSaveKey(), PersistentDataType.INTEGER, 0);
+            var level = container.getOrDefault(getSaveKey(), PersistentDataType.INTEGER, 0);
+            // If it doesn't exist in the PDC, but as vanilla enchantment it will return the level of it and sync
+            // the PDC
+            if (level == 0 && itemStack.containsEnchantment(regEnch)) {
+                level = itemStack.getEnchantments().get(regEnch);
+                enchantItem(itemStack, level);
+            }
+            return level;
         } catch (NullPointerException e) {
             return 0;
         }
@@ -138,12 +145,12 @@ public abstract class CustomEnchantment<T extends  Event> implements Listener {
      * @return Whether the enchanting was successfully.
      */
     @SuppressWarnings("UnstableApiUsage")
-    public boolean enchantItem(@NotNull ItemStack item, int level) {
+    public ItemStack enchantItem(@NotNull ItemStack item, int level) {
         if (!canEnchantItem(item)
             && item.getType() != Material.BOOK
             && item.getType() != Material.ENCHANTED_BOOK
         ) {
-            return false;
+            return null;
         }
 
         // Set CustomModelData
@@ -155,26 +162,47 @@ public abstract class CustomEnchantment<T extends  Event> implements Listener {
                 builder.build()
         );
 
-        // Set PersistentDataContainer
+        var regEnchantment = getRegisteredEnchantment();
+
+        // Put the enchantment on the item
+        if (item.getType() == Material.BOOK) {
+            item = new ItemStack(Material.ENCHANTED_BOOK);
+        }
+        // If it's an enhanced vanilla it would double the name, so we don't put the registered custom on it
+        if (item.getType() == Material.ENCHANTED_BOOK && !(this instanceof EnhVanillaEnch)){
+            var meta = (EnchantmentStorageMeta) item.getItemMeta();
+            meta.removeStoredEnchant(regEnchantment);
+            meta.addStoredEnchant(regEnchantment, level, true);
+            item.setItemMeta(meta);
+        // See above for the condition
+        } else if (!(this instanceof EnhVanillaEnch)){
+            item.addUnsafeEnchantment(regEnchantment, level);
+        }
+
+        // Set PDC
         ItemMeta itemMeta = item.getItemMeta();
         PersistentDataContainer container = itemMeta.getPersistentDataContainer();
         container.set(getSaveKey(), PersistentDataType.INTEGER, level);
         item.setItemMeta(itemMeta);
 
-        return true;
+        return item;
     }
 
     @SuppressWarnings("UnstableApiUsage")
     CustomModelData.@NotNull Builder getBuilder(CustomModelData currentModelData) {
         CustomModelData.Builder builder = CustomModelData.customModelData();
+        final var cleanId = id.replace("ä", "ae")
+                .replace("ö", "oe")
+                .replace("ü", "ue")
+                .replace(":", "-");
 
         // Add the current enchantment or "multiple" flag if it's not present, add all non-related
         boolean multipleOrEqual = false;
         for (var string : currentModelData.strings()) {
             // If this enchantment already exists or the "multiple" flag is present
-            if ((string.equals(sanitizeString(id)))
+            if ((string.equals(cleanId))
                 && !multipleOrEqual) {
-                builder.addString(sanitizeString(id));
+                builder.addString(cleanId);
                 multipleOrEqual = true;
             }
             // If it's an enchantment from the plugin
@@ -189,7 +217,7 @@ public abstract class CustomEnchantment<T extends  Event> implements Listener {
             }
         }
         if (!multipleOrEqual) {
-            builder.addString(sanitizeString(id));
+            builder.addString(cleanId);
         }
         currentModelData.floats().forEach(builder::addFloat);
         currentModelData.flags().forEach(builder::addFlag);
@@ -198,15 +226,142 @@ public abstract class CustomEnchantment<T extends  Event> implements Listener {
     }
 
     /**
-     * Returns a custom-model-data-safe string.
+     * Returns a mostly ASCII-safe string.
      * @param string The origin string
      * @return A safe string
      */
-    private static String sanitizeString(String string) {
+    public static String sanitizeString(String string) {
         return string
                 .replace("ä", "ae")
                 .replace("ö", "oe")
-                .replace("ü", "ue")
-                .replace(":", "-");
+                .replace("ü", "ue");
     }
+
+    public static String getBaseTranslationKey(String id) {
+        return "enchantment.tessertools." +
+                sanitizeString(id.replaceFirst("tessertools:", ""));
+    }
+
+    private Enchantment getRegisteredEnchantment() {
+        var reg = RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT);
+        return reg.get(TypedKey.create(RegistryKey.ENCHANTMENT, Key.key(getSafeID())));
+    }
+
+    //<editor-fold desc="Vanilla Enchantment implementation">
+    @Override public @NotNull Component displayName(int level) {
+        Component name = Component.translatable(this.baseTranslationKey);
+        if (level != 1 || maxLevel > 1) {
+            name = name.append(Component.space())
+                    .append(Component.translatable("enchantment.level." + level));
+        }
+        return name;
+    }
+
+    public @NotNull Component displayName() {
+        return Component.translatable(this.baseTranslationKey);
+    }
+
+    @Override public @NotNull Component description() {
+        return Component.translatable(baseTranslationKey + ".description");
+    }
+
+    @Override public int getMaxLevel() { return this.maxLevel; }
+    @Override public int getStartLevel() { return getMinLevel(); }
+    @Override public boolean canEnchantItem(@NotNull ItemStack item) {
+        return Arrays.stream(enchantableItems).toList().contains(item.getType());
+    }
+    @Override public boolean isTreasure() { return false; }
+    @Override public boolean isCursed() { return false; }
+    @Override public boolean conflictsWith(@NotNull Enchantment other) { return false; }
+    @Override
+    public @NotNull String getName() {
+        return displayName;
+    }
+
+    @Override
+    public @NotNull EnchantmentTarget getItemTarget() {
+        return EnchantmentTarget.BREAKABLE;
+    }
+
+    @Override
+    public boolean isTradeable() {
+        return false;
+    }
+
+    @Override
+    public boolean isDiscoverable() {
+        return false;
+    }
+
+    @Override
+    public int getMinModifiedCost(int level) {
+        return 0;
+    }
+
+    @Override
+    public int getMaxModifiedCost(int level) {
+        return 0;
+    }
+
+    @Override
+    public int getAnvilCost() {
+        return 0;
+    }
+
+    @Override
+    public @NotNull EnchantmentRarity getRarity() {
+        return EnchantmentRarity.VERY_RARE;
+    }
+
+    @Override
+    public float getDamageIncrease(int level, @NotNull EntityCategory entityCategory) {
+        return 0;
+    }
+
+    @Override
+    public float getDamageIncrease(int level, @NotNull EntityType entityType) {
+        return 0;
+    }
+
+    @Override
+    public @NotNull Set<EquipmentSlotGroup> getActiveSlotGroups() {
+        return Set.of();
+    }
+
+    @Override
+    public @NotNull RegistryKeySet<@NotNull ItemType> getSupportedItems() {
+        return this.supportedItems;
+    }
+
+    @Override
+    public @Nullable RegistryKeySet<@NotNull ItemType> getPrimaryItems() {
+        return null;
+    }
+
+    @Override
+    public int getWeight() {
+        return 0;
+    }
+
+    @Override
+    public @NotNull RegistryKeySet<@NotNull Enchantment> getExclusiveWith() {
+        return RegistrySet.keySet(RegistryKey.ENCHANTMENT);
+    }
+
+    @Override
+    public @NotNull String translationKey() {
+        return this.baseTranslationKey;
+    }
+
+    @Override
+    public @NotNull String getTranslationKey() {
+        return this.baseTranslationKey;
+    }
+
+    @Override
+    public @NotNull NamespacedKey getKey() {
+        return this.key;
+    }
+    //</editor-fold>
+
 }

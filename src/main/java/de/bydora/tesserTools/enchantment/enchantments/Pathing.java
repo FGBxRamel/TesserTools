@@ -1,10 +1,14 @@
 package de.bydora.tesserTools.enchantment.enchantments;
 
 import de.bydora.tesserTools.enchantment.enums.EnchantmentSpaceKeys;
+import de.bydora.tesserTools.enchantment.util.EnchantDef;
 import de.bydora.tesserTools.enchantment.util.EquipmentGroups;
+import de.bydora.tesserTools.enchantment.util.RegistrySets;
+import io.papermc.paper.registry.RegistryKey;
+import io.papermc.paper.registry.set.RegistrySet;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
@@ -16,7 +20,7 @@ import java.util.*;
 
 public class Pathing extends CustomEnchantment<PlayerInteractEvent> {
 
-    private final static String id = "tessertools:strassenbauer";
+    private final static String id = "tessertools:pathing";
     private final static String displayName = "Straßenbauer";
     private final static int maxLevel = 3;
     private final static int minLevel = 1;
@@ -34,7 +38,23 @@ public class Pathing extends CustomEnchantment<PlayerInteractEvent> {
     ));
 
     public Pathing() {
-        super(id, maxLevel, displayName, minLevel, enchantableItems);
+        super(id, maxLevel, displayName, minLevel, enchantableItems, EnchantmentSpaceKeys.ENCH_PATHING.getKey());
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    public static EnchantDef def() {
+        var supported = RegistrySets.fromMaterials(enchantableItems);
+        var description = Component.translatable(getBaseTranslationKey(id) + ".description");
+        return new EnchantDef(
+                sanitizeString(id),
+                description,
+                supported,
+                1,
+                maxLevel,
+                10,
+                Set.of(),
+                RegistrySet.keySet(RegistryKey.ENCHANTMENT)
+        );
     }
 
     @Override
@@ -61,11 +81,6 @@ public class Pathing extends CustomEnchantment<PlayerInteractEvent> {
 
         var blocks = areaFinder(event.getClickedBlock().getLocation(), level);
         AreaFill.placeBlocks(blocks.stream().toList(), event.getPlayer().getInventory(), availableMaterial);
-    }
-
-    @Override
-    public @NotNull NamespacedKey getSaveKey() {
-        return EnchantmentSpaceKeys.ENCH_PATHING.getKey();
     }
 
     /**

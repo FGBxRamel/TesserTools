@@ -1,13 +1,14 @@
 package de.bydora.tesserTools.enchantment.enchantments;
 
 import de.bydora.tesserTools.enchantment.enums.EnchantmentSpaceKeys;
-import de.bydora.tesserTools.enchantment.util.AreaBlockBreaker;
-import de.bydora.tesserTools.enchantment.util.EquipmentGroups;
-import de.bydora.tesserTools.enchantment.util.MaterialArrayMerger;
+import de.bydora.tesserTools.enchantment.util.*;
+import io.papermc.paper.registry.RegistryKey;
+import io.papermc.paper.registry.set.RegistrySet;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -20,7 +21,7 @@ import java.util.Set;
 
 public class AreaBreak extends CustomEnchantment<BlockBreakEvent> {
 
-    private final static String id = "tessertools:flächenabbau";
+    private final static String id = "tessertools:area_break";
     private final static String displayName = "Flächenabbau";
     private final static int maxLevel = 2;
     private final static int minLevel = 1;
@@ -41,7 +42,23 @@ public class AreaBreak extends CustomEnchantment<BlockBreakEvent> {
     };
 
     public AreaBreak() {
-        super(id, maxLevel, displayName, minLevel, enchantableItems);
+        super(id, maxLevel, displayName, minLevel, enchantableItems, EnchantmentSpaceKeys.ENCH_AREA_BREAK.getKey());
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    public static EnchantDef def() {
+        var supported = RegistrySets.fromMaterials(enchantableItems);
+        var description = Component.translatable(getBaseTranslationKey(id) + ".description");
+        return new EnchantDef(
+                sanitizeString(id),
+                description,
+                supported,
+                1,
+                maxLevel,
+                10,
+                Set.of(),
+                RegistrySet.keySet(RegistryKey.ENCHANTMENT)
+        );
     }
 
     @Override
@@ -53,12 +70,6 @@ public class AreaBreak extends CustomEnchantment<BlockBreakEvent> {
         ) {
             breakArea(getEnchantmentLevel(item) == 2, event.getPlayer(), event.getBlock(), item);
         }
-    }
-
-
-    @Override
-    public @NotNull NamespacedKey getSaveKey() {
-        return EnchantmentSpaceKeys.ENCH_AREA_BREAK.getKey();
     }
 
     /**
@@ -80,8 +91,9 @@ public class AreaBreak extends CustomEnchantment<BlockBreakEvent> {
     public static void breakArea(boolean bigArea, @NotNull Player player, @NotNull Block block,
                                  @NotNull ItemStack item) {
         AreaBlockBreaker breaker = new AreaBlockBreaker(Set.of(affectedBlocks), bigArea);
-        var pitch = Math.abs(player.getEyeLocation().getPitch());
-        List<Location> locations = breaker.findDirectNeighbors(player, block, pitch >= 30);
+        BlockFace facing = player.getTargetBlockFace(5);
+        boolean horizontal = facing == BlockFace.UP || facing == BlockFace.DOWN;
+        List<Location> locations = breaker.findDirectNeighbors(player, block, horizontal);
         for (Location location : locations) {
             location.getBlock().breakNaturally(item);
         }
