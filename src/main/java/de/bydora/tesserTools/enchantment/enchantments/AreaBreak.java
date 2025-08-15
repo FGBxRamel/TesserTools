@@ -8,6 +8,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -90,8 +91,9 @@ public class AreaBreak extends CustomEnchantment<BlockBreakEvent> {
     public static void breakArea(boolean bigArea, @NotNull Player player, @NotNull Block block,
                                  @NotNull ItemStack item) {
         AreaBlockBreaker breaker = new AreaBlockBreaker(Set.of(affectedBlocks), bigArea);
-        var pitch = Math.abs(player.getEyeLocation().getPitch());
-        List<Location> locations = breaker.findDirectNeighbors(player, block, pitch >= 30);
+        BlockFace facing = player.getTargetBlockFace(5);
+        boolean horizontal = facing == BlockFace.UP || facing == BlockFace.DOWN;
+        List<Location> locations = breaker.findDirectNeighbors(player, block, horizontal);
         for (Location location : locations) {
             location.getBlock().breakNaturally(item);
         }
