@@ -71,8 +71,9 @@ public class SpaceFill extends CustomEnchantment<PlayerInteractEvent>{
         int level = getEnchantmentLevel(event.getItem());
         var player = event.getPlayer();
         var originBlock = event.getClickedBlock();
-        var blocks = new ArrayList<>(Arrays.asList(originBlock, originBlock.getRelative(BlockFace.UP)));
-        if (level == 2 || level == 4) {blocks.add(originBlock.getRelative(BlockFace.UP, 2));}
+        var blocks = new ArrayList<>(Arrays.asList(originBlock.getRelative(BlockFace.UP),
+                originBlock.getRelative(BlockFace.UP, 2)));
+        if (level == 2 || level == 4) {blocks.add(originBlock.getRelative(BlockFace.UP, 3));}
 
         for (var block : blocks) {
             runAreaFill(level, player, block);

@@ -68,7 +68,8 @@ public class AreaFill extends CustomEnchantment<PlayerInteractEvent> {
         }
         final int level = getEnchantmentLevel(event.getItem());
         final var player = event.getPlayer();
-        var airBlocks = getAirBlocks(event.getClickedBlock(), player.getFacing(), level > 1 ? 5 : 3);
+        var airBlocks = getAirBlocks(event.getClickedBlock().getRelative(BlockFace.UP),
+                player.getFacing(), level > 1 ? 5 : 3);
         var availableItems = getAvailableItems(player.getInventory(), fillBlocks, airBlocks.size());
         if (Objects.isNull(availableItems)) {
             ResourceBundle l18 = ResourceBundle.getBundle("translations.tools", player.locale());
