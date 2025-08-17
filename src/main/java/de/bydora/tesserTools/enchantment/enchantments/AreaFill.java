@@ -80,7 +80,7 @@ public class AreaFill extends CustomEnchantment<PlayerInteractEvent> {
 
     @Override
     public boolean canEnchantItem(@NotNull ItemStack item) {
-        final boolean hasSpaceFill = new AreaFill().getEnchantmentLevel(item) > 0;
+        final boolean hasSpaceFill = new SpaceFill().getEnchantmentLevel(item) > 0;
         return Arrays.stream(enchantableItems).toList().contains(item.getType()) && !hasSpaceFill;
     }
 
