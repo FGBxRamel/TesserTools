@@ -68,7 +68,8 @@ public class AreaFill extends CustomEnchantment<PlayerInteractEvent> {
         }
         final int level = getEnchantmentLevel(event.getItem());
         final var player = event.getPlayer();
-        var airBlocks = getAirBlocks(event.getClickedBlock(), player.getFacing(), level > 1 ? 5 : 3);
+        var airBlocks = getAirBlocks(event.getClickedBlock().getRelative(BlockFace.UP),
+                player.getFacing(), level > 1 ? 5 : 3);
         var availableItems = getAvailableItems(player.getInventory(), fillBlocks, airBlocks.size());
         if (Objects.isNull(availableItems)) {
             ResourceBundle l18 = ResourceBundle.getBundle("translations.tools", player.locale());
@@ -85,7 +86,7 @@ public class AreaFill extends CustomEnchantment<PlayerInteractEvent> {
     }
 
     /**
-     * Returns all air blocks in a horizontal field starting at the clicked block (bottom-left),
+     * Returns all air, water and lava blocks in a horizontal field starting at the clicked block (bottom-left),
      * expanding in facing direction and to the right (from player's perspective)
      *
      * @param clickedBlock The clicked block (acts as bottom-left corner)
@@ -106,7 +107,10 @@ public class AreaFill extends CustomEnchantment<PlayerInteractEvent> {
                         .getRelative(right, dx)
                         .getRelative(facing, dz);
 
-                if (b.getType() == Material.AIR) {
+                if (b.getType() == Material.AIR
+                    || b.getType() == Material.WATER
+                    || b.getType() == Material.LAVA
+                    || b.getType() == Material.SEAGRASS) {
                     result.add(b);
                 }
             }
@@ -178,11 +182,20 @@ public class AreaFill extends CustomEnchantment<PlayerInteractEvent> {
                 availableMaterial.put(randomItem, remainingAmount - 1);
             }
 
-            ItemStack removeStack = new ItemStack(randomItem, 1);
-            if (randomItem == Material.LAVA_BUCKET) {randomItem = Material.LAVA;}
-            else if (randomItem == Material.WATER_BUCKET) {randomItem = Material.WATER;}
-            block.setType(randomItem);
-            inventory.removeItemAnySlot(removeStack);
+            if (randomItem == Material.WATER_BUCKET) {
+                block.setType(Material.WATER);
+                inventory.removeItemAnySlot(new ItemStack(Material.WATER_BUCKET, 1));
+                inventory.addItem(new ItemStack(Material.BUCKET, 1));
+
+            } else if (randomItem == Material.LAVA_BUCKET) {
+                block.setType(Material.LAVA);
+                inventory.removeItemAnySlot(new ItemStack(Material.LAVA_BUCKET, 1));
+                inventory.addItem(new ItemStack(Material.BUCKET, 1));
+            } else {
+                ItemStack removeStack = new ItemStack(randomItem, 1);
+                block.setType(randomItem);
+                inventory.removeItemAnySlot(removeStack);
+            }
         }
     }
 
