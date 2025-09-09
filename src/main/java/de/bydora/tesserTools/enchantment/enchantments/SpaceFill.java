@@ -24,7 +24,7 @@ public class SpaceFill extends CustomEnchantment<PlayerInteractEvent>{
 
     private final static String id = "tessertools:deep_filling";
     private final static String displayName = "Tiefenauffüllung";
-    private final static int maxLevel = 4;
+    private final static int maxLevel = 6;
     private final static int minLevel = 1;
     private final static Material[] enchantableItems = new Material[]{Material.BUNDLE};
     private final static Material[] fillBlocks = new Material[] {
@@ -73,7 +73,9 @@ public class SpaceFill extends CustomEnchantment<PlayerInteractEvent>{
         var originBlock = event.getClickedBlock();
         var blocks = new ArrayList<>(Arrays.asList(originBlock.getRelative(BlockFace.UP),
                 originBlock.getRelative(BlockFace.UP, 2)));
-        if (level == 2 || level == 4) {blocks.add(originBlock.getRelative(BlockFace.UP, 3));}
+        if (level == 2 || level >= 4) {blocks.add(originBlock.getRelative(BlockFace.UP, 3));}
+        if (level >= 5) {blocks.add(originBlock.getRelative(BlockFace.UP, 4));}
+        if (level >= 6) {blocks.add(originBlock.getRelative(BlockFace.UP, 5));}
 
         for (var block : blocks) {
             runAreaFill(level, player, block);
