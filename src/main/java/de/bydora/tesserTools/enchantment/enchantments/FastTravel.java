@@ -57,7 +57,7 @@ public class FastTravel extends CustomEnchantment<EntityMountEvent>{
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
     public void enchantmentEvent(EntityMountEvent event) {
         if (event.getMount() instanceof HappyGhast ghast
-            && event.getEntity() instanceof Player player
+            && event.getEntity() instanceof Player
             && getEnchantmentLevel(ghast.getEquipment().getItem(EquipmentSlot.BODY)) > 0
             && ghast.getPassengers().isEmpty()) {
 
@@ -75,7 +75,7 @@ public class FastTravel extends CustomEnchantment<EntityMountEvent>{
     @EventHandler(ignoreCancelled = true)
     public void unmountEvent(EntityDismountEvent event) {
         if (event.getDismounted() instanceof HappyGhast ghast
-                && event.getEntity() instanceof Player player
+                && event.getEntity() instanceof Player
                 && getEnchantmentLevel(ghast.getEquipment().getItem(EquipmentSlot.BODY)) > 0
                 && ghast.getPassengers().size() == 1) {
             Objects.requireNonNull(ghast.getAttribute(Attribute.FLYING_SPEED)).setBaseValue(BASE_VALUE);
