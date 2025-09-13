@@ -77,6 +77,7 @@ public final class TesserToolsBootstrap implements PluginBootstrap {
                 Pathing.def(),
                 AreaFill.def(),
                 SpaceFill.def(),
+                FastTravel.def(),
         };
     }
 }
