@@ -31,6 +31,7 @@ public enum EnchantmentSpaceKeys {
     ENCH_PATHING(new NamespacedKey(TesserTools.getPlugin(TesserTools.class), "enchPathing")),
     ENCH_AREA_FILL(new NamespacedKey(TesserTools.getPlugin(TesserTools.class), "enchAreaFill")),
     ENCH_SPACE_FILL(new NamespacedKey(TesserTools.getPlugin(TesserTools.class), "enchSpaceFill")),
+    ENCH_FAST_TRAVEL(new NamespacedKey(TesserTools.getPlugin(TesserTools.class), "enchFastTravel")),
     //</editor-fold>
 
     //<editor-fold desc="Other">

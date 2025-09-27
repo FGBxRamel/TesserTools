@@ -1,5 +1,5 @@
 name: Tessertools
-version: '2.0.5'
+version: '2.1.0'
 main: de.bydora.tesserTools.TesserTools
 description: A plugin which adds some tools for Tesserania.
 api-version: '1.21'

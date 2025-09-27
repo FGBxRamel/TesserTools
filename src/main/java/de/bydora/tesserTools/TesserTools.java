@@ -43,6 +43,7 @@ public final class TesserTools extends JavaPlugin {
             new Pathing(),
             new AreaFill(),
             new SpaceFill(),
+            new FastTravel(),
     };
 
     @Override
