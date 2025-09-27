@@ -65,7 +65,7 @@ public class FastTravel extends CustomEnchantment<EntityMountEvent>{
             final double modifier = switch (level) {
                 case 1 -> 1.5;
                 case 2 -> 1.75;
-                case 3 -> 2.0;
+                case 3 -> 3.0;
                 default -> 1.0;
             };
             Objects.requireNonNull(ghast.getAttribute(Attribute.FLYING_SPEED)).setBaseValue(BASE_VALUE * modifier);
