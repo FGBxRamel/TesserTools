@@ -7,6 +7,7 @@ import de.bydora.tesserTools.enchantment.listeners.EntityPickupEvent;
 import de.bydora.tesserTools.enchantment.listeners.PlayerDropItemListener;
 import de.bydora.tesserTools.enchantment.listeners.PrepareAnvilListener;
 import de.bydora.tesserTools.listeners.BlockDropItemListener;
+import de.bydora.tesserTools.listeners.GameModeChangeListener;
 import de.bydora.tesserTools.listeners.InvMoveItemListener;
 import de.bydora.tesserTools.listeners.PlayerInteractListener;
 import org.bukkit.event.Listener;
@@ -69,6 +70,7 @@ public final class TesserTools extends JavaPlugin {
                 new PlayerDropItemListener(),
                 new EntityPickupEvent(),
                 new PrepareAnvilListener(),
+                new GameModeChangeListener(),
         };
         for (Listener listener : listeners) {
             pm.registerEvents(listener, this);
