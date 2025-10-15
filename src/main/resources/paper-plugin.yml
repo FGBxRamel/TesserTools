@@ -9,3 +9,9 @@ author: FGBxRamel
 contributors: [ Blitu, Jupidui_ZVL ]
 website: https://github.com/FGBxRamel/TesserTools
 prefix: Tesserania Tools
+dependencies:
+  server:
+    LuckPerms:
+      load: BEFORE
+      required: true
+      join-classpath: true
