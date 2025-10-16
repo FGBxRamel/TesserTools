@@ -1,5 +1,5 @@
 name: TesserTools
-version: '2.1.0'
+version: '2.2.0'
 main: de.bydora.tesserTools.TesserTools
 api-version: '1.21'
 author: FGBxRamel
@@ -7,9 +7,3 @@ description: A plugin which adds some tools for Tesserania.
 contributors: [ Blitu, Jupidui_ZVL ]
 website: https://github.com/FGBxRamel/TesserTools
 prefix: Tesserania Tools
-
-#reallife:
-#  description: Helps you into the real life
-#  usage: /reallife
-#  permission: tessertools.other.reallife
-#  aliases: irl
