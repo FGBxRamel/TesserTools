@@ -211,9 +211,7 @@ public class ExtEnchantingTable {
                 PersistentDataType.LIST.strings());
         if (enchantments == null) {
             var missing = new Missing();
-            for (int i = 0; i < 5; i++) {
-                this.rolledEnchantments.add(missing);
-            }
+            for (int i = 0; i < 4; i++) {this.rolledEnchantments.add(missing);}
         }
         else {
             for (var ench : enchantments) {
@@ -468,9 +466,7 @@ public class ExtEnchantingTable {
      */
     public void clearEnchantments() {
         this.rolledEnchantments.clear();
-        for (int i = 1; i <= 4; i++) {
-            this.rolledEnchantments.add(new Missing());
-        }
+        for (int i = 1; i < 4; i++) {this.rolledEnchantments.add(new Missing());}
         this.removeTextDisplays();
         this.saveState();
     }
