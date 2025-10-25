@@ -1,4 +1,4 @@
-package de.bydora.tesserTools.listeners;
+package de.bydora.tesserTools.hoppers.listeners;
 
 import de.bydora.tesserTools.TesserTools;
 import org.bukkit.Material;

@@ -1,15 +1,15 @@
 package de.bydora.tesserTools;
 
-import de.bydora.tesserTools.cache.BoostLevelCache;
+import de.bydora.tesserTools.hoppers.cache.BoostLevelCache;
 import de.bydora.tesserTools.enchantment.enchantments.*;
 import de.bydora.tesserTools.enchantment.listeners.BlockPlaceListener;
 import de.bydora.tesserTools.enchantment.listeners.EntityPickupEvent;
 import de.bydora.tesserTools.enchantment.listeners.PlayerDropItemListener;
 import de.bydora.tesserTools.enchantment.listeners.PrepareAnvilListener;
-import de.bydora.tesserTools.listeners.BlockDropItemListener;
-import de.bydora.tesserTools.listeners.GameModeChangeListener;
-import de.bydora.tesserTools.listeners.InvMoveItemListener;
-import de.bydora.tesserTools.listeners.PlayerInteractListener;
+import de.bydora.tesserTools.hoppers.listeners.BlockDropItemListener;
+import de.bydora.tesserTools.gamemodes.listeners.GameModeChangeListener;
+import de.bydora.tesserTools.hoppers.listeners.InvMoveItemListener;
+import de.bydora.tesserTools.hoppers.listeners.PlayerInteractListener;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;

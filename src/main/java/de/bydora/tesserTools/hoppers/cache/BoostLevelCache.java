@@ -1,4 +1,4 @@
-package de.bydora.tesserTools.cache;
+package de.bydora.tesserTools.hoppers.cache;
 
 import de.bydora.tesserTools.TesserTools;
 import org.bukkit.Location;
