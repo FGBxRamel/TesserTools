@@ -8,6 +8,7 @@ import org.bukkit.block.Hopper;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -62,6 +63,14 @@ public class BoostLevelCache {
 
         cache.put(loc, new CachedBoostLevel(boostLevel, getRandomizedTtlMillis()));
         return boostLevel;
+    }
+
+    /**
+     * Invalidate the cache of the given location
+     * @param location The location which should be invalidated
+     */
+    public void invalidateCache(@NotNull Location location) {
+        cache.remove(location);
     }
 
     private long getRandomizedTtlMillis() {

@@ -15,6 +15,8 @@ import java.util.Objects;
 
 public class PlayerInteractListener implements Listener {
 
+    private final static TesserTools plugin = TesserTools.getPlugin(TesserTools.class);
+
     @SuppressWarnings("DataFlowIssue")
     @EventHandler(ignoreCancelled = true)
     public void onPlayerInteract(PlayerInteractEvent event) {
@@ -50,6 +52,7 @@ public class PlayerInteractListener implements Listener {
             }
             hopper.getPersistentDataContainer().set(key, PersistentDataType.INTEGER, newBoostLevel);
             hopper.update();
+            plugin.getBoostLevelCache().invalidateCache(hopper.getLocation());
             event.getItem().setAmount(event.getItem().getAmount() - 1);
         }
         event.setCancelled(true);
