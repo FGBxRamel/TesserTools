@@ -22,6 +22,8 @@ import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.logging.Logger;
 
 @SuppressWarnings({"rawtypes", "UnusedReturnValue", "SameParameterValue"})
@@ -60,44 +62,26 @@ public class PlayerDropItemListener implements Listener {
     public void onPlayerDropItem(PlayerDropItemEvent event) {
         Item item = event.getItemDrop();
         switch (item.getItemStack().getType()) {
-            case LAPIS_LAZULI -> handleLapisDrop(event, item);
-            case END_CRYSTAL -> handleEndCrystalDrop(event, item);
-            case ENCHANTED_BOOK -> handleEnchantedBookDrop(event, item);
-            default -> handleGenericItemDrop(event, item);
+            case LAPIS_LAZULI -> handleDrop(item, this::isOnQuartzBlock, i -> processLapisEnchant(event, i));
+            case END_CRYSTAL -> handleDrop(item, this::isOnEnchantingTable, i -> chargeEnchantingTable(event, i));
+            case ENCHANTED_BOOK -> handleDrop(item, this::isOnEnchantingTable, i -> processEnchantedBook(event, i));
+            default -> handleDrop(item, this::isOnEnchantingTable, i -> processEnchantment(event, i));
         }
     }
 
-    private void handleLapisDrop(PlayerDropItemEvent event, Item item) {
+    /**
+     * Handles an item drop. <br>
+     * It continuously checks for condition and executes action if condition is met.
+     * @param item The item that was dropped
+     * @param condition The condition that needs to be met
+     * @param action The action to execute if condition is met
+     */
+    private void handleDrop(Item item,
+                            Predicate<Item> condition,
+                            Consumer<Item> action) {
         scheduleItemCheck(item, () -> {
-            if (isOnQuartzBlock(item)) {
-                processLapisEnchant(event, item);
-                cancelTasks();
-            }
-        });
-    }
-
-    private void handleEndCrystalDrop(PlayerDropItemEvent event, Item item) {
-        scheduleItemCheck(item, () -> {
-            if (isOnEnchantingTable(item)) {
-                chargeEnchantingTable(event, item);
-                cancelTasks();
-            }
-        });
-    }
-
-    private void handleEnchantedBookDrop(PlayerDropItemEvent event, Item item) {
-        scheduleItemCheck(item, () -> {
-            if (isOnEnchantingTable(item)) {
-                processEnchantedBook(event, item);
-                cancelTasks();
-            }
-        });
-    }
-
-    private void handleGenericItemDrop(PlayerDropItemEvent event, Item item) {
-        scheduleItemCheck(item, () -> {
-            if (isOnEnchantingTable(item)) {
-                processEnchantment(event, item);
+            if (condition.test(item)) {
+                action.accept(item);
                 cancelTasks();
             }
         });
