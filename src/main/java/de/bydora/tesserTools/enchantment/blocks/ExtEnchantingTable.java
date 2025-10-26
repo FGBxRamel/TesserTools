@@ -25,15 +25,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static java.util.Map.entry;
 
 @SuppressWarnings({"rawtypes"})
 public class ExtEnchantingTable {
-
-    private static final Logger log = TesserTools.getPlugin(TesserTools.class).getLogger();
 
     public static final Registry<@NotNull Enchantment> ENCHANTMENT_REGISTRY = RegistryAccess.registryAccess()
             .getRegistry(RegistryKey.ENCHANTMENT);

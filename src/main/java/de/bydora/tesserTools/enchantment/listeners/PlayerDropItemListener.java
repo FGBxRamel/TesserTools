@@ -161,7 +161,7 @@ public class PlayerDropItemListener implements Listener {
             enchanted = true;
             enchantItem.setItemStack(newStack);
         }
-        if (enchanted) finalizeEnchantmentProcess(extTable, item, enchantItem);
+        if (enchanted) finalizeEnchantmentProcess(extTable, item);
     }
 
     private ItemStack applyCustomEnchantment(@Nullable Player player, ItemStack enchantStack,
@@ -433,7 +433,7 @@ public class PlayerDropItemListener implements Listener {
         }
     }
 
-    private void finalizeEnchantmentProcess(ExtEnchantingTable extTable, Item item, Item enchantItem) {
+    private void finalizeEnchantmentProcess(ExtEnchantingTable extTable, Item item) {
         item.getItemStack().setAmount(item.getItemStack().getAmount() - 1);
         spawnEnchantParticles(extTable.getLocation().add(0, 1, 0));
         extTable.clearEnchantments();
