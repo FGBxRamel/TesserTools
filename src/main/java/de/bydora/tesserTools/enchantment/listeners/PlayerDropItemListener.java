@@ -34,7 +34,7 @@ public class PlayerDropItemListener implements Listener {
     private final static int usedLevelVanilla = 3; // How many levels are used when enchanting Vanilla enchantments
     private final static int usedLevelCustom = 4; // How many levels are used when enchanting Custom enchantments
 
-    private final static Map<String, CustomEnchantment> customEnchantments = TesserTools.getPlugin(TesserTools.class)
+    private final static Map<String, CustomEnchantment<?>> customEnchantments = TesserTools.getPlugin(TesserTools.class)
             .getEnchantmentMap();
     private final static Map<Enchantment, CustomEnchantment> enhVanillaEnchMap =  Map.of(
             Enchantment.PROTECTION, new Protection(),
