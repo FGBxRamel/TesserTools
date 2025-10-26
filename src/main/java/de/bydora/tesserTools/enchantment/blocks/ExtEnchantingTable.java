@@ -32,9 +32,11 @@ public class ExtEnchantingTable {
 
     public static final Registry<@NotNull Enchantment> ENCHANTMENT_REGISTRY = RegistryAccess.registryAccess()
             .getRegistry(RegistryKey.ENCHANTMENT);
+
+    private static final NamespacedKey TT_CRYSTAL = new NamespacedKey(TesserTools.getPlugin(TesserTools.class),
+            "tt_crystal");
     private static final NamespacedKey TT_DISPLAY = new NamespacedKey(TesserTools.getPlugin(TesserTools.class),
             "tt_display");
-
     private static final Map ENCHANTMENT_MAP = TesserTools.getPlugin(TesserTools.class).getEnchantmentMap();
     private static final Map<Integer, String> ROMAN_NUMERALS = Map.ofEntries(
             entry(1, "I"),
@@ -450,7 +452,7 @@ public class ExtEnchantingTable {
     private void updateLevelCrystals() {
         int remainingCharge = this.chargeLevel;
         for (var crystal : location.getNearbyEntitiesByType(EnderCrystal.class, 7,7,7)) {
-            crystal.remove();
+            if (crystal.getPersistentDataContainer().has(TT_CRYSTAL)) crystal.remove();
         }
         for (var location : simpleLapisLocations) {
             var blockLocation = location.clone().add(0,2,0);
@@ -458,6 +460,7 @@ public class ExtEnchantingTable {
                 var crystal = blockLocation.getWorld().spawn(blockLocation, EnderCrystal.class);
                 crystal.setShowingBottom(false);
                 crystal.setInvulnerable(true);
+                crystal.getPersistentDataContainer().set(TT_CRYSTAL, PersistentDataType.BOOLEAN, true);
             }
         }
     }
