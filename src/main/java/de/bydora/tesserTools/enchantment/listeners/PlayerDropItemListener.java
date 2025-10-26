@@ -19,6 +19,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -88,18 +89,19 @@ public class PlayerDropItemListener implements Listener {
     }
 
     private void scheduleItemCheck(Item item, Runnable action) {
-        Bukkit.getScheduler().runTaskTimer(TesserTools.getPlugin(TesserTools.class), new Runnable() {
-            int attempts = 0;
+        var plugin = TesserTools.getPlugin(TesserTools.class);
+        new BukkitRunnable() {
+            private int attempts;
+
             @Override
             public void run() {
-                if (attempts++ >= 3 || !item.isValid()) {
-                    cancelTasks();
-
-             } else {
-                    action.run();
+                if (++attempts > 3 || !item.isValid()) {
+                    cancel();
+                    return;
                 }
-         }
-     }, 0L, 5L);
+                action.run();
+            }
+        }.runTaskTimer(plugin, 0L, 5L);
     }
 
     private boolean isOnQuartzBlock(Item item) {
