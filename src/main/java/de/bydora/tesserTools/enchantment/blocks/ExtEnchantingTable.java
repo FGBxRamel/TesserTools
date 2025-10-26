@@ -155,10 +155,10 @@ public class ExtEnchantingTable {
 
     private static @NotNull ParticleBuilder getBaseParticle(@NotNull Location originLocation) {
         final ParticleBuilder baseParticle = new ParticleBuilder(Particle.DUST);
-        baseParticle.offset(.2,.2,.2);
-        baseParticle.location(originLocation);
-        baseParticle.receivers(160);
-        baseParticle.count(10);
+        baseParticle.offset(.2,.2,.2)
+                .location(originLocation)
+                .receivers(160)
+                .count(10);
         return baseParticle.clone();
     }
 
