@@ -106,7 +106,7 @@ public class ExtEnchantingTable {
     }
 
     /**
-     * Determines if the extended enchantment block has a valid quartz constellation.
+     * Returns whether the extended enchantment block has a valid quartz constellation.
      * @return Whether it has a valid quartz constellation
      */
     public boolean hasValidQuartz() {
@@ -118,7 +118,7 @@ public class ExtEnchantingTable {
     }
 
     /**
-     * Determines if the extended enchantment block has a valid lapis constellation.
+     * Returns whether the extended enchantment block has a valid lapis constellation.
      * @return Whether it has a valid lapis constellation
      */
     public boolean hasValidLapis() {
@@ -131,7 +131,7 @@ public class ExtEnchantingTable {
     }
 
     /**
-     * Determines if the table is valid for enchantments
+     * Whether the table is valid for enchantments
      * @return Whether it is valid for enchantments
      */
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
