@@ -11,10 +11,7 @@ import io.papermc.paper.registry.TypedKey;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Registry;
+import org.bukkit.*;
 import org.bukkit.block.EnchantingTable;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Display;
@@ -33,8 +30,12 @@ import static java.util.Map.entry;
 @SuppressWarnings({"rawtypes"})
 public class ExtEnchantingTable {
 
+    public static final Registry<@NotNull Enchantment> ENCHANTMENT_REGISTRY = RegistryAccess.registryAccess()
+            .getRegistry(RegistryKey.ENCHANTMENT);
+    private static final NamespacedKey TT_DISPLAY = new NamespacedKey(TesserTools.getPlugin(TesserTools.class),
+            "tt_display");
+
     private static final Map ENCHANTMENT_MAP = TesserTools.getPlugin(TesserTools.class).getEnchantmentMap();
-    public static final Registry<@NotNull Enchantment> ENCHANTMENT_REGISTRY = RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT);
     private static final Map<Integer, String> ROMAN_NUMERALS = Map.ofEntries(
             entry(1, "I"),
             entry(2, "II"),
@@ -370,7 +371,7 @@ public class ExtEnchantingTable {
 
     public void removeTextDisplays() {
         for (var display : location.getNearbyEntitiesByType(TextDisplay.class, 6,6,6)) {
-            display.remove();
+            if (display.getPersistentDataContainer().has(TT_DISPLAY)) display.remove();
         }
     }
 
@@ -380,6 +381,7 @@ public class ExtEnchantingTable {
             entity.text(Component.text(text, red ? NamedTextColor.DARK_RED : NamedTextColor.WHITE));
             entity.setBillboard(Display.Billboard.VERTICAL);
             entity.setPersistent(false);
+            entity.getPersistentDataContainer().set(TT_DISPLAY, PersistentDataType.BOOLEAN, true);
         });
     }
 
