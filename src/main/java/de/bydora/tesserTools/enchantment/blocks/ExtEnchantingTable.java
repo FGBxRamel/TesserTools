@@ -37,7 +37,8 @@ public class ExtEnchantingTable {
             "tt_crystal");
     private static final NamespacedKey TT_DISPLAY = new NamespacedKey(TesserTools.getPlugin(TesserTools.class),
             "tt_display");
-    private static final Map ENCHANTMENT_MAP = TesserTools.getPlugin(TesserTools.class).getEnchantmentMap();
+    private static final Map<String, CustomEnchantment<?>> ENCHANTMENT_MAP = TesserTools.getPlugin(TesserTools.class)
+            .getEnchantmentMap();
     private static final Map<Integer, String> ROMAN_NUMERALS = Map.ofEntries(
             entry(1, "I"),
             entry(2, "II"),
@@ -46,9 +47,9 @@ public class ExtEnchantingTable {
             entry(5, "V"),
             entry(6, "VI")
     );
-    private final static Collection<CustomEnchantment> CUSTOM_ENCHANTMENTS = TesserTools.getPlugin(TesserTools.class)
+    private final static Collection<CustomEnchantment<?>> CUSTOM_ENCHANTMENTS = TesserTools.getPlugin(TesserTools.class)
             .getEnchantmentMap().values();
-    private final static Map<@NotNull Class<? extends EnhVanillaEnch>, @NotNull Enchantment> enhVanillaEnchMap =  Map.of(
+    private final static Map<Class<? extends EnhVanillaEnch>, Enchantment> ENH_VANILLA_ENCH_MAP =  Map.of(
             Protection.class, Enchantment.PROTECTION,
             SwiftSneak.class, Enchantment.SWIFT_SNEAK,
             Unbreaking.class, Enchantment.UNBREAKING,
@@ -279,7 +280,7 @@ public class ExtEnchantingTable {
     private List<CustomEnchantment> getCustomEnchantments(ItemStack item) {
         var enchantments = new ArrayList<CustomEnchantment>();
         for (var enchantment : CUSTOM_ENCHANTMENTS) {
-            var vanillaEnch = enhVanillaEnchMap.get(enchantment.getClass());
+            var vanillaEnch = ENH_VANILLA_ENCH_MAP.get(enchantment.getClass());
             if ((item.getType() == Material.ENCHANTED_BOOK
                 || item.getType() == Material.BOOK)
                 && enchantment.getEnchantmentLevel(item) < enchantment.getMaxLevel()
@@ -400,7 +401,7 @@ public class ExtEnchantingTable {
     /**
      * Gets the next possible level of the custom enchantment.
      * @param itemStack The {@link ItemStack} that should be checked
-     * @param enchantment The {@link CustomEnchantment} to check
+     * @param enchantment The {@link CustomEnchantment} to checktext displays
      * @return The next possible level
      */
     private int getNextEnchantmentLevel(ItemStack itemStack, CustomEnchantment enchantment) {

@@ -24,7 +24,7 @@ public final class TesserTools extends JavaPlugin {
 
     private final PluginManager pm = getServer().getPluginManager();
     private final List<String> enchantmentIDs = new ArrayList<>();
-    private final Map<String, CustomEnchantment> enchantmentMap = new HashMap<>();
+    private final Map<String, CustomEnchantment<?>> enchantmentMap = new HashMap<>();
     private BoostLevelCache boostLevelCache;
     private final CustomEnchantment<?>[] enchantments = new CustomEnchantment[] {
             new Abholzung(),
@@ -91,7 +91,7 @@ public final class TesserTools extends JavaPlugin {
         return enchantmentIDs;
     }
 
-    public Map<String, CustomEnchantment> getEnchantmentMap() {
+    public Map<String, CustomEnchantment<?>> getEnchantmentMap() {
         return enchantmentMap;
     }
 
