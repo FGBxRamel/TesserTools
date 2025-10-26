@@ -59,7 +59,7 @@ public class ExtEnchantingTable {
             BlastProtection.class, Enchantment.BLAST_PROTECTION
     );
 
-    private final Location[] simpleQuarzLocations;
+    private final Location[] simpleQuartzLocations;
     private final Location[] simpleLapisLocations;
     private final Location location;
     private final List<Enchantment> vanillaEnchantments;
@@ -81,12 +81,12 @@ public class ExtEnchantingTable {
                     "an Enchanting Table!");
         }
 
-        final Location calcQuarzLocation = location.clone().toCenterLocation();
-        this.simpleQuarzLocations = new Location[]{
-                calcQuarzLocation.add(4, 0, 4).clone(),
-                calcQuarzLocation.add(-8, 0, 0).clone(),
-                calcQuarzLocation.add(0, 0, -8).clone(),
-                calcQuarzLocation.add(8, 0, 0).clone()
+        final Location calcQuartzLocation = location.clone().toCenterLocation();
+        this.simpleQuartzLocations = new Location[]{
+                calcQuartzLocation.add(4, 0, 4).clone(),
+                calcQuartzLocation.add(-8, 0, 0).clone(),
+                calcQuartzLocation.add(0, 0, -8).clone(),
+                calcQuartzLocation.add(8, 0, 0).clone()
         };
         // Reset so the calc is right
         final Location calcLapisLocation = location.clone().toCenterLocation();
@@ -106,12 +106,12 @@ public class ExtEnchantingTable {
     }
 
     /**
-     * Determines if the extended enchantment block has a valid quarz constellation.
-     * @return Whether it has a valid quarz constellation
+     * Determines if the extended enchantment block has a valid quartz constellation.
+     * @return Whether it has a valid quartz constellation
      */
-    public boolean hasValidQuarz() {
-        for(Location quarz : simpleQuarzLocations) {
-            Material materialBottom = quarz.getBlock().getType();
+    public boolean hasValidQuartz() {
+        for(Location quartz : simpleQuartzLocations) {
+            Material materialBottom = quartz.getBlock().getType();
             if (materialBottom != Material.CHISELED_QUARTZ_BLOCK) {return false;}
         }
         return true;
@@ -136,14 +136,14 @@ public class ExtEnchantingTable {
      */
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isValid() {
-        return (this.hasValidLapis() && this.hasValidQuarz());
+        return (this.hasValidLapis() && this.hasValidQuartz());
     }
 
     public void spawnParticles() {
         final ParticleBuilder builder = getBaseParticle(this.location);
         builder.color(255, 255,255);
-        for (Location quarz : simpleQuarzLocations) {
-            builder.location(quarz);
+        for (Location quartz : simpleQuartzLocations) {
+            builder.location(quartz);
             builder.spawn();
         }
         builder.color(38,97,156);
@@ -177,13 +177,13 @@ public class ExtEnchantingTable {
     }
 
     /**
-     * Get the {@link CustomEnchantment} or {@link Enchantment} of the quarz block given.
-     * @param loc The location of the quarz block
+     * Get the {@link CustomEnchantment} or {@link Enchantment} of the quartz block given.
+     * @param loc The location of the quartz block
      * @return The {@link CustomEnchantment} or {@link Enchantment} or null
      */
     public @Nullable Object getEnchantment(@NotNull Location loc) {
         int i = 0;
-        for (var location : simpleQuarzLocations) {
+        for (var location : simpleQuartzLocations) {
             // Check if it's the same block location... Bad, but works
             if (Math.abs(loc.getX() - location.getX()) < 1
                 && Math.abs(loc.getY() - location.getY()) < 1
@@ -356,7 +356,7 @@ public class ExtEnchantingTable {
             if (enchantment instanceof CustomEnchantment<?>) {
                 int nextLevel = getNextEnchantmentLevel(itemStack, (CustomEnchantment) enchantment);
                 String roman = nextLevel <= ROMAN_NUMERALS.size() ? ROMAN_NUMERALS.get(nextLevel) : "UNDEFINED";
-                spawnText(this.simpleQuarzLocations[i].clone().add(0,1,0),
+                spawnText(this.simpleQuartzLocations[i].clone().add(0,1,0),
                         ((CustomEnchantment<?>) enchantment).getDisplayName(lang) + " " + roman,
                         true);
             }
@@ -364,7 +364,7 @@ public class ExtEnchantingTable {
                 ResourceBundle l18 = ResourceBundle.getBundle("translations.tools", lang);
                 var level = ROMAN_NUMERALS.get(getNextEnchantmentLevel(itemStack, castedEnch));
                 String enchName = l18.getString(castedEnch.getKey().asMinimalString()) + " " + level;
-                spawnText(this.simpleQuarzLocations[i].clone().add(0,1,0),
+                spawnText(this.simpleQuartzLocations[i].clone().add(0,1,0),
                         enchName,
                         false);
             }
