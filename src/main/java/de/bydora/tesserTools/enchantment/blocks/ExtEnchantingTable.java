@@ -110,11 +110,10 @@ public class ExtEnchantingTable {
      * @return Whether it has a valid quartz constellation
      */
     public boolean hasValidQuartz() {
-        for(Location quartz : simpleQuartzLocations) {
-            Material materialBottom = quartz.getBlock().getType();
-            if (materialBottom != Material.CHISELED_QUARTZ_BLOCK) {return false;}
-        }
-        return true;
+        return Arrays.stream(simpleQuartzLocations)
+                .map(Location::toBlockLocation)
+                .allMatch(loc -> loc.getWorld() != null
+                        && loc.getBlock().getType() == Material.QUARTZ_BLOCK);
     }
 
     /**
@@ -122,12 +121,11 @@ public class ExtEnchantingTable {
      * @return Whether it has a valid lapis constellation
      */
     public boolean hasValidLapis() {
-        for(Location lapis : simpleLapisLocations) {
-            Material materialBottom = lapis.getBlock().getType();
-            Material materialTop = lapis.clone().add(0,1,0).getBlock().getType();
-            if (materialBottom != Material.LAPIS_BLOCK || materialTop != Material.LAPIS_BLOCK) { return false; }
-        }
-        return true;
+        return Arrays.stream(simpleLapisLocations)
+                .map(Location::toBlockLocation)
+                .allMatch(loc -> loc.getWorld() != null
+                        && loc.getBlock().getType() == Material.LAPIS_BLOCK
+                        && loc.clone().add(0,1,0).getBlock().getType() == Material.LAPIS_BLOCK);
     }
 
     /**
