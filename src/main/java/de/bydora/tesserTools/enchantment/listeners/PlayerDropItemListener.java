@@ -5,6 +5,7 @@ import de.bydora.tesserTools.TesserTools;
 import de.bydora.tesserTools.enchantment.blocks.ExtEnchantingTable;
 import de.bydora.tesserTools.enchantment.enchantments.*;
 import de.bydora.tesserTools.enchantment.exceptions.NotAnEnchantmentTableException;
+import de.bydora.tesserTools.enchantment.util.RolledEnchantment;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -142,19 +143,19 @@ public class PlayerDropItemListener implements Listener {
             return;
         }
 
-        ItemStack enchantStack = enchantItem.getItemStack();
-        Object enchantment = extTable.getEnchantment(item.getLocation());
+        var enchantStack = enchantItem.getItemStack();
+        var enchantment = extTable.getEnchantment(item.getLocation().add(0,-1,0));
         var player = event.getPlayer();
         var chargeLevel = extTable.getChargeLevel();
 
         boolean enchanted = false;
         ItemStack newStack = null;
-        if (enchantment instanceof CustomEnchantment<?> customEnch) {
-            newStack = applyCustomEnchantment(player, enchantStack, customEnch, chargeLevel, true,
-                    customEnch.getEnchantmentLevel(enchantStack) + 1);
-        } else if (enchantment instanceof Enchantment vanillaEnch) {
-                newStack = applyVanillaEnchantment(player, enchantStack, vanillaEnch,
-                    enchantStack.getEnchantmentLevel(vanillaEnch) + 1);
+        switch (enchantment) {
+            case RolledEnchantment.Custom c -> newStack = applyCustomEnchantment(player, enchantStack, c.enchantment(),
+                    chargeLevel, true, c.enchantment().getEnchantmentLevel(enchantStack) + 1);
+            case RolledEnchantment.Vanilla v -> newStack = applyVanillaEnchantment(player, enchantStack, v.enchantment(),
+                    enchantStack.getEnchantmentLevel(v.enchantment()) + 1);
+            case null, default -> {}
         }
         if (Objects.nonNull(newStack)) {
             enchanted = true;

@@ -5,6 +5,7 @@ import de.bydora.tesserTools.TesserTools;
 import de.bydora.tesserTools.enchantment.enchantments.*;
 import de.bydora.tesserTools.enchantment.enums.EnchantmentSpaceKeys;
 import de.bydora.tesserTools.enchantment.exceptions.NotAnEnchantmentTableException;
+import de.bydora.tesserTools.enchantment.util.RolledEnchantment;
 import io.papermc.paper.registry.RegistryAccess;
 import io.papermc.paper.registry.RegistryKey;
 import io.papermc.paper.registry.TypedKey;
@@ -24,11 +25,15 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import static java.util.Map.entry;
 
 @SuppressWarnings({"rawtypes"})
 public class ExtEnchantingTable {
+
+    private static final Logger log = TesserTools.getPlugin(TesserTools.class).getLogger();
 
     public static final Registry<@NotNull Enchantment> ENCHANTMENT_REGISTRY = RegistryAccess.registryAccess()
             .getRegistry(RegistryKey.ENCHANTMENT);
@@ -65,7 +70,7 @@ public class ExtEnchantingTable {
     private final List<Enchantment> vanillaEnchantments;
     private boolean isBlocked;
     private int chargeLevel;
-    private final List<Object> rolledEnchantments = new ArrayList<>();
+    private final List<RolledEnchantment> rolledEnchantments = new ArrayList<>();
     private final EnchantingTable vanillaTable;
 
     public ExtEnchantingTable(@NotNull Location location) {
@@ -113,7 +118,7 @@ public class ExtEnchantingTable {
         return Arrays.stream(simpleQuartzLocations)
                 .map(Location::toBlockLocation)
                 .allMatch(loc -> loc.getWorld() != null
-                        && loc.getBlock().getType() == Material.QUARTZ_BLOCK);
+                        && loc.getBlock().getType() == Material.CHISELED_QUARTZ_BLOCK);
     }
 
     /**
@@ -179,17 +184,12 @@ public class ExtEnchantingTable {
      * @param loc The location of the quartz block
      * @return The {@link CustomEnchantment} or {@link Enchantment} or null
      */
-    public @Nullable Object getEnchantment(@NotNull Location loc) {
-        int i = 0;
-        for (var location : simpleQuartzLocations) {
-            // Check if it's the same block location... Bad, but works
-            if (Math.abs(loc.getX() - location.getX()) < 1
-                && Math.abs(loc.getY() - location.getY()) < 1
-                && Math.abs(loc.getZ() - location.getZ()) < 1
-            ) {
-                return this.rolledEnchantments.get(i);
+    public @Nullable RolledEnchantment getEnchantment(@NotNull Location loc) {
+        var blockLoc = loc.toBlockLocation();
+        for (int i = 0; i < simpleQuartzLocations.length; i++) {
+            if (simpleQuartzLocations[i].toBlockLocation().equals(blockLoc)) {
+                return rolledEnchantments.get(i);
             }
-            i++;
         }
         return null;
     }
@@ -212,19 +212,16 @@ public class ExtEnchantingTable {
         var enchantments = stateContainer.get(EnchantmentSpaceKeys.STATE_ENCHANTMENTS.getKey(),
                 PersistentDataType.LIST.strings());
         if (enchantments == null) {
-            var missing = new Missing();
-            for (int i = 0; i < 4; i++) {this.rolledEnchantments.add(missing);}
+            for (int i = 0; i < 4; i++) {rolledEnchantments.add(new RolledEnchantment.Missing());}
         }
         else {
             for (var ench : enchantments) {
-                Object enchantment = null;
                 if (ench.startsWith("tessertools:")) {
-                    enchantment = ENCHANTMENT_MAP.get(ench);
+                    rolledEnchantments.add(new RolledEnchantment.Custom(ENCHANTMENT_MAP.get(ench)));
                 } else if (ench.startsWith("minecraft:")) {
-                    enchantment = ENCHANTMENT_REGISTRY.get(TypedKey.create(RegistryKey.ENCHANTMENT,
-                            Key.key(ench)));
-                }
-                this.rolledEnchantments.add(Objects.requireNonNullElseGet(enchantment, Missing::new));
+                    var vanilla = ENCHANTMENT_REGISTRY.get(TypedKey.create(RegistryKey.ENCHANTMENT, Key.key(ench)));
+                    rolledEnchantments.add(new RolledEnchantment.Vanilla(vanilla));
+                } else {rolledEnchantments.add(new RolledEnchantment.Missing());}
             }
         }
         //</editor-fold>
@@ -309,21 +306,23 @@ public class ExtEnchantingTable {
     public void startEnchanting(@NotNull ItemStack item, Locale lang) {
         var customs = getCustomEnchantments(item);
         Collections.shuffle(customs);
-        List<Object> mixedList = new ArrayList<>(getVanillaEnchantments(item));
+        List<RolledEnchantment> mixedList = getVanillaEnchantments(item)
+                .stream()
+                .map(RolledEnchantment.Vanilla::new).collect(Collectors.toList());
+
         for (int i = mixedList.size() / 3; i > 0; i--) {
             if (customs.isEmpty()) {break;}
-            mixedList.add(customs.removeFirst());
+            mixedList.add(new RolledEnchantment.Custom(customs.removeFirst()));
         }
         if (mixedList.size() < 4) { return; }
         Collections.shuffle(mixedList);
 
-        this.rolledEnchantments.clear();
+        rolledEnchantments.clear();
         for (int i = 1; i <= 4; i++) {
-            this.rolledEnchantments.add(mixedList.removeFirst());
+            rolledEnchantments.add(mixedList.removeFirst());
         }
-        this.saveState();
+        saveState();
         showEnchantments(item, lang);
-
     }
 
     /**
@@ -339,7 +338,7 @@ public class ExtEnchantingTable {
 
         this.rolledEnchantments.clear();
         for (int i = 1; i <= 4; i++) {
-            this.rolledEnchantments.add(vanillas.removeFirst());
+            rolledEnchantments.add(new RolledEnchantment.Vanilla(vanillas.removeFirst()));
         }
         this.saveState();
         showEnchantments(item, lang);
@@ -350,21 +349,28 @@ public class ExtEnchantingTable {
         removeTextDisplays();
 
         int i = 0;
-        for (var enchantment : this.rolledEnchantments) {
-            if (enchantment instanceof CustomEnchantment<?>) {
-                int nextLevel = getNextEnchantmentLevel(itemStack, (CustomEnchantment) enchantment);
-                String roman = nextLevel <= ROMAN_NUMERALS.size() ? ROMAN_NUMERALS.get(nextLevel) : "UNDEFINED";
-                spawnText(this.simpleQuartzLocations[i].clone().add(0,1,0),
-                        ((CustomEnchantment<?>) enchantment).getDisplayName(lang) + " " + roman,
+        for (var enchantment : rolledEnchantments) {
+            switch (enchantment) {
+                case RolledEnchantment.Custom c -> {
+                    int nextLevel = getNextEnchantmentLevel(itemStack, c.enchantment());
+                    // Get roman numeral or just the arabic number if no numeral is defined
+                    String roman = nextLevel <= ROMAN_NUMERALS.size() ? ROMAN_NUMERALS.get(nextLevel) :
+                            Integer.toString(nextLevel);
+                    spawnText(this.simpleQuartzLocations[i].clone().add(0,1,0),
+                            (c.enchantment()).getDisplayName(lang) + " " + roman,
+                            true);
+                }
+                case RolledEnchantment.Vanilla v -> {
+                    ResourceBundle l18 = ResourceBundle.getBundle("translations.tools", lang);
+                    var level = ROMAN_NUMERALS.get(getNextEnchantmentLevel(itemStack, v.enchantment()));
+                    String enchName = l18.getString(v.enchantment().getKey().asMinimalString()) + " " + level;
+                    spawnText(this.simpleQuartzLocations[i].clone().add(0,1,0),
+                            enchName,
+                            false);
+                }
+                default -> spawnText(this.simpleQuartzLocations[i].clone().add(0,1,0),
+                        "ERROR: MISSING",
                         true);
-            }
-            else if (enchantment instanceof Enchantment castedEnch) {
-                ResourceBundle l18 = ResourceBundle.getBundle("translations.tools", lang);
-                var level = ROMAN_NUMERALS.get(getNextEnchantmentLevel(itemStack, castedEnch));
-                String enchName = l18.getString(castedEnch.getKey().asMinimalString()) + " " + level;
-                spawnText(this.simpleQuartzLocations[i].clone().add(0,1,0),
-                        enchName,
-                        false);
             }
             i++;
         }
@@ -412,11 +418,11 @@ public class ExtEnchantingTable {
      */
     private List<String> getEnchantmentStrings() {
         var enchantments = new ArrayList<String>();
-        for (var enchantment : this.rolledEnchantments) {
-            if (enchantment instanceof CustomEnchantment) {
-                enchantments.add(((CustomEnchantment<?>) enchantment).getID());
-            } else if (enchantment instanceof Enchantment) {
-                enchantments.add(((Enchantment) enchantment).getKey().toString());
+        for (var enchantment : rolledEnchantments) {
+            switch (enchantment) {
+                case RolledEnchantment.Custom c -> enchantments.add(c.enchantment().getID());
+                case RolledEnchantment.Vanilla v -> enchantments.add(v.enchantment().getKey().toString());
+                default -> {}
             }
         }
         return enchantments;
@@ -470,7 +476,7 @@ public class ExtEnchantingTable {
      */
     public void clearEnchantments() {
         this.rolledEnchantments.clear();
-        for (int i = 1; i < 4; i++) {this.rolledEnchantments.add(new Missing());}
+        for (int i = 1; i < 4; i++) {this.rolledEnchantments.add(new RolledEnchantment.Missing());}
         this.removeTextDisplays();
         this.saveState();
     }
