@@ -65,6 +65,8 @@ public class PlayerDropItemListener implements Listener {
             new Vector( 4, 0,  4),
             new Vector(-4, 0,  4)
     };
+    private static final ParticleBuilder ENCHANT_PARTICLE =
+            new ParticleBuilder(Particle.ENCHANT).offset(.2,.2,.2).count(500);
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerDropItem(PlayerDropItemEvent event) {
@@ -466,7 +468,7 @@ public class PlayerDropItemListener implements Listener {
     }
 
     private void spawnEnchantParticles(Location loc) {
-        new ParticleBuilder(Particle.ENCHANT).offset(.2,.2,.2).location(loc).count(500).spawn();
+        ENCHANT_PARTICLE.location(loc).spawn();
     }
 
     private ExtEnchantingTable getExtTable(Location loc) {
