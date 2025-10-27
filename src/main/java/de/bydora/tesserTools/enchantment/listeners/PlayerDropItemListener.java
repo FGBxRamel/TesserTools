@@ -194,7 +194,7 @@ public class PlayerDropItemListener implements Listener {
         // Whether the player has enough level
         if (!hasSufficientLevel(player, reqLevelVanilla)) return null;
         // Change the players level if one exists and level should change
-        deductLevel(player, usedLevelVanilla);
+        if (changeLevel) deductLevel(player, usedLevelVanilla);
         if (enchantStack.getType() == Material.BOOK) {
             enchantStack = new ItemStack(Material.ENCHANTED_BOOK);
         }
