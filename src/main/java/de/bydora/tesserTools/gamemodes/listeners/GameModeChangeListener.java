@@ -1,4 +1,4 @@
-package de.bydora.tesserTools.listeners;
+package de.bydora.tesserTools.gamemodes.listeners;
 
 import net.kyori.adventure.text.Component;
 import net.luckperms.api.LuckPerms;

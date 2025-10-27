@@ -1,4 +1,4 @@
-package de.bydora.tesserTools.listeners;
+package de.bydora.tesserTools.hoppers.listeners;
 
 import de.bydora.tesserTools.TesserTools;
 import org.bukkit.Material;
@@ -14,6 +14,8 @@ import org.bukkit.persistence.PersistentDataType;
 import java.util.Objects;
 
 public class PlayerInteractListener implements Listener {
+
+    private final static TesserTools plugin = TesserTools.getPlugin(TesserTools.class);
 
     @SuppressWarnings("DataFlowIssue")
     @EventHandler(ignoreCancelled = true)
@@ -50,6 +52,7 @@ public class PlayerInteractListener implements Listener {
             }
             hopper.getPersistentDataContainer().set(key, PersistentDataType.INTEGER, newBoostLevel);
             hopper.update();
+            plugin.getBoostLevelCache().invalidateCache(hopper.getLocation());
             event.getItem().setAmount(event.getItem().getAmount() - 1);
         }
         event.setCancelled(true);

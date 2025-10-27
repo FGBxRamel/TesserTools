@@ -1,7 +1,7 @@
-package de.bydora.tesserTools.listeners;
+package de.bydora.tesserTools.hoppers.listeners;
 
 import de.bydora.tesserTools.TesserTools;
-import de.bydora.tesserTools.cache.BoostLevelCache;
+import de.bydora.tesserTools.hoppers.cache.BoostLevelCache;
 import org.bukkit.Server;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;

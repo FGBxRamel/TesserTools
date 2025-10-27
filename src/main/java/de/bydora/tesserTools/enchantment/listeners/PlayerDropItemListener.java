@@ -5,7 +5,8 @@ import de.bydora.tesserTools.TesserTools;
 import de.bydora.tesserTools.enchantment.blocks.ExtEnchantingTable;
 import de.bydora.tesserTools.enchantment.enchantments.*;
 import de.bydora.tesserTools.enchantment.exceptions.NotAnEnchantmentTableException;
-import org.bukkit.Bukkit;
+import de.bydora.tesserTools.enchantment.util.EnchantmentMergeService;
+import de.bydora.tesserTools.enchantment.util.RolledEnchantment;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -18,25 +19,29 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.logging.Logger;
 
-@SuppressWarnings({"rawtypes", "UnusedReturnValue", "SameParameterValue"})
+@SuppressWarnings({"UnusedReturnValue", "SameParameterValue"})
 public class PlayerDropItemListener implements Listener {
 
     @SuppressWarnings("unused")
-    private final static Logger log = TesserTools.getPlugin(TesserTools.class).getLogger();
+    private final static Logger LOG = TesserTools.getPlugin(TesserTools.class).getLogger();
 
-    private final static int reqLevelVanilla = 30; // How many levels are required to show Vanilla enchantments
-    private final static int reqLevelCustom = 40; // How many levels are required to show Custom enchantments
-    private final static int usedLevelVanilla = 3; // How many levels are used when enchanting Vanilla enchantments
-    private final static int usedLevelCustom = 4; // How many levels are used when enchanting Custom enchantments
+    private final static int REQ_LEVEL_VANILLA = 30; // How many levels are required to show Vanilla enchantments
+    private final static int REQ_LEVEL_CUSTOM = 40; // How many levels are required to show Custom enchantments
+    private final static int USED_LEVEL_VANILLA = 3; // How many levels are used when enchanting Vanilla enchantments
+    private final static int USED_LEVEL_CUSTOM = 4; // How many levels are used when enchanting Custom enchantments
 
-    private final static Map<String, CustomEnchantment> customEnchantments = TesserTools.getPlugin(TesserTools.class)
+    private final static Map<String, CustomEnchantment<?>> CUSTOM_ENCHANTMENTS = TesserTools.getPlugin(TesserTools.class)
             .getEnchantmentMap();
-    private final static Map<Enchantment, CustomEnchantment> enhVanillaEnchMap =  Map.of(
+    private final static Map<Enchantment, CustomEnchantment<?>> ENH_VANILLA_ENCH_MAP =  Map.of(
             Enchantment.PROTECTION, new Protection(),
             Enchantment.SWIFT_SNEAK, new SwiftSneak(),
             Enchantment.UNBREAKING, new Unbreaking(),
@@ -45,7 +50,7 @@ public class PlayerDropItemListener implements Listener {
             Enchantment.FIRE_PROTECTION, new FireProtection(),
             Enchantment.BLAST_PROTECTION, new BlastProtection()
     );
-    private final static Set<Class<? extends CustomEnchantment>> excludedEnchantments = Set.of(
+    private final static Set<Class<? extends CustomEnchantment<?>>> EXCLUDED_ENCHANTMENTS = Set.of(
             Protection.class,
             SwiftSneak.class,
             Unbreaking.class,
@@ -54,67 +59,52 @@ public class PlayerDropItemListener implements Listener {
             FireProtection.class,
             BlastProtection.class
     );
+    private static final Vector[] TABLE_OFFSETS = {
+            new Vector(-4, 0, -4),
+            new Vector( 4, 0, -4),
+            new Vector( 4, 0,  4),
+            new Vector(-4, 0,  4)
+    };
+    private static final EnchantmentMergeService MERGE_SERVICE = new EnchantmentMergeService(
+            new EnchantmentMergeService.Config(REQ_LEVEL_VANILLA, REQ_LEVEL_CUSTOM, USED_LEVEL_VANILLA,
+                    USED_LEVEL_CUSTOM), ENH_VANILLA_ENCH_MAP,CUSTOM_ENCHANTMENTS, EXCLUDED_ENCHANTMENTS);
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerDropItem(PlayerDropItemEvent event) {
         Item item = event.getItemDrop();
         switch (item.getItemStack().getType()) {
-            case LAPIS_LAZULI -> handleLapisDrop(event, item);
-            case END_CRYSTAL -> handleEndCrystalDrop(event, item);
-            case ENCHANTED_BOOK -> handleEnchantedBookDrop(event, item);
-            default -> handleGenericItemDrop(event, item);
+            case LAPIS_LAZULI -> handleDrop(item, this::isOnQuartzBlock, i -> processLapisEnchant(event, i));
+            case END_CRYSTAL -> handleDrop(item, this::isOnEnchantingTable, i -> chargeEnchantingTable(event, i));
+            case ENCHANTED_BOOK -> handleDrop(item, this::isOnEnchantingTable, i -> processEnchantedBook(event, i));
+            default -> handleDrop(item, this::isOnEnchantingTable, i -> processEnchantment(event, i));
         }
     }
 
-    private void handleLapisDrop(PlayerDropItemEvent event, Item item) {
-        scheduleItemCheck(item, () -> {
-            if (isOnQuartzBlock(item)) {
-                processLapisEnchant(event, item);
-                cancelTasks();
-            }
-        });
-    }
+    /**
+     * Handles an item drop. <br>
+     * It continuously checks for condition and executes action if condition is met.
+     * @param item The item that was dropped
+     * @param condition The condition that needs to be met
+     * @param action The action to execute if condition is met
+     */
+    private void handleDrop(Item item,
+                            Predicate<Item> condition,
+                            Consumer<Item> action) {
+        var plugin = TesserTools.getPlugin(TesserTools.class);
 
-    private void handleEndCrystalDrop(PlayerDropItemEvent event, Item item) {
-        scheduleItemCheck(item, () -> {
-            if (isOnEnchantingTable(item)) {
-                chargeEnchantingTable(event, item);
-                cancelTasks();
-            }
-        });
-    }
-
-    private void handleEnchantedBookDrop(PlayerDropItemEvent event, Item item) {
-        scheduleItemCheck(item, () -> {
-            if (isOnEnchantingTable(item)) {
-                processEnchantedBook(event, item);
-                cancelTasks();
-            }
-        });
-    }
-
-    private void handleGenericItemDrop(PlayerDropItemEvent event, Item item) {
-        scheduleItemCheck(item, () -> {
-            if (isOnEnchantingTable(item)) {
-                processEnchantment(event, item);
-                cancelTasks();
-            }
-        });
-    }
-
-    private void scheduleItemCheck(Item item, Runnable action) {
-        Bukkit.getScheduler().runTaskTimer(TesserTools.getPlugin(TesserTools.class), new Runnable() {
+        new BukkitRunnable() {
             int attempts = 0;
+
             @Override
             public void run() {
-                if (attempts++ >= 3 || !item.isValid()) {
-                    cancelTasks();
-
-             } else {
-                    action.run();
+                if (++attempts > 3 || !item.isValid()) {
+                    cancel();
+                } else if (condition.test(item)) {
+                    action.accept(item);
+                    cancel();
                 }
-         }
-     }, 0L, 5L);
+            }
+        }.runTaskTimer(plugin, 0L, 5L);
     }
 
     private boolean isOnQuartzBlock(Item item) {
@@ -129,7 +119,7 @@ public class PlayerDropItemListener implements Listener {
 
     private void processLapisEnchant(PlayerDropItemEvent event, Item item) {
         ResourceBundle l18 = ResourceBundle.getBundle("translations.tools", event.getPlayer().locale());
-        ExtEnchantingTable extTable = getQuarzTable(item.getLocation().clone().add(0, -1, 0));
+        ExtEnchantingTable extTable = getQuartzTable(item.getLocation().clone().add(0, -1, 0));
         if (extTable == null) return;
         if (!extTable.isValid()) {
             event.getPlayer().sendMessage(l18.getString("invalidTable"));
@@ -142,53 +132,52 @@ public class PlayerDropItemListener implements Listener {
             return;
         }
 
-        ItemStack enchantStack = enchantItem.getItemStack();
-        Object enchantment = extTable.getEnchantment(item.getLocation());
+        var enchantStack = enchantItem.getItemStack();
+        var enchantment = extTable.getEnchantment(item.getLocation().add(0,-1,0));
         var player = event.getPlayer();
         var chargeLevel = extTable.getChargeLevel();
 
         boolean enchanted = false;
         ItemStack newStack = null;
-        if (enchantment instanceof CustomEnchantment<?> customEnch) {
-            newStack = applyCustomEnchantment(player, enchantStack, customEnch, chargeLevel, true,
-                    customEnch.getEnchantmentLevel(enchantStack) + 1);
-        } else if (enchantment instanceof Enchantment vanillaEnch) {
-                newStack = applyVanillaEnchantment(player, enchantStack, vanillaEnch,
-                    enchantStack.getEnchantmentLevel(vanillaEnch) + 1);
+        switch (enchantment) {
+            case RolledEnchantment.Custom c -> newStack = applyCustomEnchantment(player, enchantStack, c.enchantment(),
+                    chargeLevel, true, c.enchantment().getEnchantmentLevel(enchantStack) + 1);
+            case RolledEnchantment.Vanilla v -> newStack = applyVanillaEnchantment(player, enchantStack, v.enchantment(),
+                    true, enchantStack.getEnchantmentLevel(v.enchantment()) + 1);
+            case null, default -> {}
         }
         if (Objects.nonNull(newStack)) {
             enchanted = true;
             enchantItem.setItemStack(newStack);
         }
-        if (enchanted) finalizeEnchantmentProcess(extTable, item, enchantItem);
+        if (enchanted) finalizeEnchantmentProcess(extTable, item);
     }
 
-    private ItemStack applyCustomEnchantment(@Nullable Player player, ItemStack enchantStack,
+    /**
+     * Applies a {@link CustomEnchantment} to an {@link ItemStack}
+     * @param player The player that tries this action
+     * @param enchantStack The {@link ItemStack} to enchant
+     * @param enchantment The {@link CustomEnchantment} to use
+     * @param chargeLevel The charge level of the enchanting table
+     * @param changeLevel Whether the players level should change
+     * @param level The level of the {@link CustomEnchantment}
+     * @return The enchanted ItemStack, or null if the enchanting failed
+     */
+    private static @Nullable ItemStack applyCustomEnchantment(@Nullable Player player, ItemStack enchantStack,
                                            CustomEnchantment<?> enchantment, int chargeLevel, boolean changeLevel,
-                                           int level
-    ) {
-        // Whether the player has enough level
-        boolean hasLevel = player == null || player.getLevel() >= reqLevelCustom;
-        // Change the players level if one exists and level should change
-        if (player != null && changeLevel) {
-            player.setLevel(player.getLevel() - usedLevelCustom);
-        }
+                                           int level) {
+        if (!hasSufficientLevel(player, REQ_LEVEL_CUSTOM)) return null;
 
-        if (hasLevel && chargeLevel > 0
-            && (enchantment.canEnchantItem(enchantStack)
+        if (chargeLevel > 0 && (enchantment.canEnchantItem(enchantStack)
                 || enchantStack.getType() == Material.ENCHANTED_BOOK
                 || enchantStack.getType() == Material.BOOK
                 )
         ) {
+            if (changeLevel) deductLevel(player, USED_LEVEL_CUSTOM);
             enchantStack = enchantment.enchantItem(enchantStack, level);
             return enchantStack;
         }
         return null;
-    }
-
-    private ItemStack applyCustomEnchantment(ItemStack enchantStack, CustomEnchantment<?> enchantment, int chargeLevel,
-                                           int level) {
-        return applyCustomEnchantment(null, enchantStack, enchantment, chargeLevel, false, level);
     }
 
     /**
@@ -200,15 +189,11 @@ public class PlayerDropItemListener implements Listener {
      * @param level The level of the enchantment
      * @return The enchanted ItemStack; null if it didn't enchant
      */
-    private @Nullable ItemStack applyVanillaEnchantment(@Nullable Player player, ItemStack enchantStack, Enchantment enchantment,
-                                            boolean changeLevel, Integer level) {
-        // Whether the player has enough level
-        boolean hasLevel = player == null || player.getLevel() >= reqLevelVanilla;
-        // Change the players level if one exists and level should change
-        if (player != null && changeLevel) {
-            player.setLevel(player.getLevel() - usedLevelVanilla);
-        }
-        if (!hasLevel) {return null;}
+    private static @Nullable ItemStack applyVanillaEnchantment(@Nullable Player player, ItemStack enchantStack,
+                                                               Enchantment enchantment, boolean changeLevel,
+                                                               Integer level) {
+        if (!hasSufficientLevel(player, REQ_LEVEL_VANILLA)) return null;
+        if (changeLevel) deductLevel(player, USED_LEVEL_VANILLA);
         if (enchantStack.getType() == Material.BOOK) {
             enchantStack = new ItemStack(Material.ENCHANTED_BOOK);
         }
@@ -227,25 +212,24 @@ public class PlayerDropItemListener implements Listener {
     }
 
     /**
-     * Applies an {@link Enchantment} to an {@link ItemStack}, removing the appropriate levels from the player.
-     * @param player The player doing the action
-     * @param enchantStack The item to be enchanted
-     * @param enchantment The enchantment to put on the item
-     * @return The enchanted ItemStack; null if it didn't enchant
+     * Checks whether a player has the given amount of level.
+     * Also returns true if the player is null.
+     * @param player The player to check the level of
+     * @param requiredLevel The level the player has to have
+     * @return Whether the player has enough level, or is null
      */
-    private @Nullable ItemStack applyVanillaEnchantment(Player player, ItemStack enchantStack, Enchantment enchantment,
-                                            @Nullable Integer level) {
-        return applyVanillaEnchantment(player, enchantStack, enchantment, true, level);
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    private static boolean hasSufficientLevel(@Nullable Player player, int requiredLevel) {
+        return player == null || player.getLevel() >= requiredLevel;
     }
 
     /**
-     * Applies an {@link Enchantment} to an {@link ItemStack}.
-     * @param enchantStack The item to be enchanted
-     * @param enchantment The enchantment to put on the item
-     * @return The enchanted ItemStack; null if it didn't enchant
+     * Deducts the given amount of levels from the player, setting it to 0 if the player hasn't got enough.
+     * @param player The player to remove the levels from
+     * @param amount The amount of levels to remove
      */
-    private @Nullable ItemStack applyVanillaEnchantment(ItemStack enchantStack, Enchantment enchantment, @Nullable Integer level) {
-        return applyVanillaEnchantment(null, enchantStack, enchantment, false, level);
+    private static void deductLevel(@Nullable Player player, int amount) {
+        if (player != null) player.setLevel(Math.max(0, player.getLevel() - amount));
     }
 
     private void chargeEnchantingTable(PlayerDropItemEvent event, Item item) {
@@ -274,7 +258,7 @@ public class PlayerDropItemListener implements Listener {
         else if (!extTable.isValid()) {
             event.getPlayer().sendMessage(l18.getString("invalidTable"));
             return;
-        } else if (event.getPlayer().getLevel() < reqLevelVanilla) {
+        } else if (event.getPlayer().getLevel() < REQ_LEVEL_VANILLA) {
             event.getPlayer().sendMessage(l18.getString("insufficientLevel"));
             return;
         }
@@ -284,7 +268,7 @@ public class PlayerDropItemListener implements Listener {
             && secondItem.getItemStack().getType() == item.getItemStack().getType()
             && (hasEnchantments(secondItem.getItemStack()) || hasEnchantments(item.getItemStack()))
         ) {
-            var enchanted = mergeEnchantments(item, secondItem, true, event.getPlayer());
+            var enchanted = MERGE_SERVICE.merge(item, secondItem, true, event.getPlayer());
             if (enchanted) {
                 extTable.clearEnchantments();
                 item.remove();
@@ -293,7 +277,7 @@ public class PlayerDropItemListener implements Listener {
             }
         } else {
             extTable.setBlocked(true);
-            extTable.startEnchanting(item.getItemStack(), event.getPlayer().getLevel() >= reqLevelCustom
+            extTable.startEnchanting(item.getItemStack(), event.getPlayer().getLevel() >= REQ_LEVEL_CUSTOM
                     && extTable.getChargeLevel() > 0, event.getPlayer().locale());
         }
     }
@@ -311,7 +295,7 @@ public class PlayerDropItemListener implements Listener {
         if (secondItem == null) {
             return;
         }
-        var enchanted = mergeEnchantments(book, secondItem, true, event.getPlayer());
+        var enchanted = MERGE_SERVICE.merge(book, secondItem, true, event.getPlayer());
         if (enchanted) {
             extTable.clearEnchantments();
             book.remove();
@@ -320,119 +304,7 @@ public class PlayerDropItemListener implements Listener {
         }
     }
 
-    /**
-     * Merges the enchantments of two items.<p />
-     * It will merge the enchantments onto the second item.
-     * @param item1 Item with enchantments
-     * @param mergeItem Item with enchantments. All enchantments will be merged onto this
-     * @param strict Whether conflicts, level and tool restrictions should be checked
-     */
-    private boolean mergeEnchantments(Item item1, Item mergeItem, boolean strict, Player player) {
-        var item1Stack = item1.getItemStack();
-        var mergeStack = mergeItem.getItemStack();
-        var itemVanillaEnch = getVanillaEnchantments(item1Stack);
-        var mergeVanillaEnch = getVanillaEnchantments(mergeStack);
-        var newStack = new ItemStack(mergeStack);
-        int usedLevel = 0;
-        Map<Enchantment, Integer> vanillas = new HashMap<>();
-
-        for (var ench : itemVanillaEnch.keySet()) {
-            boolean conflicts = false;
-            // Check for conflicts
-            if (strict) {
-                if (!ench.canEnchantItem(mergeStack) && mergeStack.getType() != Material.ENCHANTED_BOOK) {
-                    conflicts = true;
-                } else {
-                    for (var itemEnch : mergeVanillaEnch.keySet()) {
-                        if (ench.conflictsWith(itemEnch) && ench != itemEnch) {
-                            conflicts = true;
-                            break;
-                        }
-                    }
-                }
-            }
-            if (conflicts) {return false;}
-
-            CustomEnchantment<?> customEnch = enhVanillaEnchMap.get(ench);
-            // Search for the highest level of the enchantments
-            int item1Level = itemVanillaEnch.get(ench);
-            int mergeLevel = Objects.requireNonNullElse(mergeVanillaEnch.get(ench), 0);
-
-            int customLevel = mergeLevel;
-
-            // If it's an "advanced vanilla"
-            if (Objects.nonNull(customEnch)) {
-                // Level detection
-                if (mergeLevel == item1Level && customEnch.getMaxLevel() > mergeLevel) {
-                    customLevel = mergeLevel + 1;
-                    usedLevel += customLevel > ench.getMaxLevel() ? usedLevelCustom : 0;
-                    vanillas.put(ench, customLevel);
-                }
-                else if (customEnch.getMaxLevel() >= item1Level) {
-                    customLevel = item1Level;
-                    usedLevel += customLevel > ench.getMaxLevel() ? usedLevelCustom : 0;
-                    vanillas.put(ench, customLevel);
-                }
-            }
-            else if (mergeLevel == item1Level
-                    && ench.getMaxLevel() > mergeLevel
-            ) {
-                usedLevel += usedLevelVanilla;
-                vanillas.put(ench, mergeLevel + 1);
-            }
-            // If not just use the higher one
-            else if (ench.getMaxLevel() >= item1Level
-                    && ench.getMaxLevel() >= mergeLevel
-            ) {
-                usedLevel += usedLevelVanilla;
-                vanillas.put(ench, Math.max(mergeLevel, item1Level));
-            }
-
-
-            if (customEnch != null) {
-                applyCustomEnchantment(newStack, customEnch, 4, customLevel);
-            }
-        }
-        for (var van : vanillas.keySet()) {
-            applyVanillaEnchantment(newStack, van, vanillas.get(van));
-        }
-
-        // Customs
-        for (var ench : customEnchantments.values()) {
-            if (excludedEnchantments.contains(ench.getClass())) {continue;}
-
-            if (!ench.canEnchantItem(mergeStack)
-                && mergeStack.getType() != Material.ENCHANTED_BOOK
-                && ench.getEnchantmentLevel(item1Stack) > 0
-            ) {
-                return false;
-            }
-            var mergeLevel = ench.getEnchantmentLevel(mergeStack);
-            var item1Level = ench.getEnchantmentLevel(item1Stack);
-            if (mergeLevel == item1Level
-                    && mergeLevel > 0
-                    && ench.getMaxLevel() > mergeLevel
-            ) {
-                usedLevel += usedLevelCustom;
-                applyCustomEnchantment(newStack, ench, 4, mergeLevel + 1);
-                continue;
-            }
-
-            if (item1Level > mergeLevel) {
-                usedLevel += usedLevelCustom;
-                applyCustomEnchantment(newStack, ench, 4, item1Level);
-            }
-        }
-        if (player.getLevel() >= usedLevel) {
-            mergeItem.setItemStack(newStack);
-            player.setLevel(player.getLevel() - usedLevel);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    private void finalizeEnchantmentProcess(ExtEnchantingTable extTable, Item item, Item enchantItem) {
+    private void finalizeEnchantmentProcess(ExtEnchantingTable extTable, Item item) {
         item.getItemStack().setAmount(item.getItemStack().getAmount() - 1);
         spawnEnchantParticles(extTable.getLocation().add(0, 1, 0));
         extTable.clearEnchantments();
@@ -459,13 +331,11 @@ public class PlayerDropItemListener implements Listener {
      * @return The found item, or null
      */
     private @Nullable Item getNearbyItem(ExtEnchantingTable extTable, Item excludeItem) {
-        var items = getNearbyItems(extTable);
-        for (Item item : items) {
-            if (!item.equals(excludeItem)) {
-                return item;
-            }
-        }
-        return null;
+        return getNearbyItems(extTable)
+                .stream()
+                .filter(i -> !i.equals(excludeItem))
+                .findFirst()
+                .orElse(null);
     }
 
     private Collection<Item> getNearbyItems(ExtEnchantingTable extTable) {
@@ -473,12 +343,12 @@ public class PlayerDropItemListener implements Listener {
                 .getNearbyEntitiesByType(Item.class, 1);
     }
 
-    private void cancelTasks() {
-        Bukkit.getScheduler().cancelTasks(TesserTools.getPlugin(TesserTools.class));
-    }
-
     private void spawnEnchantParticles(Location loc) {
-        new ParticleBuilder(Particle.ENCHANT).offset(.2,.2,.2).location(loc).count(500).spawn();
+        new ParticleBuilder(Particle.ENCHANT)
+                .location(loc)
+                .offset(.2,.2,.2)
+                .count(500)
+                .spawn();
     }
 
     private ExtEnchantingTable getExtTable(Location loc) {
@@ -490,34 +360,18 @@ public class PlayerDropItemListener implements Listener {
     }
 
     /**
-     * Checks if the quarz block given is part of an enchanting table.
-     * @param loc The location of the quarz block
+     * Checks if the quartz block given is part of an enchanting table.
+     * @param loc The location of the quartz block
      * @return An instance of an {@link ExtEnchantingTable} or null
      */
-    private @Nullable ExtEnchantingTable getQuarzTable(Location loc) {
-        if (loc.clone().add(-4,0,-4).getBlock().getType() == Material.ENCHANTING_TABLE)
-        {
-            return new ExtEnchantingTable(loc.clone().add(-4,0,-4));
-        } else if (loc.clone().add(4,0,-4).getBlock().getType() == Material.ENCHANTING_TABLE) {
-            return new ExtEnchantingTable(loc.clone().add(4,0,-4));
-        } else if (loc.clone().add(4,0,4).getBlock().getType() == Material.ENCHANTING_TABLE) {
-            return new ExtEnchantingTable(loc.clone().add(4,0,4));
-        } else if (loc.clone().add(-4,0,4).getBlock().getType() == Material.ENCHANTING_TABLE) {
-            return new ExtEnchantingTable(loc.clone().add(-4,0,4));
-        } else {
-            return null;
+    private static @Nullable ExtEnchantingTable getQuartzTable(Location loc) {
+        for (Vector offset : TABLE_OFFSETS) {
+            var check = loc.clone().add(offset);
+            if (check.getBlock().getType() == Material.ENCHANTING_TABLE) {
+                return new ExtEnchantingTable(check);
+            }
         }
-    }
-
-    private Map<Enchantment, Integer> getVanillaEnchantments(ItemStack item) {
-        if (item.getType() == Material.ENCHANTED_BOOK
-            || item.getType() == Material.BOOK
-        ) {
-            var meta = (EnchantmentStorageMeta) item.getItemMeta();
-            return meta.getStoredEnchants();
-        } else {
-            return item.getEnchantments();
-        }
+        return null;
     }
 
     /**
@@ -533,12 +387,8 @@ public class PlayerDropItemListener implements Listener {
             return true;
         }
 
-        for (var ench : customEnchantments.values()) {
-            if (ench.getEnchantmentLevel(item) > 0) {
-                return true;
-            }
-        }
-
-        return false;
+        return CUSTOM_ENCHANTMENTS.values()
+                .stream()
+                .anyMatch(ench -> ench.getEnchantmentLevel(item) > 0);
     }
 }
