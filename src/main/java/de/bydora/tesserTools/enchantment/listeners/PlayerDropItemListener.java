@@ -123,7 +123,7 @@ public class PlayerDropItemListener implements Listener {
 
     private void processLapisEnchant(PlayerDropItemEvent event, Item item) {
         ResourceBundle l18 = ResourceBundle.getBundle("translations.tools", event.getPlayer().locale());
-        ExtEnchantingTable extTable = getQuarzTable(item.getLocation().clone().add(0, -1, 0));
+        ExtEnchantingTable extTable = getQuartzTable(item.getLocation().clone().add(0, -1, 0));
         if (extTable == null) return;
         if (!extTable.isValid()) {
             event.getPlayer().sendMessage(l18.getString("invalidTable"));
@@ -478,11 +478,11 @@ public class PlayerDropItemListener implements Listener {
     }
 
     /**
-     * Checks if the quarz block given is part of an enchanting table.
-     * @param loc The location of the quarz block
+     * Checks if the quartz block given is part of an enchanting table.
+     * @param loc The location of the quartz block
      * @return An instance of an {@link ExtEnchantingTable} or null
      */
-    private static @Nullable ExtEnchantingTable getQuarzTable(Location loc) {
+    private static @Nullable ExtEnchantingTable getQuartzTable(Location loc) {
         for (Vector offset : TABLE_OFFSETS) {
             var check = loc.clone().add(offset);
             if (check.getBlock().getType() == Material.ENCHANTING_TABLE) {
