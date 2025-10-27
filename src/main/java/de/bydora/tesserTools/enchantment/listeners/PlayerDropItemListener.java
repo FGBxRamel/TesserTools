@@ -157,22 +157,27 @@ public class PlayerDropItemListener implements Listener {
         if (enchanted) finalizeEnchantmentProcess(extTable, item);
     }
 
-    private static ItemStack applyCustomEnchantment(@Nullable Player player, ItemStack enchantStack,
+    /**
+     * Applies a {@link CustomEnchantment} to an {@link ItemStack}
+     * @param player The player that tries this action
+     * @param enchantStack The {@link ItemStack} to enchant
+     * @param enchantment The {@link CustomEnchantment} to use
+     * @param chargeLevel The charge level of the enchanting table
+     * @param changeLevel Whether the players level should change
+     * @param level The level of the {@link CustomEnchantment}
+     * @return The enchanted ItemStack, or null if the enchanting failed
+     */
+    private static @Nullable ItemStack applyCustomEnchantment(@Nullable Player player, ItemStack enchantStack,
                                            CustomEnchantment<?> enchantment, int chargeLevel, boolean changeLevel,
                                            int level) {
-        // Whether the player has enough level
-        boolean hasLevel = player == null || player.getLevel() >= reqLevelCustom;
-        // Change the players level if one exists and level should change
-        if (player != null && changeLevel) {
-            player.setLevel(player.getLevel() - usedLevelCustom);
-        }
+        if (!hasSufficientLevel(player, reqLevelCustom)) return null;
 
-        if (hasLevel && chargeLevel > 0
-            && (enchantment.canEnchantItem(enchantStack)
+        if (chargeLevel > 0 && (enchantment.canEnchantItem(enchantStack)
                 || enchantStack.getType() == Material.ENCHANTED_BOOK
                 || enchantStack.getType() == Material.BOOK
                 )
         ) {
+            if (changeLevel) deductLevel(player, usedLevelCustom);
             enchantStack = enchantment.enchantItem(enchantStack, level);
             return enchantStack;
         }
@@ -191,9 +196,7 @@ public class PlayerDropItemListener implements Listener {
     private static @Nullable ItemStack applyVanillaEnchantment(@Nullable Player player, ItemStack enchantStack,
                                                                Enchantment enchantment, boolean changeLevel,
                                                                Integer level) {
-        // Whether the player has enough level
         if (!hasSufficientLevel(player, reqLevelVanilla)) return null;
-        // Change the players level if one exists and level should change
         if (changeLevel) deductLevel(player, usedLevelVanilla);
         if (enchantStack.getType() == Material.BOOK) {
             enchantStack = new ItemStack(Material.ENCHANTED_BOOK);
@@ -219,6 +222,7 @@ public class PlayerDropItemListener implements Listener {
      * @param requiredLevel The level the player has to have
      * @return Whether the player has enough level, or is null
      */
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private static boolean hasSufficientLevel(@Nullable Player player, int requiredLevel) {
         return player == null || player.getLevel() >= requiredLevel;
     }
