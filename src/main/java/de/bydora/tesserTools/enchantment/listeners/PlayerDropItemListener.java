@@ -20,6 +20,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -27,7 +28,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 
-@SuppressWarnings({"rawtypes", "UnusedReturnValue", "SameParameterValue"})
+@SuppressWarnings({"UnusedReturnValue", "SameParameterValue"})
 public class PlayerDropItemListener implements Listener {
 
     @SuppressWarnings("unused")
@@ -40,7 +41,7 @@ public class PlayerDropItemListener implements Listener {
 
     private final static Map<String, CustomEnchantment<?>> customEnchantments = TesserTools.getPlugin(TesserTools.class)
             .getEnchantmentMap();
-    private final static Map<Enchantment, CustomEnchantment> enhVanillaEnchMap =  Map.of(
+    private final static Map<Enchantment, CustomEnchantment<?>> enhVanillaEnchMap =  Map.of(
             Enchantment.PROTECTION, new Protection(),
             Enchantment.SWIFT_SNEAK, new SwiftSneak(),
             Enchantment.UNBREAKING, new Unbreaking(),
@@ -49,7 +50,7 @@ public class PlayerDropItemListener implements Listener {
             Enchantment.FIRE_PROTECTION, new FireProtection(),
             Enchantment.BLAST_PROTECTION, new BlastProtection()
     );
-    private final static Set<Class<? extends CustomEnchantment>> excludedEnchantments = Set.of(
+    private final static Set<Class<? extends CustomEnchantment<?>>> excludedEnchantments = Set.of(
             Protection.class,
             SwiftSneak.class,
             Unbreaking.class,
@@ -58,6 +59,12 @@ public class PlayerDropItemListener implements Listener {
             FireProtection.class,
             BlastProtection.class
     );
+    private static final Vector[] TABLE_OFFSETS = {
+            new Vector(-4, 0, -4),
+            new Vector( 4, 0, -4),
+            new Vector( 4, 0,  4),
+            new Vector(-4, 0,  4)
+    };
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerDropItem(PlayerDropItemEvent event) {
@@ -481,19 +488,14 @@ public class PlayerDropItemListener implements Listener {
      * @param loc The location of the quarz block
      * @return An instance of an {@link ExtEnchantingTable} or null
      */
-    private @Nullable ExtEnchantingTable getQuarzTable(Location loc) {
-        if (loc.clone().add(-4,0,-4).getBlock().getType() == Material.ENCHANTING_TABLE)
-        {
-            return new ExtEnchantingTable(loc.clone().add(-4,0,-4));
-        } else if (loc.clone().add(4,0,-4).getBlock().getType() == Material.ENCHANTING_TABLE) {
-            return new ExtEnchantingTable(loc.clone().add(4,0,-4));
-        } else if (loc.clone().add(4,0,4).getBlock().getType() == Material.ENCHANTING_TABLE) {
-            return new ExtEnchantingTable(loc.clone().add(4,0,4));
-        } else if (loc.clone().add(-4,0,4).getBlock().getType() == Material.ENCHANTING_TABLE) {
-            return new ExtEnchantingTable(loc.clone().add(-4,0,4));
-        } else {
-            return null;
+    private static @Nullable ExtEnchantingTable getQuarzTable(Location loc) {
+        for (Vector offset : TABLE_OFFSETS) {
+            var check = loc.clone().add(offset);
+            if (check.getBlock().getType() == Material.ENCHANTING_TABLE) {
+                return new ExtEnchantingTable(check);
+            }
         }
+        return null;
     }
 
     private Map<Enchantment, Integer> getVanillaEnchantments(ItemStack item) {
