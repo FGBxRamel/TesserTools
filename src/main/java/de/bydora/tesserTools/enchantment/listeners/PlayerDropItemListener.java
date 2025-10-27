@@ -5,6 +5,7 @@ import de.bydora.tesserTools.TesserTools;
 import de.bydora.tesserTools.enchantment.blocks.ExtEnchantingTable;
 import de.bydora.tesserTools.enchantment.enchantments.*;
 import de.bydora.tesserTools.enchantment.exceptions.NotAnEnchantmentTableException;
+import de.bydora.tesserTools.enchantment.util.EnchantmentMergeService;
 import de.bydora.tesserTools.enchantment.util.RolledEnchantment;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -65,8 +66,9 @@ public class PlayerDropItemListener implements Listener {
             new Vector( 4, 0,  4),
             new Vector(-4, 0,  4)
     };
-    private static final ParticleBuilder ENCHANT_PARTICLE =
-            new ParticleBuilder(Particle.ENCHANT).offset(.2,.2,.2).count(500);
+    private static final EnchantmentMergeService MERGE_SERVICE = new EnchantmentMergeService(
+            new EnchantmentMergeService.Config(REQ_LEVEL_VANILLA, REQ_LEVEL_CUSTOM, USED_LEVEL_VANILLA,
+                    USED_LEVEL_CUSTOM), ENH_VANILLA_ENCH_MAP,CUSTOM_ENCHANTMENTS, EXCLUDED_ENCHANTMENTS);
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerDropItem(PlayerDropItemEvent event) {
@@ -274,7 +276,7 @@ public class PlayerDropItemListener implements Listener {
             && secondItem.getItemStack().getType() == item.getItemStack().getType()
             && (hasEnchantments(secondItem.getItemStack()) || hasEnchantments(item.getItemStack()))
         ) {
-            var enchanted = mergeEnchantments(item, secondItem, true, event.getPlayer());
+            var enchanted = MERGE_SERVICE.merge(item, secondItem, true, event.getPlayer());
             if (enchanted) {
                 extTable.clearEnchantments();
                 item.remove();
@@ -301,124 +303,12 @@ public class PlayerDropItemListener implements Listener {
         if (secondItem == null) {
             return;
         }
-        var enchanted = mergeEnchantments(book, secondItem, true, event.getPlayer());
+        var enchanted = MERGE_SERVICE.merge(book, secondItem, true, event.getPlayer());
         if (enchanted) {
             extTable.clearEnchantments();
             book.remove();
         } else {
             event.getPlayer().sendMessage(l18.getString("failedEnchantGeneric"));
-        }
-    }
-
-    /**
-     * Merges the enchantments of two items.<p />
-     * It will merge the enchantments onto the second item.
-     * @param item1 Item with enchantments
-     * @param mergeItem Item with enchantments. All enchantments will be merged onto this
-     * @param strict Whether conflicts, level and tool restrictions should be checked
-     */
-    private boolean mergeEnchantments(Item item1, Item mergeItem, boolean strict, Player player) {
-        var item1Stack = item1.getItemStack();
-        var mergeStack = mergeItem.getItemStack();
-        var itemVanillaEnch = getVanillaEnchantments(item1Stack);
-        var mergeVanillaEnch = getVanillaEnchantments(mergeStack);
-        var newStack = new ItemStack(mergeStack);
-        int usedLevel = 0;
-        Map<Enchantment, Integer> vanillas = new HashMap<>();
-
-        for (var ench : itemVanillaEnch.keySet()) {
-            boolean conflicts = false;
-            // Check for conflicts
-            if (strict) {
-                if (!ench.canEnchantItem(mergeStack) && mergeStack.getType() != Material.ENCHANTED_BOOK) {
-                    conflicts = true;
-                } else {
-                    for (var itemEnch : mergeVanillaEnch.keySet()) {
-                        if (ench.conflictsWith(itemEnch) && ench != itemEnch) {
-                            conflicts = true;
-                            break;
-                        }
-                    }
-                }
-            }
-            if (conflicts) {return false;}
-
-            CustomEnchantment<?> customEnch = ENH_VANILLA_ENCH_MAP.get(ench);
-            // Search for the highest level of the enchantments
-            int item1Level = itemVanillaEnch.get(ench);
-            int mergeLevel = Objects.requireNonNullElse(mergeVanillaEnch.get(ench), 0);
-
-            int customLevel = mergeLevel;
-
-            // If it's an "advanced vanilla"
-            if (Objects.nonNull(customEnch)) {
-                // Level detection
-                if (mergeLevel == item1Level && customEnch.getMaxLevel() > mergeLevel) {
-                    customLevel = mergeLevel + 1;
-                    usedLevel += customLevel > ench.getMaxLevel() ? USED_LEVEL_CUSTOM : 0;
-                    vanillas.put(ench, customLevel);
-                }
-                else if (customEnch.getMaxLevel() >= item1Level) {
-                    customLevel = item1Level;
-                    usedLevel += customLevel > ench.getMaxLevel() ? USED_LEVEL_CUSTOM : 0;
-                    vanillas.put(ench, customLevel);
-                }
-            }
-            else if (mergeLevel == item1Level
-                    && ench.getMaxLevel() > mergeLevel
-            ) {
-                usedLevel += USED_LEVEL_VANILLA;
-                vanillas.put(ench, mergeLevel + 1);
-            }
-            // If not just use the higher one
-            else if (ench.getMaxLevel() >= item1Level
-                    && ench.getMaxLevel() >= mergeLevel
-            ) {
-                usedLevel += USED_LEVEL_VANILLA;
-                vanillas.put(ench, Math.max(mergeLevel, item1Level));
-            }
-
-
-            if (customEnch != null) {
-                applyCustomEnchantment(null, newStack, customEnch, 4, false, customLevel);
-            }
-        }
-        for (var van : vanillas.keySet()) {
-            applyVanillaEnchantment(null, newStack, van, false, vanillas.get(van));
-        }
-
-        // Customs
-        for (var ench : CUSTOM_ENCHANTMENTS.values()) {
-            if (EXCLUDED_ENCHANTMENTS.contains(ench.getClass())) {continue;}
-
-            if (!ench.canEnchantItem(mergeStack)
-                && mergeStack.getType() != Material.ENCHANTED_BOOK
-                && ench.getEnchantmentLevel(item1Stack) > 0
-            ) {
-                return false;
-            }
-            var mergeLevel = ench.getEnchantmentLevel(mergeStack);
-            var item1Level = ench.getEnchantmentLevel(item1Stack);
-            if (mergeLevel == item1Level
-                    && mergeLevel > 0
-                    && ench.getMaxLevel() > mergeLevel
-            ) {
-                usedLevel += USED_LEVEL_CUSTOM;
-                applyCustomEnchantment(null, newStack, ench, 4, false, mergeLevel + 1);
-                continue;
-            }
-
-            if (item1Level > mergeLevel) {
-                usedLevel += USED_LEVEL_CUSTOM;
-                applyCustomEnchantment(null, newStack, ench, 4, false, item1Level);
-            }
-        }
-        if (player.getLevel() >= usedLevel) {
-            mergeItem.setItemStack(newStack);
-            player.setLevel(player.getLevel() - usedLevel);
-            return true;
-        } else {
-            return false;
         }
     }
 
@@ -466,7 +356,11 @@ public class PlayerDropItemListener implements Listener {
     }
 
     private void spawnEnchantParticles(Location loc) {
-        ENCHANT_PARTICLE.location(loc).spawn();
+        new ParticleBuilder(Particle.ENCHANT)
+                .location(loc)
+                .offset(.2,.2,.2)
+                .count(500)
+                .spawn();
     }
 
     private ExtEnchantingTable getExtTable(Location loc) {
@@ -490,17 +384,6 @@ public class PlayerDropItemListener implements Listener {
             }
         }
         return null;
-    }
-
-    private Map<Enchantment, Integer> getVanillaEnchantments(ItemStack item) {
-        if (item.getType() == Material.ENCHANTED_BOOK
-            || item.getType() == Material.BOOK
-        ) {
-            var meta = (EnchantmentStorageMeta) item.getItemMeta();
-            return meta.getStoredEnchants();
-        } else {
-            return item.getEnchantments();
-        }
     }
 
     /**

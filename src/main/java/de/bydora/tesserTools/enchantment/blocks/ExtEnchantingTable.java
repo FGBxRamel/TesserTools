@@ -60,11 +60,6 @@ public class ExtEnchantingTable {
             FireProtection.class, Enchantment.FIRE_PROTECTION,
             BlastProtection.class, Enchantment.BLAST_PROTECTION
     );
-    private final static ParticleBuilder BASE_PARTICLE = new ParticleBuilder(Particle.DUST)
-            .offset(.2,.2,.2)
-            .receivers(160)
-            .count(10);
-
     private final Location[] simpleQuartzLocations;
     private final Location[] simpleLapisLocations;
     private final Location location;
@@ -158,7 +153,11 @@ public class ExtEnchantingTable {
     }
 
     private static @NotNull ParticleBuilder getBaseParticle(@NotNull Location originLocation) {
-        return BASE_PARTICLE.location(originLocation).clone();
+        return new ParticleBuilder(Particle.DUST)
+                .location(originLocation).clone()
+                .offset(.2,.2,.2)
+                .receivers(160)
+                .count(10);
     }
 
     @SuppressWarnings("unused")
