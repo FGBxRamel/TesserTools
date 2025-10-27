@@ -449,13 +449,11 @@ public class PlayerDropItemListener implements Listener {
      * @return The found item, or null
      */
     private @Nullable Item getNearbyItem(ExtEnchantingTable extTable, Item excludeItem) {
-        var items = getNearbyItems(extTable);
-        for (Item item : items) {
-            if (!item.equals(excludeItem)) {
-                return item;
-            }
-        }
-        return null;
+        return getNearbyItems(extTable)
+                .stream()
+                .filter(i -> !i.equals(excludeItem))
+                .findFirst()
+                .orElse(null);
     }
 
     private Collection<Item> getNearbyItems(ExtEnchantingTable extTable) {
@@ -518,12 +516,8 @@ public class PlayerDropItemListener implements Listener {
             return true;
         }
 
-        for (var ench : CUSTOM_ENCHANTMENTS.values()) {
-            if (ench.getEnchantmentLevel(item) > 0) {
-                return true;
-            }
-        }
-
-        return false;
+        return CUSTOM_ENCHANTMENTS.values()
+                .stream()
+                .anyMatch(ench -> ench.getEnchantmentLevel(item) > 0);
     }
 }
