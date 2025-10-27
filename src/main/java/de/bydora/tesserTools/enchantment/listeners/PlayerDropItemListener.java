@@ -32,16 +32,16 @@ import java.util.logging.Logger;
 public class PlayerDropItemListener implements Listener {
 
     @SuppressWarnings("unused")
-    private final static Logger log = TesserTools.getPlugin(TesserTools.class).getLogger();
+    private final static Logger LOG = TesserTools.getPlugin(TesserTools.class).getLogger();
 
-    private final static int reqLevelVanilla = 30; // How many levels are required to show Vanilla enchantments
-    private final static int reqLevelCustom = 40; // How many levels are required to show Custom enchantments
-    private final static int usedLevelVanilla = 3; // How many levels are used when enchanting Vanilla enchantments
-    private final static int usedLevelCustom = 4; // How many levels are used when enchanting Custom enchantments
+    private final static int REQ_LEVEL_VANILLA = 30; // How many levels are required to show Vanilla enchantments
+    private final static int REQ_LEVEL_CUSTOM = 40; // How many levels are required to show Custom enchantments
+    private final static int USED_LEVEL_VANILLA = 3; // How many levels are used when enchanting Vanilla enchantments
+    private final static int USED_LEVEL_CUSTOM = 4; // How many levels are used when enchanting Custom enchantments
 
-    private final static Map<String, CustomEnchantment<?>> customEnchantments = TesserTools.getPlugin(TesserTools.class)
+    private final static Map<String, CustomEnchantment<?>> CUSTOM_ENCHANTMENTS = TesserTools.getPlugin(TesserTools.class)
             .getEnchantmentMap();
-    private final static Map<Enchantment, CustomEnchantment<?>> enhVanillaEnchMap =  Map.of(
+    private final static Map<Enchantment, CustomEnchantment<?>> ENH_VANILLA_ENCH_MAP =  Map.of(
             Enchantment.PROTECTION, new Protection(),
             Enchantment.SWIFT_SNEAK, new SwiftSneak(),
             Enchantment.UNBREAKING, new Unbreaking(),
@@ -50,7 +50,7 @@ public class PlayerDropItemListener implements Listener {
             Enchantment.FIRE_PROTECTION, new FireProtection(),
             Enchantment.BLAST_PROTECTION, new BlastProtection()
     );
-    private final static Set<Class<? extends CustomEnchantment<?>>> excludedEnchantments = Set.of(
+    private final static Set<Class<? extends CustomEnchantment<?>>> EXCLUDED_ENCHANTMENTS = Set.of(
             Protection.class,
             SwiftSneak.class,
             Unbreaking.class,
@@ -170,14 +170,14 @@ public class PlayerDropItemListener implements Listener {
     private static @Nullable ItemStack applyCustomEnchantment(@Nullable Player player, ItemStack enchantStack,
                                            CustomEnchantment<?> enchantment, int chargeLevel, boolean changeLevel,
                                            int level) {
-        if (!hasSufficientLevel(player, reqLevelCustom)) return null;
+        if (!hasSufficientLevel(player, REQ_LEVEL_CUSTOM)) return null;
 
         if (chargeLevel > 0 && (enchantment.canEnchantItem(enchantStack)
                 || enchantStack.getType() == Material.ENCHANTED_BOOK
                 || enchantStack.getType() == Material.BOOK
                 )
         ) {
-            if (changeLevel) deductLevel(player, usedLevelCustom);
+            if (changeLevel) deductLevel(player, USED_LEVEL_CUSTOM);
             enchantStack = enchantment.enchantItem(enchantStack, level);
             return enchantStack;
         }
@@ -196,8 +196,8 @@ public class PlayerDropItemListener implements Listener {
     private static @Nullable ItemStack applyVanillaEnchantment(@Nullable Player player, ItemStack enchantStack,
                                                                Enchantment enchantment, boolean changeLevel,
                                                                Integer level) {
-        if (!hasSufficientLevel(player, reqLevelVanilla)) return null;
-        if (changeLevel) deductLevel(player, usedLevelVanilla);
+        if (!hasSufficientLevel(player, REQ_LEVEL_VANILLA)) return null;
+        if (changeLevel) deductLevel(player, USED_LEVEL_VANILLA);
         if (enchantStack.getType() == Material.BOOK) {
             enchantStack = new ItemStack(Material.ENCHANTED_BOOK);
         }
@@ -262,7 +262,7 @@ public class PlayerDropItemListener implements Listener {
         else if (!extTable.isValid()) {
             event.getPlayer().sendMessage(l18.getString("invalidTable"));
             return;
-        } else if (event.getPlayer().getLevel() < reqLevelVanilla) {
+        } else if (event.getPlayer().getLevel() < REQ_LEVEL_VANILLA) {
             event.getPlayer().sendMessage(l18.getString("insufficientLevel"));
             return;
         }
@@ -281,7 +281,7 @@ public class PlayerDropItemListener implements Listener {
             }
         } else {
             extTable.setBlocked(true);
-            extTable.startEnchanting(item.getItemStack(), event.getPlayer().getLevel() >= reqLevelCustom
+            extTable.startEnchanting(item.getItemStack(), event.getPlayer().getLevel() >= REQ_LEVEL_CUSTOM
                     && extTable.getChargeLevel() > 0, event.getPlayer().locale());
         }
     }
@@ -341,7 +341,7 @@ public class PlayerDropItemListener implements Listener {
             }
             if (conflicts) {return false;}
 
-            CustomEnchantment<?> customEnch = enhVanillaEnchMap.get(ench);
+            CustomEnchantment<?> customEnch = ENH_VANILLA_ENCH_MAP.get(ench);
             // Search for the highest level of the enchantments
             int item1Level = itemVanillaEnch.get(ench);
             int mergeLevel = Objects.requireNonNullElse(mergeVanillaEnch.get(ench), 0);
@@ -353,26 +353,26 @@ public class PlayerDropItemListener implements Listener {
                 // Level detection
                 if (mergeLevel == item1Level && customEnch.getMaxLevel() > mergeLevel) {
                     customLevel = mergeLevel + 1;
-                    usedLevel += customLevel > ench.getMaxLevel() ? usedLevelCustom : 0;
+                    usedLevel += customLevel > ench.getMaxLevel() ? USED_LEVEL_CUSTOM : 0;
                     vanillas.put(ench, customLevel);
                 }
                 else if (customEnch.getMaxLevel() >= item1Level) {
                     customLevel = item1Level;
-                    usedLevel += customLevel > ench.getMaxLevel() ? usedLevelCustom : 0;
+                    usedLevel += customLevel > ench.getMaxLevel() ? USED_LEVEL_CUSTOM : 0;
                     vanillas.put(ench, customLevel);
                 }
             }
             else if (mergeLevel == item1Level
                     && ench.getMaxLevel() > mergeLevel
             ) {
-                usedLevel += usedLevelVanilla;
+                usedLevel += USED_LEVEL_VANILLA;
                 vanillas.put(ench, mergeLevel + 1);
             }
             // If not just use the higher one
             else if (ench.getMaxLevel() >= item1Level
                     && ench.getMaxLevel() >= mergeLevel
             ) {
-                usedLevel += usedLevelVanilla;
+                usedLevel += USED_LEVEL_VANILLA;
                 vanillas.put(ench, Math.max(mergeLevel, item1Level));
             }
 
@@ -386,8 +386,8 @@ public class PlayerDropItemListener implements Listener {
         }
 
         // Customs
-        for (var ench : customEnchantments.values()) {
-            if (excludedEnchantments.contains(ench.getClass())) {continue;}
+        for (var ench : CUSTOM_ENCHANTMENTS.values()) {
+            if (EXCLUDED_ENCHANTMENTS.contains(ench.getClass())) {continue;}
 
             if (!ench.canEnchantItem(mergeStack)
                 && mergeStack.getType() != Material.ENCHANTED_BOOK
@@ -401,13 +401,13 @@ public class PlayerDropItemListener implements Listener {
                     && mergeLevel > 0
                     && ench.getMaxLevel() > mergeLevel
             ) {
-                usedLevel += usedLevelCustom;
+                usedLevel += USED_LEVEL_CUSTOM;
                 applyCustomEnchantment(null, newStack, ench, 4, false, mergeLevel + 1);
                 continue;
             }
 
             if (item1Level > mergeLevel) {
-                usedLevel += usedLevelCustom;
+                usedLevel += USED_LEVEL_CUSTOM;
                 applyCustomEnchantment(null, newStack, ench, 4, false, item1Level);
             }
         }
@@ -516,7 +516,7 @@ public class PlayerDropItemListener implements Listener {
             return true;
         }
 
-        for (var ench : customEnchantments.values()) {
+        for (var ench : CUSTOM_ENCHANTMENTS.values()) {
             if (ench.getEnchantmentLevel(item) > 0) {
                 return true;
             }
