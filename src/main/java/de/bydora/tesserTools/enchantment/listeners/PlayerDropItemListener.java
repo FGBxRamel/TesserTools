@@ -7,7 +7,6 @@ import de.bydora.tesserTools.enchantment.enchantments.*;
 import de.bydora.tesserTools.enchantment.exceptions.NotAnEnchantmentTableException;
 import de.bydora.tesserTools.enchantment.util.EnchantmentMergeService;
 import de.bydora.tesserTools.enchantment.util.RolledEnchantment;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -91,26 +90,19 @@ public class PlayerDropItemListener implements Listener {
     private void handleDrop(Item item,
                             Predicate<Item> condition,
                             Consumer<Item> action) {
-        scheduleItemCheck(item, () -> {
-            if (condition.test(item)) {
-                action.accept(item);
-                cancelTasks();
-            }
-        });
-    }
-
-    private void scheduleItemCheck(Item item, Runnable action) {
         var plugin = TesserTools.getPlugin(TesserTools.class);
+
         new BukkitRunnable() {
-            private int attempts;
+            int attempts = 0;
 
             @Override
             public void run() {
                 if (++attempts > 3 || !item.isValid()) {
                     cancel();
-                    return;
+                } else if (condition.test(item)) {
+                    action.accept(item);
+                    cancel();
                 }
-                action.run();
             }
         }.runTaskTimer(plugin, 0L, 5L);
     }
@@ -349,10 +341,6 @@ public class PlayerDropItemListener implements Listener {
     private Collection<Item> getNearbyItems(ExtEnchantingTable extTable) {
         return extTable.getLocation()
                 .getNearbyEntitiesByType(Item.class, 1);
-    }
-
-    private void cancelTasks() {
-        Bukkit.getScheduler().cancelTasks(TesserTools.getPlugin(TesserTools.class));
     }
 
     private void spawnEnchantParticles(Location loc) {
