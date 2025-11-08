@@ -36,6 +36,11 @@ public class AreaBreak extends CustomEnchantment<BlockBreakEvent> {
             Material.COBBLED_DEEPSLATE, Material.CRIMSON_STEM, Material.WARPED_STEM, Material.ICE, Material.BLUE_ICE,
             Material.PACKED_ICE,
 
+            Material.BLACK_CONCRETE, Material.CYAN_CONCRETE, Material.BLUE_CONCRETE, Material.LIGHT_BLUE_CONCRETE,
+            Material.GRAY_CONCRETE, Material.BROWN_CONCRETE, Material.LIGHT_GRAY_CONCRETE, Material.GREEN_CONCRETE,
+            Material.LIME_CONCRETE, Material.MAGENTA_CONCRETE, Material.ORANGE_CONCRETE, Material.PINK_CONCRETE,
+            Material.PURPLE_CONCRETE, Material.RED_CONCRETE, Material.WHITE_CONCRETE, Material.YELLOW_CONCRETE,
+
             Material.TERRACOTTA, Material.BLACK_TERRACOTTA, Material.BLUE_TERRACOTTA, Material.BROWN_TERRACOTTA,
             Material.CYAN_TERRACOTTA, Material.GRAY_TERRACOTTA, Material.LIGHT_GRAY_TERRACOTTA,
             Material.LIGHT_BLUE_TERRACOTTA, Material.GREEN_TERRACOTTA, Material.LIME_TERRACOTTA,
