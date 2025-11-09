@@ -78,6 +78,7 @@ public final class TesserToolsBootstrap implements PluginBootstrap {
                 AreaFill.def(),
                 SpaceFill.def(),
                 FastTravel.def(),
+                Razor.def(),
         };
     }
 }
