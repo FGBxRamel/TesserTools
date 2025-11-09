@@ -45,6 +45,8 @@ public final class TesserTools extends JavaPlugin {
             new AreaFill(),
             new SpaceFill(),
             new FastTravel(),
+            new Razor(),
+            new Debarker(),
     };
 
     @Override
