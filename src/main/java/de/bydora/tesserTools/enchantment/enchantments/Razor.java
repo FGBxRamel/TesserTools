@@ -1,11 +1,13 @@
 package de.bydora.tesserTools.enchantment.enchantments;
 
 import de.bydora.tesserTools.enchantment.enums.EnchantmentSpaceKeys;
+import de.bydora.tesserTools.enchantment.util.AdjacentBlockFinder;
 import de.bydora.tesserTools.enchantment.util.EnchantDef;
 import de.bydora.tesserTools.enchantment.util.RegistrySets;
 import io.papermc.paper.registry.RegistryKey;
 import io.papermc.paper.registry.set.RegistrySet;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -13,6 +15,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 public class Razor extends CustomEnchantment<BlockBreakEvent> {
@@ -59,10 +62,13 @@ public class Razor extends CustomEnchantment<BlockBreakEvent> {
                 && canEnchantItem(item)
                 && Arrays.stream(LEAVES).toList().contains(eventBlock.getType())
         ) {
-            final int leaveAmount = 5 * level - 1;
-            final ItemStack leaves = new ItemStack(eventBlock.getType());
-            leaves.setAmount(leaveAmount);
-            eventBlock.getWorld().dropItem(eventBlock.getLocation(), leaves);
+            final int leaveAmount = 5 * level;
+            final AdjacentBlockFinder breaker = new AdjacentBlockFinder(LEAVES, leaveAmount);
+            List<Location> blocksToBreak = breaker.findConnectedBlocks(eventBlock);
+
+            for (Location loc : blocksToBreak) {
+                loc.getBlock().breakNaturally(item);
+            }
         }
     }
 }
