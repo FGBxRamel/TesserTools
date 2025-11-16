@@ -29,7 +29,15 @@ public class Abholzung extends CustomEnchantment<BlockBreakEvent> {
     private final static Material[] woodTypes = new Material[] {
             Material.ACACIA_LOG, Material.BIRCH_LOG, Material.CHERRY_LOG, Material.DARK_OAK_LOG,
             Material.PALE_OAK_LOG, Material.OAK_LOG, Material.JUNGLE_LOG, Material.MANGROVE_LOG,
-            Material.SPRUCE_LOG, Material.CRIMSON_STEM, Material.WARPED_STEM
+            Material.SPRUCE_LOG, Material.CRIMSON_STEM, Material.WARPED_STEM,
+
+            Material.STRIPPED_ACACIA_LOG, Material.STRIPPED_ACACIA_WOOD, Material.STRIPPED_BIRCH_WOOD,
+            Material.STRIPPED_BIRCH_LOG, Material.STRIPPED_CHERRY_WOOD, Material.STRIPPED_CHERRY_LOG,
+            Material.STRIPPED_BAMBOO_BLOCK, Material.STRIPPED_CRIMSON_HYPHAE, Material.STRIPPED_CRIMSON_STEM,
+            Material.STRIPPED_DARK_OAK_LOG, Material.STRIPPED_DARK_OAK_WOOD, Material.STRIPPED_JUNGLE_LOG,
+            Material.STRIPPED_JUNGLE_WOOD, Material.STRIPPED_MANGROVE_LOG, Material.STRIPPED_MANGROVE_WOOD,
+            Material.STRIPPED_OAK_LOG, Material.STRIPPED_OAK_WOOD, Material.STRIPPED_PALE_OAK_LOG,
+            Material.STRIPPED_PALE_OAK_WOOD, Material.STRIPPED_SPRUCE_LOG, Material.STRIPPED_SPRUCE_WOOD
     };
 
     public Abholzung() {
