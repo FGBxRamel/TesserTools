@@ -68,6 +68,7 @@ public class Debarker extends CustomEnchantment<PlayerInteractEvent> {
         final ItemStack item = player.getInventory().getItemInMainHand();
         final int level = getEnchantmentLevel(item);
         if (level != 0
+            && event.getAction().isRightClick()
             && canEnchantItem(item)
             && Objects.nonNull(event.getClickedBlock())
             && woodTypes.containsKey(event.getClickedBlock().getType())
