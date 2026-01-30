@@ -1,5 +1,5 @@
 name: TesserTools
-version: '2.4.6'
+version: '2.4.7'
 main: de.bydora.tesserTools.TesserTools
 api-version: '1.21'
 author: FGBxRamel
