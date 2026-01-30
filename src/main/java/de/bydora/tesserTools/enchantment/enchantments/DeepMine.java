@@ -22,7 +22,7 @@ public class DeepMine extends CustomEnchantment<BlockBreakEvent> {
 
     private final static String id = "tessertools:deep_mining";
     private final static String displayName = "Tiefenabbau";
-    private final static int maxLevel = 2;
+    private final static int maxLevel = 4;
     private final static int minLevel = 1;
     private final static Material[] enchantableItems = MaterialArrayMerger.merge(
             EquipmentGroups.SHOVELS, EquipmentGroups.PICKAXES);
