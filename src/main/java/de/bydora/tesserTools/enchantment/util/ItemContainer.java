@@ -103,8 +103,12 @@ public class ItemContainer {
         if (removeFromInventory) {
             for (var source : sourceMap.get(material)) {
                 var notRemoved = source.removeItemAnySlot(removeItem);
+                int notRemovedAmount = notRemoved.isEmpty() ? 0 : notRemoved.get(0).getAmount();
+                if (material == Material.WATER_BUCKET || material == Material.LAVA_BUCKET) {
+                    source.addItem(new ItemStack(Material.BUCKET, amount-notRemovedAmount));
+                }
                 if (!notRemoved.isEmpty()) {
-                    removeItem.setAmount(notRemoved.get(0).getAmount());
+                    removeItem.setAmount(notRemovedAmount);
                     sourceMap.get(material).remove(source); // Remove the source as it's empty
                 } else {break;}
             }
@@ -114,6 +118,23 @@ public class ItemContainer {
             amounts.remove(material);
             sourceMap.remove(material);
         }
+    }
+
+    /**
+     * Removes exactly one of a random Material and returns the material
+     * @param removeFromInventory Whether to also remove it from the inventory it's in
+     * @return The removed material. Gives back WATER and LAVA instead of their respective buckets.
+     */
+    public Material removeRandom(boolean removeFromInventory) {
+        Random generator = new Random();
+        // Get random material
+        Material material = (Material) amounts.keySet().toArray()[generator.nextInt()];
+        removeAmount(material, 1, removeFromInventory);
+        return switch (material) {
+            case WATER_BUCKET -> Material.WATER;
+            case LAVA_BUCKET -> Material.LAVA;
+            default -> material;
+        };
     }
 
     /**
@@ -132,8 +153,6 @@ public class ItemContainer {
      * @param material The material to get the amount for
      * @return The amount of the material in the ItemContainer
      */
-    public int getAmount(@NotNull Material material) {
-        return amounts.get(material);
-    }
+    public int getAmount(@NotNull Material material) {return amounts.get(material);}
 
 }

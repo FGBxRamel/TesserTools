@@ -2,6 +2,7 @@ package de.bydora.tesserTools.enchantment.enchantments;
 
 import de.bydora.tesserTools.enchantment.enums.EnchantmentSpaceKeys;
 import de.bydora.tesserTools.enchantment.util.EnchantDef;
+import de.bydora.tesserTools.enchantment.util.ItemContainer;
 import de.bydora.tesserTools.enchantment.util.RegistrySets;
 import io.papermc.paper.registry.RegistryKey;
 import io.papermc.paper.registry.set.RegistrySet;
@@ -13,7 +14,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -70,13 +70,13 @@ public class AreaFill extends CustomEnchantment<PlayerInteractEvent> {
         final var player = event.getPlayer();
         var airBlocks = getAirBlocks(event.getClickedBlock().getRelative(BlockFace.UP),
                 player.getFacing(), level > 1 ? 5 : 3);
-        var availableItems = getAvailableItems(player.getInventory(), fillBlocks, airBlocks.size());
-        if (Objects.isNull(availableItems)) {
+        ItemContainer availableItems = ItemContainer.fromInventory(player.getInventory(), Set.of(fillBlocks));
+        if (availableItems.getTotalAmount() < airBlocks.size()) {
             ResourceBundle l18 = ResourceBundle.getBundle("translations.tools", player.locale());
             player.sendMessage(l18.getString("areaEnchNotEnoughItems"));
             return;
         }
-        placeBlocks(airBlocks, player.getInventory(), availableItems);
+        placeBlocks(airBlocks, availableItems);
     }
 
     @Override
@@ -133,69 +133,19 @@ public class AreaFill extends CustomEnchantment<PlayerInteractEvent> {
     }
 
     /**
-     * Returns a map of available items and their count; null if there are not enough.
-     * @param inventory The inventory of the player
-     * @param allowedMaterials Which materials should be searched for
-     * @param requiredBlockAmount Which amount of blocks (not materials!) is needed
-     * @return Map of available items and their count; null if not enough exist
-     */
-    public static Map<Material, Integer> getAvailableItems(PlayerInventory inventory, Material[] allowedMaterials,
-                                                            int requiredBlockAmount) {
-        int totalAmount = 0; // Total amount of relevant blocks the player has
-        Map<Material, Integer> availableMaterial = new HashMap<>();
-        for (var material : allowedMaterials) {
-            var inventoryItemStacks = inventory.all(material);
-            if (!inventoryItemStacks.isEmpty()) {
-                for (var stack : inventoryItemStacks.values()) {
-                    totalAmount += stack.getAmount();
-                    int newAmount = Objects.requireNonNullElse(availableMaterial.get(stack.getType()), 0)
-                            + stack.getAmount();
-                    availableMaterial.put(stack.getType(), newAmount);
-                }
-            }
-        }
-        if (totalAmount < requiredBlockAmount) {
-            return null;
-        }
-        return availableMaterial;
-    }
-
-    /**
      * (Re)places the given blocks with a random Material from the given Materials.
      * Attention: This does not yield any resources, the blocks will be overwritten!
      * @param blocks A list of blocks to (re)place
-     * @param inventory The inventory of the player
      * @param availableMaterial A map of the available material and their count
      */
-    public static void placeBlocks(List<Block> blocks, PlayerInventory inventory,
-                                    Map<Material, Integer> availableMaterial) {
-        var items = availableMaterial.keySet().toArray();
+    public static void placeBlocks(List<Block> blocks, ItemContainer availableMaterial) {
+        if (blocks.size() > availableMaterial.getTotalAmount()) {
+            throw new IllegalArgumentException("Not enough items in inventory!");
+        }
         for (var block : blocks) {
-            // Get random item, check if it is the last one, if yes remove it, if not decrement it
-            Random generator = new Random();
-            Material randomItem = (Material) items[generator.nextInt(items.length)];
-            int remainingAmount = availableMaterial.get(randomItem);
-            if (remainingAmount == 1) {
-                availableMaterial.remove(randomItem);
-                items = availableMaterial.keySet().toArray();
-            } else {
-                availableMaterial.put(randomItem, remainingAmount - 1);
-            }
-
-            if (randomItem == Material.WATER_BUCKET) {
-                block.setType(Material.WATER);
-                inventory.removeItemAnySlot(new ItemStack(Material.WATER_BUCKET, 1));
-                inventory.addItem(new ItemStack(Material.BUCKET, 1));
-
-            } else if (randomItem == Material.LAVA_BUCKET) {
-                block.setType(Material.LAVA);
-                inventory.removeItemAnySlot(new ItemStack(Material.LAVA_BUCKET, 1));
-                inventory.addItem(new ItemStack(Material.BUCKET, 1));
-            } else {
-                ItemStack removeStack = new ItemStack(randomItem, 1);
-                block.setType(randomItem);
-                inventory.removeItemAnySlot(removeStack);
-            }
+            // Remove random material and set the block to that material
+            Material randomMaterial = availableMaterial.removeRandom(true);
+            block.setType(randomMaterial);
         }
     }
 

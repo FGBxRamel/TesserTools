@@ -2,6 +2,7 @@ package de.bydora.tesserTools.enchantment.enchantments;
 
 import de.bydora.tesserTools.enchantment.enums.EnchantmentSpaceKeys;
 import de.bydora.tesserTools.enchantment.util.EnchantDef;
+import de.bydora.tesserTools.enchantment.util.ItemContainer;
 import de.bydora.tesserTools.enchantment.util.RegistrySets;
 import io.papermc.paper.registry.RegistryKey;
 import io.papermc.paper.registry.set.RegistrySet;
@@ -91,12 +92,12 @@ public class SpaceFill extends CustomEnchantment<PlayerInteractEvent>{
 
     private void runAreaFill(int level, Player player, Block clickedBlock) {
         var airBlocks = getAirBlocks(clickedBlock, player.getFacing(), level > 2 ? 5 : 3);
-        var availableItems = getAvailableItems(player.getInventory(), fillBlocks, airBlocks.size());
-        if (Objects.isNull(availableItems)) {
+        ItemContainer availableItems = ItemContainer.fromInventory(player.getInventory(), Set.of(fillBlocks));
+        if (availableItems.getTotalAmount() < airBlocks.size()) {
             ResourceBundle l18 = ResourceBundle.getBundle("translations.tools", player.locale());
             player.sendMessage(l18.getString("areaEnchNotEnoughItems"));
             return;
         }
-        placeBlocks(airBlocks, player.getInventory(), availableItems);
+        placeBlocks(airBlocks, availableItems);
     }
 }

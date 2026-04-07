@@ -3,6 +3,7 @@ package de.bydora.tesserTools.enchantment.enchantments;
 import de.bydora.tesserTools.enchantment.enums.EnchantmentSpaceKeys;
 import de.bydora.tesserTools.enchantment.util.EnchantDef;
 import de.bydora.tesserTools.enchantment.util.EquipmentGroups;
+import de.bydora.tesserTools.enchantment.util.ItemContainer;
 import de.bydora.tesserTools.enchantment.util.RegistrySets;
 import io.papermc.paper.registry.RegistryKey;
 import io.papermc.paper.registry.set.RegistrySet;
@@ -71,16 +72,16 @@ public class Pathing extends CustomEnchantment<PlayerInteractEvent> {
         int level = getEnchantmentLevel(event.getItem());
         if (level > 3) { level = 3; } // Limit level at 3 as we only defined blocks for 3 levels
 
-        var availableMaterial = AreaFill.getAvailableItems(event.getPlayer().getInventory(), levelBlocks.get(level - 1),
-        9);
-        if (Objects.isNull(availableMaterial)) {
+        var availableMaterial = ItemContainer.fromInventory(event.getPlayer().getInventory(),
+                Set.of(levelBlocks.get(level - 1)));
+        if (availableMaterial.getTotalAmount() < 9) {
             ResourceBundle l18 = ResourceBundle.getBundle("translations.tools", event.getPlayer().locale());
             event.getPlayer().sendMessage(l18.getString("pathingNotEnoughItems"));
             return;
         }
 
         var blocks = areaFinder(event.getClickedBlock().getLocation(), level);
-        AreaFill.placeBlocks(blocks.stream().toList(), event.getPlayer().getInventory(), availableMaterial);
+        AreaFill.placeBlocks(blocks.stream().toList(), availableMaterial);
     }
 
     /**
