@@ -1,5 +1,6 @@
 package de.bydora.tesserTools.enchantment.enchantments;
 
+import de.bydora.tesserTools.TesserTools;
 import de.bydora.tesserTools.enchantment.enums.EnchantmentSpaceKeys;
 import de.bydora.tesserTools.enchantment.util.EnchantDef;
 import de.bydora.tesserTools.enchantment.util.ItemContainer;
@@ -17,6 +18,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 public class AreaFill extends CustomEnchantment<PlayerInteractEvent> {
 
@@ -71,6 +73,7 @@ public class AreaFill extends CustomEnchantment<PlayerInteractEvent> {
         var airBlocks = getAirBlocks(event.getClickedBlock().getRelative(BlockFace.UP),
                 player.getFacing(), level > 1 ? 5 : 3);
         ItemContainer availableItems = ItemContainer.fromInventory(player.getInventory(), Set.of(fillBlocks));
+        player.sendMessage(Integer.toString(availableItems.getTotalAmount()));
         if (availableItems.getTotalAmount() < airBlocks.size()) {
             ResourceBundle l18 = ResourceBundle.getBundle("translations.tools", player.locale());
             player.sendMessage(l18.getString("areaEnchNotEnoughItems"));
@@ -142,6 +145,7 @@ public class AreaFill extends CustomEnchantment<PlayerInteractEvent> {
         if (blocks.size() > availableMaterial.getTotalAmount()) {
             throw new IllegalArgumentException("Not enough items in inventory!");
         }
+        Logger log = TesserTools.getPlugin(TesserTools.class).getLogger();
         for (var block : blocks) {
             // Remove random material and set the block to that material
             Material randomMaterial = availableMaterial.removeRandom(true);

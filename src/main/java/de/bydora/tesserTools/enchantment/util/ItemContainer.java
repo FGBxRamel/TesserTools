@@ -1,5 +1,6 @@
 package de.bydora.tesserTools.enchantment.util;
 
+import de.bydora.tesserTools.TesserTools;
 import org.bukkit.Material;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.inventory.Inventory;
@@ -7,11 +8,13 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 public class ItemContainer {
 
     private final Map<Material, List<Inventory>> sourceMap = new HashMap<>();
     private final Map<Material, Integer> amounts = new HashMap<>();
+    private static final Logger log = TesserTools.getPlugin(TesserTools.class).getLogger();
 
     public ItemContainer() {}
 
@@ -31,7 +34,7 @@ public class ItemContainer {
      * @return The filled ItemContainer
      */
     public static @NotNull ItemContainer fromInventory(@NotNull Inventory inventory, Set<Material> allowedMaterial) {
-        var checkAllowed = Objects.isNull(allowedMaterial) || allowedMaterial.isEmpty();
+        var shouldCheckAllowed = !(Objects.isNull(allowedMaterial) || allowedMaterial.isEmpty());
         var container = new ItemContainer();
         for (var item: inventory.getContents()) {
             if (Objects.isNull(item)) {continue;}
@@ -40,13 +43,15 @@ public class ItemContainer {
                 var boxInventory = box.getInventory();
                 for (var boxItem : boxInventory) {
                     if (!Objects.isNull(boxItem)
-                            && (checkAllowed && allowedMaterial.contains(boxItem.getType()))) {
+                            && (shouldCheckAllowed && allowedMaterial.contains(boxItem.getType()))) {
                         container.addMaterial(boxItem.getType(), boxItem.getAmount(), boxInventory);
                     }
                 }
-            } else if ((checkAllowed && allowedMaterial.contains(item.getType()))) {
-                container.addMaterial(item.getType(), item.getAmount(), inventory);
-            }
+            } else if (shouldCheckAllowed) {
+                if (allowedMaterial.contains(item.getType())) {
+                    container.addMaterial(item.getType(), item.getAmount(), inventory);
+                }
+            } else {container.addMaterial(item.getType(), item.getAmount(), inventory);}
         }
         return container;
     }
@@ -128,7 +133,8 @@ public class ItemContainer {
     public Material removeRandom(boolean removeFromInventory) {
         Random generator = new Random();
         // Get random material
-        Material material = (Material) amounts.keySet().toArray()[generator.nextInt()];
+        Material[] materials = amounts.keySet().toArray(new Material[0]);
+        Material material = materials[generator.nextInt(materials.length)];
         removeAmount(material, 1, removeFromInventory);
         return switch (material) {
             case WATER_BUCKET -> Material.WATER;
