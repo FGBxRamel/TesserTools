@@ -35,7 +35,13 @@ public class SpaceFill extends CustomEnchantment<PlayerInteractEvent>{
             Material.CALCITE, Material.BASALT, Material.TERRACOTTA, Material.DEEPSLATE, Material.COBBLED_DEEPSLATE,
             Material.NETHERRACK, Material.BLACKSTONE, Material.SOUL_SAND, Material.END_STONE, Material.SOUL_SOIL,
             Material.CRIMSON_NYLIUM, Material.WARPED_NYLIUM, Material.PODZOL, Material.COARSE_DIRT, Material.MYCELIUM,
-            Material.ROOTED_DIRT, Material.MUD, Material.CLAY, Material.SNOW_BLOCK, Material.WATER_BUCKET
+            Material.ROOTED_DIRT, Material.MUD, Material.CLAY, Material.SNOW_BLOCK, Material.WATER_BUCKET,
+
+            Material.COAL_ORE, Material.DEEPSLATE_COAL_ORE, Material.COPPER_ORE, Material.DEEPSLATE_COPPER_ORE,
+            Material.LAPIS_ORE, Material.DEEPSLATE_LAPIS_ORE, Material.IRON_ORE, Material.DEEPSLATE_IRON_ORE,
+            Material.GOLD_ORE, Material.DEEPSLATE_GOLD_ORE, Material.REDSTONE_ORE, Material.DEEPSLATE_REDSTONE_ORE,
+            Material.DIAMOND_ORE, Material.DEEPSLATE_DIAMOND_ORE, Material.EMERALD_ORE, Material.DEEPSLATE_EMERALD_ORE,
+            Material.NETHER_QUARTZ_ORE, Material.NETHER_GOLD_ORE, Material.ANCIENT_DEBRIS
     };
 
     public SpaceFill() {
