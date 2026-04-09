@@ -40,7 +40,7 @@ public class ItemContainer {
         var container = new ItemContainer();
         for (var item: inventory.getContents()) {
             if (Objects.isNull(item)) {continue;}
-            if (item.getType() == Material.SHULKER_BOX) {
+            if (item.getType().name().endsWith("SHULKER_BOX")) {
                 var stateMeta = (BlockStateMeta) item.getItemMeta();
                 var box = (ShulkerBox) stateMeta.getBlockState();
                 var boxInventory = box.getInventory();
