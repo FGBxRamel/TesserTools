@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
+@SuppressWarnings("unused")
 public class ItemContainer {
 
     private final Map<Material, List<ItemSource>> sourceMap = new HashMap<>();
