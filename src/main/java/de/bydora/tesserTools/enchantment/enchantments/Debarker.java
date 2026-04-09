@@ -8,14 +8,19 @@ import de.bydora.tesserTools.enchantment.util.RegistrySets;
 import io.papermc.paper.registry.RegistryKey;
 import io.papermc.paper.registry.set.RegistrySet;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.data.Orientable;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 import static java.util.Map.entry;
 
@@ -81,7 +86,10 @@ public class Debarker extends CustomEnchantment<PlayerInteractEvent> {
 
             for (Location loc : blocksToStrip) {
                 var log = loc.getBlock();
-                log.setType(woodTypes.get(log.getType()));
+                var oldData = (Orientable) log.getBlockData();
+                var newData = (Orientable) Bukkit.createBlockData(woodTypes.get(log.getType()));
+                newData.setAxis(oldData.getAxis());
+                log.setBlockData(newData, false);
             }
         }
     }
