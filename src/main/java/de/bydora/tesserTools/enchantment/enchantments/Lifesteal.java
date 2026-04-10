@@ -4,6 +4,7 @@ import de.bydora.tesserTools.TesserTools;
 import de.bydora.tesserTools.enchantment.enums.EnchantmentSpaceKeys;
 import de.bydora.tesserTools.enchantment.util.EnchantDef;
 import de.bydora.tesserTools.enchantment.util.EquipmentGroups;
+import de.bydora.tesserTools.enchantment.util.MaterialArrayMerger;
 import de.bydora.tesserTools.enchantment.util.RegistrySets;
 import io.papermc.paper.registry.RegistryKey;
 import io.papermc.paper.registry.set.RegistrySet;
@@ -24,7 +25,11 @@ public class Lifesteal extends CustomEnchantment<EntityDamageByEntityEvent> {
     private final static String displayName = "Lebensklauer";
     private final static int maxLevel = 1;
     private final static int minLevel = 1;
-    private final static Material[] enchantableItems = EquipmentGroups.SWORDS;
+    private final static Material[] enchantableItems = MaterialArrayMerger.merge(
+            MaterialArrayMerger.merge(EquipmentGroups.SWORDS,
+                    EquipmentGroups.SPEARS),
+            new Material[] {Material.CROSSBOW, Material.BOW, Material.MACE}
+            );
 
     public Lifesteal() {
         super(id, maxLevel, displayName, minLevel, enchantableItems, EnchantmentSpaceKeys.ENCH_LIFESTEAL.getKey());

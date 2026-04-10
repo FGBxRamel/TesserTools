@@ -49,6 +49,16 @@ public record EquipmentGroups() {
             Material.NETHERITE_SWORD
     };
 
+    public static final Material[] SPEARS = new Material[] {
+            Material.STONE_SPEAR,
+            Material.COPPER_SPEAR,
+            Material.GOLDEN_SPEAR,
+            Material.IRON_SPEAR,
+            Material.WOODEN_SPEAR,
+            Material.DIAMOND_SPEAR,
+            Material.NETHERITE_SPEAR
+    };
+
     public static final Material[] HELMETS = new Material[] {
             Material.DIAMOND_HELMET,
             Material.GOLDEN_HELMET,
