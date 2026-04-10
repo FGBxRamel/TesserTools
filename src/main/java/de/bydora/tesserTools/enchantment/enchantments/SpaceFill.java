@@ -2,6 +2,7 @@ package de.bydora.tesserTools.enchantment.enchantments;
 
 import de.bydora.tesserTools.enchantment.enums.EnchantmentSpaceKeys;
 import de.bydora.tesserTools.enchantment.util.EnchantDef;
+import de.bydora.tesserTools.enchantment.util.ItemContainer;
 import de.bydora.tesserTools.enchantment.util.RegistrySets;
 import io.papermc.paper.registry.RegistryKey;
 import io.papermc.paper.registry.set.RegistrySet;
@@ -34,7 +35,13 @@ public class SpaceFill extends CustomEnchantment<PlayerInteractEvent>{
             Material.CALCITE, Material.BASALT, Material.TERRACOTTA, Material.DEEPSLATE, Material.COBBLED_DEEPSLATE,
             Material.NETHERRACK, Material.BLACKSTONE, Material.SOUL_SAND, Material.END_STONE, Material.SOUL_SOIL,
             Material.CRIMSON_NYLIUM, Material.WARPED_NYLIUM, Material.PODZOL, Material.COARSE_DIRT, Material.MYCELIUM,
-            Material.ROOTED_DIRT, Material.MUD, Material.CLAY, Material.SNOW_BLOCK, Material.WATER_BUCKET
+            Material.ROOTED_DIRT, Material.MUD, Material.CLAY, Material.SNOW_BLOCK, Material.WATER_BUCKET,
+
+            Material.COAL_ORE, Material.DEEPSLATE_COAL_ORE, Material.COPPER_ORE, Material.DEEPSLATE_COPPER_ORE,
+            Material.LAPIS_ORE, Material.DEEPSLATE_LAPIS_ORE, Material.IRON_ORE, Material.DEEPSLATE_IRON_ORE,
+            Material.GOLD_ORE, Material.DEEPSLATE_GOLD_ORE, Material.REDSTONE_ORE, Material.DEEPSLATE_REDSTONE_ORE,
+            Material.DIAMOND_ORE, Material.DEEPSLATE_DIAMOND_ORE, Material.EMERALD_ORE, Material.DEEPSLATE_EMERALD_ORE,
+            Material.NETHER_QUARTZ_ORE, Material.NETHER_GOLD_ORE, Material.ANCIENT_DEBRIS
     };
 
     public SpaceFill() {
@@ -91,12 +98,12 @@ public class SpaceFill extends CustomEnchantment<PlayerInteractEvent>{
 
     private void runAreaFill(int level, Player player, Block clickedBlock) {
         var airBlocks = getAirBlocks(clickedBlock, player.getFacing(), level > 2 ? 5 : 3);
-        var availableItems = getAvailableItems(player.getInventory(), fillBlocks, airBlocks.size());
-        if (Objects.isNull(availableItems)) {
+        ItemContainer availableItems = ItemContainer.fromInventory(player.getInventory(), Set.of(fillBlocks));
+        if (availableItems.getTotalAmount() < airBlocks.size()) {
             ResourceBundle l18 = ResourceBundle.getBundle("translations.tools", player.locale());
             player.sendMessage(l18.getString("areaEnchNotEnoughItems"));
             return;
         }
-        placeBlocks(airBlocks, player.getInventory(), availableItems);
+        placeBlocks(airBlocks, availableItems);
     }
 }

@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'de.bydora'
-version = '2.4.7'
+version = '2.5.5'
 
 repositories {
     mavenCentral()
@@ -54,7 +54,7 @@ tasks {
     runServer {
         //noinspection GroovyMissingReturnStatement
         downloadPlugins {
-            url("https://download.luckperms.net/1606/bukkit/loader/LuckPerms-Bukkit-5.5.17.jar")
+            url("https://download.luckperms.net/1631/bukkit/loader/LuckPerms-Bukkit-5.5.42.jar")
         }
         // Configure the Minecraft version for our task.
         // This is the only required configuration besides applying the plugin.
