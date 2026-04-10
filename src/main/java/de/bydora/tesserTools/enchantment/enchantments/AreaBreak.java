@@ -34,7 +34,7 @@ public class AreaBreak extends CustomEnchantment<BlockBreakEvent> {
             Material.GRASS_BLOCK, Material.MUD, Material.COBBLESTONE, Material.MOSSY_COBBLESTONE,
             Material.RED_SAND, Material.SANDSTONE, Material.RED_SANDSTONE,
             Material.COBBLED_DEEPSLATE, Material.CRIMSON_STEM, Material.WARPED_STEM, Material.ICE, Material.BLUE_ICE,
-            Material.PACKED_ICE, Material.SMOOTH_BASALT,
+            Material.PACKED_ICE, Material.SMOOTH_BASALT, Material.DRIPSTONE_BLOCK,
 
             Material.BLACK_CONCRETE, Material.CYAN_CONCRETE, Material.BLUE_CONCRETE, Material.LIGHT_BLUE_CONCRETE,
             Material.GRAY_CONCRETE, Material.BROWN_CONCRETE, Material.LIGHT_GRAY_CONCRETE, Material.GREEN_CONCRETE,
@@ -44,7 +44,13 @@ public class AreaBreak extends CustomEnchantment<BlockBreakEvent> {
             Material.TERRACOTTA, Material.BLACK_TERRACOTTA, Material.BLUE_TERRACOTTA, Material.BROWN_TERRACOTTA,
             Material.CYAN_TERRACOTTA, Material.GRAY_TERRACOTTA, Material.LIGHT_GRAY_TERRACOTTA,
             Material.LIGHT_BLUE_TERRACOTTA, Material.GREEN_TERRACOTTA, Material.LIME_TERRACOTTA,
-            Material.RED_TERRACOTTA, Material.WHITE_TERRACOTTA, Material.YELLOW_TERRACOTTA, Material.PURPLE_TERRACOTTA
+            Material.RED_TERRACOTTA, Material.WHITE_TERRACOTTA, Material.YELLOW_TERRACOTTA, Material.PURPLE_TERRACOTTA,
+
+            Material.COAL_ORE, Material.DEEPSLATE_COAL_ORE, Material.COPPER_ORE, Material.DEEPSLATE_COPPER_ORE,
+            Material.LAPIS_ORE, Material.DEEPSLATE_LAPIS_ORE, Material.IRON_ORE, Material.DEEPSLATE_IRON_ORE,
+            Material.GOLD_ORE, Material.DEEPSLATE_GOLD_ORE, Material.REDSTONE_ORE, Material.DEEPSLATE_REDSTONE_ORE,
+            Material.DIAMOND_ORE, Material.DEEPSLATE_DIAMOND_ORE, Material.EMERALD_ORE, Material.DEEPSLATE_EMERALD_ORE,
+            Material.NETHER_QUARTZ_ORE, Material.NETHER_GOLD_ORE, Material.ANCIENT_DEBRIS
     };
 
     public AreaBreak() {
