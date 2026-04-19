@@ -80,6 +80,7 @@ public final class TesserToolsBootstrap implements PluginBootstrap {
                 FastTravel.def(),
                 Razor.def(),
                 Debarker.def(),
+                Decapitater.def(),
         };
     }
 }

@@ -47,6 +47,7 @@ public final class TesserTools extends JavaPlugin {
             new FastTravel(),
             new Razor(),
             new Debarker(),
+            new Decapitater(),
     };
 
     @Override
