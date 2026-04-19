@@ -106,6 +106,7 @@ public class Decapitater extends CustomEnchantment<EntityDeathEvent> {
             headMeta.setPlayerProfile(headProfile);
             final Component name = text()
                     .content(getEntityName(entityType))
+                    .append(text(" Head"))
                     .build();
             headMeta.customName(name);
             head.setItemMeta(headMeta);
