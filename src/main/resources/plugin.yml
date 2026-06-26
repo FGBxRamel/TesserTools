@@ -1,7 +1,7 @@
 name: TesserTools
 version: '2.6.2'
 main: de.bydora.tesserTools.TesserTools
-api-version: '1.21'
+api-version: '26.2'
 author: FGBxRamel
 description: A plugin which adds some tools for Tesserania.
 contributors: [ Blitu, Jupidui_ZVL ]
